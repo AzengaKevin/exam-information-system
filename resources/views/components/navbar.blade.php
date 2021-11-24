@@ -16,7 +16,7 @@
             </ul>
             <div class="hstack gap-3">
                 @auth
-                <ul class="mb-2 navbar-nav ms-auto mb-lg-0">
+                <ul class="mb-2 navbar-nav ms-md-auto mb-lg-0">
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">

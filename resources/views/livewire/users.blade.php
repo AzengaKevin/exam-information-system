@@ -28,7 +28,7 @@
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                            <button wire:click="editUser({{ $user }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
@@ -65,4 +65,7 @@
             </tfoot>
         </table>
     </div>
+
+    <x-modals.users.upsert :userId="$userId" />
+    
 </div>
