@@ -33,25 +33,28 @@ class FortifyServiceProvider extends ServiceProvider
     {
 
         // Authentication view
-        Fortify::loginView(fn() => view('auth.login'));
+        Fortify::loginView('auth.login');
 
         // Registration  View
-        Fortify::registerView(fn() => view('auth.register'));
+        Fortify::registerView('auth.register');
 
         // Forgort Password
-        Fortify::requestPasswordResetLinkView(fn() => view('auth.forgot-password'));
+        Fortify::requestPasswordResetLinkView('auth.forgot-password');
 
         // Reset Password View
-        Fortify::resetPasswordView(fn(Request $request) =>view('auth.reset-password', [
-            'token' => $request->route('token'),
-            'email' => $request->get('email'),
-        ]));
+        Fortify::resetPasswordView(function(Request $request){
+            return view('auth.reset-password', [
+                'token' => $request->route('token'),
+                'email' => $request->get('email'),
+            ]);
+        });
 
         // Verify Email View
-        Fortify::verifyEmailView(fn() => view('auth.verify-email'));
+        Fortify::verifyEmailView('auth.verify-email');
 
         // Confirm Password View
-        Fortify::confirmPasswordView(fn() => view('auth.confirm-password'));
+        Fortify::confirmPasswordView('auth.confirm-password');
+        
         Fortify::createUsersUsing(CreateNewUser::class);
         Fortify::updateUserProfileInformationUsing(UpdateUserProfileInformation::class);
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
