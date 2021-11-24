@@ -2,30 +2,7 @@
 
 @section('body')
 <header class="fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary bg-gradient">
-        <div class="container">
-            <a class="navbar-brand fs-4" href="{{ route('welcome') }}">
-                <span class="d-none d-md-block">{{ config('app.name') }}</span>
-                <span class="d-inline d-md-none">{{ config('app.short_name') }}</span>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
-                data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
-                aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        <a class="nav-link active" aria-current="page" href="#">Home</a>
-                    </li>
-                </ul>
-                <div class="hstack gap-3">
-                    <a href="#" class="btn btn-outline-light">Login</a>
-                    <a href="#" class="btn btn-outline-light">Register</a>
-                </div>
-            </div>
-        </div>
-    </nav>
+    <x-navbar />
 </header>
 <main>
     <section class="">
@@ -37,21 +14,30 @@
                         for primary schools. Ranking, Grading, Pictorial Representaion and what have you.</p>
                     <a href="#" class="btn btn-lg btn-primary">Get Started</a>
                 </div>
-                
-                @guest
-                <form class="col-md-5" action="">
-                    <div class="card shadow">
 
+                @guest
+                <form class="col-md-5" action="{{ route('login') }}" method="POST">
+                    @csrf
+                    <div class="card shadow">
                         <div class="card-body p-3 p-md-5">
                             <div class="form-floating">
-                                <input type="email" name="email" id="email" class="form-control"
-                                    placeholder="Email Address">
+                                <input type="email" name="email" id="email"
+                                    class="form-control @error('email') is-invalid @enderror"
+                                    placeholder="Email Address" value="{{ old('email') }}" autocomplete="email"
+                                    autofocus>
                                 <label for="email">Email Address</label>
+                                @error('email')
+                                <div class="invalid-feedback"><strong>{{ $message }}</strong></div>
+                                @enderror
                             </div>
                             <div class="form-floating mt-3">
-                                <input type="password" name="password" id="password" class="form-control"
-                                    placeholder="Password">
+                                <input type="password" name="password" id="password"
+                                    class="form-control @error('password') is-invalid @enderror" placeholder="Password"
+                                    autocomplete="new-password">
                                 <label for="email">Password</label>
+                                @error('password')
+                                <div class="invalid-feedback"><strong>{{ $message }}</strong></div>
+                                @enderror
                             </div>
                             <div class="mt-3">
                                 <div class="form-check">
@@ -75,3 +61,7 @@
     </section>
 </main>
 @endsection
+
+@push('modals')
+<x-modals.logout />
+@endpush
