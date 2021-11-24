@@ -18,7 +18,7 @@
                 @auth
                 <ul class="mb-2 navbar-nav ms-auto mb-lg-0">
                     <li class="nav-item dropdown">
-                        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
                             aria-expanded="false">
                             <div class="d-inline-flex align-items-center">
                                 <span class="fs-4"><i class="fa fa-user"></i></span>

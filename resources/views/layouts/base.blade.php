@@ -12,6 +12,7 @@
     @endif
     <link rel="stylesheet" href="{{ mix('css/app.css') }}">
     @stack('styles')
+    <livewire:styles />
 </head>
 
 <body class="antialiased">
@@ -20,6 +21,7 @@
 
     @stack('modals')
     <script src="{{ mix('js/app.js') }}"></script>
+    <livewire:scripts />
     @stack('scripts')
 </body>
 
