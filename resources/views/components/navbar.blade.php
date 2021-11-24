@@ -16,8 +16,47 @@
             </ul>
             <div class="hstack gap-3">
                 @auth
-                <button type="button" data-bs-toggle="modal" data-bs-target="#logout-modal"
-                    class="btn btn-outline-danger">Logout</button>
+                <ul class="mb-2 navbar-nav ms-auto mb-lg-0">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
+                            aria-expanded="false">
+                            <div class="d-inline-flex align-items-center">
+                                <span class="fs-4"><i class="fa fa-user"></i></span>
+                                <span class="ms-2">{{ Auth::user()->name }}</span>
+                            </div>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                            <li>
+                                <a class="dropdown-item text-muted" href="{{ route('home') }}">
+                                    <span><i class="fa fa-home"></i></span>
+                                    <span class="ms-2">Homepage</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-muted" href="{{ route('dashboard') }}">
+                                    <span><i class="fa fa-tachometer-alt"></i></span>
+                                    <span class="ms-2">Dashboard</span>
+                                </a>
+                            </li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-muted" href="#">
+                                    <span><i class="fa fa-user"></i></span>
+                                    <span class="ms-2">My Profile</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item text-muted" href="#" data-bs-toggle="modal"
+                                    data-bs-target="#logout-modal">
+                                    <span><i class="fa fa-sign-out-alt"></i></span>
+                                    <span class="ms-2">Logout</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
                 @else
                 <a href="{{ route('login') }}" class="btn btn-outline-light">Login</a>
                 <a href="#" class="btn btn-outline-light">Register</a>
