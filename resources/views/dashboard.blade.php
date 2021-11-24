@@ -5,11 +5,11 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">Admin Dashboard</h1>
+    <h1 class="h4 fw-bold text-muted">Dashboard</h1>
 </div>
 <hr>
 <div class="row g-3">
-    <a href="#" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
+    <a href="{{ route('users.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
         <div class="bg-white shadow-sm card h-100 border-light">
             <div class="card-body">
                 <div class="p-0 card-text">
