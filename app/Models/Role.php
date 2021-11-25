@@ -20,4 +20,9 @@ class Role extends Model
         $this->attributes['slug'] = Str::slug($value);
         
     }
+
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class);
+    }
 }
