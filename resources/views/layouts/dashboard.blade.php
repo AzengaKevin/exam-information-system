@@ -49,7 +49,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white-50" href="#">
+                <a class="nav-link {{ request()->routeIs('levels.index') ? 'text-white' : 'text-white-50' }}" href="{{route('levels.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-layer-group"></i></span>
                         <span>Levels</span>
@@ -57,7 +57,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white-50" href="#">
+                <a class="nav-link {{request()->routeIs('streams.index') ? 'text-white':'text-white-50' }}" href="{{route('streams.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-layer-group"></i></span>
                         <span>Streams</span>
