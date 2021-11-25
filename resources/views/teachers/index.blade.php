@@ -6,7 +6,7 @@
 
 <div class="d-flex justify-content-between">
     <h1 class="h4 fw-bold text-muted">Teachers</h1>
-    <button class="btn btn-outline-primary hstack gap-2 align-items-center">
+    <button data-bs-toggle="modal" data-bs-target="#upsert-teacher-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Teacher</span>
     </button>

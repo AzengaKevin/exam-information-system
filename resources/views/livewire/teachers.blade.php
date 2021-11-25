@@ -65,4 +65,6 @@
         </table>
     </div>
 
+    <x-modals.teachers.upsert :teacherId="$teacherId" :employers="$employers" />
+
 </div>

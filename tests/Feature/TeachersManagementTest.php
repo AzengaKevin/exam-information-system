@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\Teachers;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Teacher;
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class TeachersManagementTest extends TestCase
 {
@@ -49,5 +51,37 @@ class TeachersManagementTest extends TestCase
 
         $response->assertSeeLivewire('teachers');
         
+    }
+
+    /** @group teachers */
+    public function testAuthorizedUserCanAddATeacher()
+    {
+        $this->withoutExceptionHandling();
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'employer' => $this->faker->randomElement(Teacher::employerOptions()),
+            'tsc_number' => $this->faker->numberBetween(123456, 999999),
+        ];
+
+        Livewire::test(Teachers::class)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('employer', $payload['employer'])
+            ->set('tsc_number', $payload['tsc_number'])
+            ->call('addTeacher');
+
+        $teacher = Teacher::first();
+
+        $this->assertNotNull($teacher);
+
+        $this->assertEquals($payload['employer'], $teacher->employer);
+        $this->assertEquals($payload['tsc_number'], $teacher->tsc_number);
+
+        $this->assertNotNull($teacher->auth);
+
+        $this->assertEquals($payload['name'], $teacher->auth->name);
+        $this->assertEquals($payload['email'], $teacher->auth->email);
     }
 }

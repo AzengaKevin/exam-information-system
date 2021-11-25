@@ -10,7 +10,8 @@ class Teacher extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employer'
+        'employer',
+        'tsc_number'
     ];
 
     public static function employerOptions()
