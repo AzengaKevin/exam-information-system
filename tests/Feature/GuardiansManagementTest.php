@@ -83,6 +83,44 @@ class GuardiansManagementTest extends TestCase
         $this->assertEquals($payload['name'], $guardian->auth->name);
         $this->assertEquals($payload['email'], $guardian->auth->email);
 
+    }
+
+    /** @group guardians */
+    public function testAuthorizedUsersCanUpdateAGuardian()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Guardian */
+        $guardian = Guardian::factory()->create();
+
+        $guardian->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'location' => $this->faker->streetAddress(),
+            'profession' => $this->faker->company()
+        ];
+
+        Livewire::test(Guardians::class)
+            ->call('editGuardian', $guardian)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('profession', $payload['profession'])
+            ->set('location', $payload['location'])
+            ->call('updateGuardian');
+
+        $this->assertEquals($payload['profession'], $guardian->fresh()->profession);
+        $this->assertEquals($payload['location'], $guardian->fresh()->location);
+
+        $this->assertNotNull($guardian->fresh()->auth);
+
+        $this->assertEquals($payload['name'], $guardian->fresh()->auth->name);
+        $this->assertEquals($payload['email'], $guardian->fresh()->auth->email);
         
     }
 }

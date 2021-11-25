@@ -22,7 +22,6 @@ class GuardianPersistenceTest extends TestCase
         /** @var Guardian */
         $guardian = Guardian::create($payload);
 
-
         $guardian->auth()->create([
             'name' => $name = $this->faker->name(),
             'email' => $email = $this->faker->safeEmail(),

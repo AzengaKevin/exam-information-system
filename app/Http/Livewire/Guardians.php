@@ -83,7 +83,6 @@ class Guardians extends Component
             DB::rollBack();
 
             Log::error($exception->getMessage(), [
-                'guardian-id' => $this->guardianId,
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
 
@@ -92,5 +91,62 @@ class Guardians extends Component
             $this->emit('hide-upsert-guardian-modal');
         }
         
+    }
+
+    public function editGuardian(Guardian $guardian)
+    {
+        
+        $this->guardianId = $guardian->id;
+        $this->userId = $guardian->auth->id;
+
+        $this->name = $guardian->auth->name;
+        $this->email = $guardian->auth->email;
+
+        $this->profession = $guardian->profession;
+        $this->location = $guardian->location;
+
+        $this->emit('show-upsert-guardian-modal');
+
+    }
+
+    public function updateGuardian()
+    {
+        $data = $this->validate();
+
+        try {
+
+            DB::beginTransaction();
+
+            /** @var Guardian */
+            $guardian = Guardian::findOrFail($this->guardianId);
+
+            if($guardian->update($data)){
+                
+                if($guardian->auth->update($data)){
+
+                    DB::commit();
+
+                    $this->reset(['guardianId', 'userId', 'name', 'email', 'profession', 'location']);
+
+                    session()->flash('status', 'A guardian has successfully been updated');
+
+                    $this->emit('hide-upsert-guardian-modal');
+
+                }
+            }
+
+        } catch (\Exception $exception) {
+            
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'guardian-id' => $this->guardianId,
+                'action' => __CLASS__ . '@' . __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred check the logs');
+
+            $this->emit('hide-upsert-guardian-modal');
+        }
     }
 }
