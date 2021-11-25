@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Guardian;
 use App\Models\Teacher;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::enforceMorphMap([
             'teacher' => Teacher::class,
+            'guardian' => Guardian::class
         ]);
     }
 }
