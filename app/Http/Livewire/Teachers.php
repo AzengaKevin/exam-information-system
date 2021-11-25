@@ -95,7 +95,67 @@ class Teachers extends Component
             session()->flash('error', 'A fatal error occurred check the logs');
 
         }
+        
+    }
 
+    public function editTeacher(Teacher $teacher)
+    {
+
+        $this->teacherId = $teacher->id;
+        $this->userId = $teacher->auth->id;
+
+        $this->name = $teacher->auth->name;
+        $this->email = $teacher->auth->email;
+
+        $this->employer = $teacher->employer;
+        $this->tsc_number = $teacher->tsc_number;
+
+        $this->emit('show-upsert-teacher-modal');
+        
+    }
+
+    public function updateTeacher()
+    {
+        $data = $this->validate();
+
+        try {
+
+            /** @var Teacher */
+            $teacher = Teacher::findOrFail($this->teacherId);
+
+            DB::beginTransaction();
+
+            if($teacher->update($data)){
+
+                if($teacher->auth->update($data)){
+
+                    DB::commit();
+
+                    $this->reset(['teacherId', 'userId', 'name', 'email', 'employer', 'tsc_number']);
+
+                    $this->resetPage();
+
+                    session()->flash('status', 'Teacher Successfully Updated');
+
+                    $this->emit('hide-upsert-teacher-modal');
+
+                }
+            }
+
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'teacher-id' => $this->teacherId,
+                'action' => __CLASS__ . '@' . __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred check the logs');
+
+            $this->emit('hide-upsert-teacher-modal');
+            
+        }
         
     }
 }

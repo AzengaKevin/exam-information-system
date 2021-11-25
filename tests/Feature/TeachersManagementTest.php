@@ -84,4 +84,43 @@ class TeachersManagementTest extends TestCase
         $this->assertEquals($payload['name'], $teacher->auth->name);
         $this->assertEquals($payload['email'], $teacher->auth->email);
     }
+
+    /** @group teachers */
+    public function testAuthorizedUserCanUpdateATeacher()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'employer' => $this->faker->randomElement(Teacher::employerOptions()),
+            'tsc_number' => $this->faker->numberBetween(123456, 999999),
+        ];
+
+        Livewire::test(Teachers::class)
+            ->call('editTeacher', $teacher)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('employer', $payload['employer'])
+            ->set('tsc_number', $payload['tsc_number'])
+            ->call('updateTeacher');
+
+        $this->assertEquals($payload['employer'], $teacher->fresh()->employer);
+        $this->assertEquals($payload['tsc_number'], $teacher->fresh()->tsc_number);
+
+        $this->assertNotNull($teacher->fresh()->auth);
+
+        $this->assertEquals($payload['name'], $teacher->fresh()->auth->name);
+        $this->assertEquals($payload['email'], $teacher->fresh()->auth->email);
+        
+    }
 }
