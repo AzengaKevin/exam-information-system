@@ -65,6 +65,22 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}" href="{{route('departments.index')}}">
+                    <div class="hstack gap-3">
+                        <span><i class="fas fa-layer-group"></i></span>
+                        <span>Departments</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{request()->routeIs('subjects.index') ? 'text-white':'text-white-50' }}" href="{{route('subjects.index')}}">
+                    <div class="hstack gap-3">
+                        <span><i class="fas fa-user-graduate"></i></span>
+                        <span>Subjects</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link text-white-50" href="#">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-user-graduate"></i></span>

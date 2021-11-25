@@ -1,9 +1,11 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LevelsController;
 use App\Http\Controllers\StreamsController;
+use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -40,4 +42,10 @@ Route::group(['middleware' => ['auth']], function(){
   
     Route::resource('teachers', TeachersController::class)
         ->only('index');
+
+    Route::resource('departments',DepartmentsController::class)
+         ->only('index');    
+
+    Route::resource('subjects',SubjectsController::class)
+    ->only('index');         
 });
