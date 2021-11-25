@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LevelsController;
+use App\Http\Controllers\StreamsController;
 use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
@@ -30,6 +32,12 @@ Route::group(['middleware' => ['auth']], function(){
     Route::resource('users', UsersController::class)
         ->only(['index']);
 
+    Route::resource('levels',LevelsController::class)
+           ->only(['index']);   
+           
+    Route::resource('streams',StreamsController::class)
+           ->only(['index']);        
+  
     Route::resource('teachers', TeachersController::class)
         ->only('index');
 });
