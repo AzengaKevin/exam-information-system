@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Teacher;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\ServiceProvider;
 
@@ -26,5 +28,9 @@ class AppServiceProvider extends ServiceProvider
     {
         // Change paginator to bootstrap
         Paginator::useBootstrap();
+
+        Relation::enforceMorphMap([
+            'teacher' => Teacher::class,
+        ]);
     }
 }

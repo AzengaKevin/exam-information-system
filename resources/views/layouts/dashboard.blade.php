@@ -73,10 +73,10 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white-50" href="#">
+                <a class="nav-link {{ request()->routeIs('teachers.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('teachers.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fas fa-user-graduate"></i></span>
-                        <span>Students</span>
+                        <span><i class="fas fa-user-tie"></i></span>
+                        <span>Teachers</span>
                     </div>
                 </a>
             </li>
