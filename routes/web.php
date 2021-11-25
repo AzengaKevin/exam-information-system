@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\UsersController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,4 +29,7 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::resource('users', UsersController::class)
         ->only(['index']);
+
+    Route::resource('teachers', TeachersController::class)
+        ->only('index');
 });
