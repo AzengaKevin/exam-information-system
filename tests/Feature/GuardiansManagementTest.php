@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\Guardians;
 use App\Models\Guardian;
 use App\Models\User;
 use Tests\TestCase;
@@ -9,6 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Livewire\Livewire;
 
 class GuardiansManagementTest extends TestCase
 {
@@ -48,5 +50,39 @@ class GuardiansManagementTest extends TestCase
         $response->assertViewIs('guardians.index');
 
         $response->assertSeeLivewire('guardians');
+    }
+
+    /** @group guardians */
+    public function testAuthorizedUserAddAGuardian()
+    {
+        $this->withoutExceptionHandling();
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'location' => $this->faker->streetAddress(),
+            'profession' => $this->faker->company()
+        ];
+
+        Livewire::test(Guardians::class)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('profession', $payload['profession'])
+            ->set('location', $payload['location'])
+            ->call('addGuardian');
+
+        $guardian = Guardian::first();
+
+        $this->assertNotNull($guardian);
+
+        $this->assertEquals($payload['profession'], $guardian->profession);
+        $this->assertEquals($payload['location'], $guardian->location);
+
+        $this->assertNotNull($guardian->auth);
+
+        $this->assertEquals($payload['name'], $guardian->auth->name);
+        $this->assertEquals($payload['email'], $guardian->auth->email);
+
+        
     }
 }

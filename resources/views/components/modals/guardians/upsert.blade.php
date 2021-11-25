@@ -35,7 +35,7 @@
                     @enderror
                 </div>
                 <div class="mt-3">
-                    <label for="profession" class="form-label">Proffesion</label>
+                    <label for="profession" class="form-label">Profession</label>
                     <input type="text" wire:model.lazy="profession" id="profession"
                         class="form-control @error('profession') is-invalid @enderror">
                     @error('profession')
