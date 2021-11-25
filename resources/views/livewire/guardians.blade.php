@@ -37,7 +37,7 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
+                            <button wire:click="showDeleteGuardianModal({{ $guardian }})" class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
                                 <i class="fa fa-trash-alt"></i>
                                 <span>Delete</span>
                             </button>
@@ -68,5 +68,6 @@
     </div>
 
     <x-modals.guardians.upsert :guardianId="$guardianId" />
+    <x-modals.guardians.delete :name="$name" />
 
 </div>

@@ -149,4 +149,55 @@ class Guardians extends Component
             $this->emit('hide-upsert-guardian-modal');
         }
     }
+
+
+    public function showDeleteGuardianModal(Guardian $guardian)
+    {
+        $this->guardianId = $guardian->id;
+
+        $this->name = optional($guardian->auth)->name ?? 'Anonymous';
+
+        $this->emit('show-delete-guardian-modal');
+    }
+
+    public function deleteGuardian()
+    {
+        
+        try {
+            
+            /** @var Guardian */
+            $guardian = Guardian::findOrFail($this->guardianId);
+
+            DB::beginTransaction();
+
+            if($guardian->auth) $guardian->auth->delete();
+
+            if($guardian->delete()){
+
+                DB::commit();
+
+                $this->reset(['name', 'guardianId']);
+
+                $this->resetPage();
+
+                session()->flash('status', 'Guardian successfully deleted');
+
+                $this->emit('hide-delete-guardian-modal');
+            }
+            
+        } catch (\Exception $exception) {
+            
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'guardian-id' => $this->guardianId,
+                'action' => __CLASS__ . '@' . __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred check the logs');
+
+            $this->emit('hide-delete-guardian-modal');
+        }
+        
+    }
 }

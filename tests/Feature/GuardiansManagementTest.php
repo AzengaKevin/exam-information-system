@@ -123,4 +123,27 @@ class GuardiansManagementTest extends TestCase
         $this->assertEquals($payload['email'], $guardian->fresh()->auth->email);
         
     }
+
+    /** @group guardians */
+    public function testAuthorizedUserCanDeleteAGuardian()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Guardian */
+        $guardian = Guardian::factory()->create();
+
+        $guardian->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+
+        Livewire::test(Guardians::class)
+            ->call('showDeleteGuardianModal', $guardian)
+            ->call('deleteGuardian');
+
+        $this->assertFalse(Guardian::where('id', $guardian->id)->exists());
+        $this->assertFalse(User::where('id', $guardian->auth->id)->exists());
+        
+    }
 }
