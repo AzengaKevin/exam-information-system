@@ -21,5 +21,8 @@
 <script>
     livewire.on('show-upsert-guardian-modal', () => $('#upsert-guardian-modal').modal('show'))
     livewire.on('hide-upsert-guardian-modal', () => $('#upsert-guardian-modal').modal('hide'))
+
+    livewire.on('show-delete-guardian-modal', () => $('#delete-guardian-modal').modal('show'))
+    livewire.on('hide-delete-guardian-modal', () => $('#delete-guardian-modal').modal('hide'))
 </script>
 @endpush
