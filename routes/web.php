@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LevelsController;
 use App\Http\Controllers\StreamsController;
@@ -39,5 +40,8 @@ Route::group(['middleware' => ['auth']], function(){
            ->only(['index']);        
   
     Route::resource('teachers', TeachersController::class)
+        ->only('index');
+
+    Route::resource('guardians', GuardiansController::class)
         ->only('index');
 });
