@@ -34,11 +34,11 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-warning hstack gap-1 align-items-center">
+                            <button wire:click="toggleUserActiveStatus({{ $user }})" class="btn btn-sm btn-outline-{{ $user->active ? 'warning' : 'success' }} hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
-                                <span>Activate</span>
+                                <span>{{ $user->active ? 'Deativate' : 'Activate' }}</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
+                            <button wire:click="showDeleteUserModal({{ $user }})" class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
                                 <i class="fa fa-trash-alt"></i>
                                 <span>Delete</span>
                             </button>
@@ -69,5 +69,6 @@
     </div>
 
     <x-modals.users.upsert :userId="$userId" />
+    <x-modals.users.delete :name="$name" />
     
 </div>
