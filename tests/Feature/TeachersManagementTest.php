@@ -123,4 +123,26 @@ class TeachersManagementTest extends TestCase
         $this->assertEquals($payload['email'], $teacher->fresh()->auth->email);
         
     }
+
+    /** @group teachers */
+    public function testAuthorizedUserCanDeleteATeacher()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+
+        Livewire::test(Teachers::class)
+            ->call('showDeleteTeacherModal', $teacher)
+            ->call('deleteTeacher');
+        
+        $this->assertFalse(Teacher::where('id', $teacher->id)->exists());
+        $this->assertFalse(User::where('id', $teacher->auth->id)->exists());
+    }
 }

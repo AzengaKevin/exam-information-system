@@ -35,7 +35,7 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
+                            <button wire:click="showDeleteTeacherModal({{ $teacher }})" class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
                                 <i class="fa fa-trash-alt"></i>
                                 <span>Delete</span>
                             </button>
@@ -66,5 +66,6 @@
     </div>
 
     <x-modals.teachers.upsert :teacherId="$teacherId" :employers="$employers" />
+    <x-modals.teachers.delete :name="$name" />
 
 </div>

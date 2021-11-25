@@ -158,4 +158,56 @@ class Teachers extends Component
         }
         
     }
+
+    public function showDeleteTeacherModal(Teacher $teacher)
+    {
+
+        $this->teacherId = $teacher->id;
+
+        $this->name = $teacher->auth->name;
+
+        $this->emit('show-delete-teacher-modal');
+        
+    }
+
+    public function deleteTeacher()
+    {
+        try {
+
+            /** @var Teacher */
+            $teacher = Teacher::findOrFail($this->teacherId);
+
+            DB::beginTransaction();
+
+            if($teacher->auth) $teacher->auth->delete();
+
+            if($teacher->delete()){
+
+                DB::commit();
+
+                $this->reset(['teacherId', 'name']);
+
+                $this->resetPage();
+
+                session()->flash('status', 'Teacher has been succefully deleted');
+
+                $this->emit('hide-delete-teacher-modal');
+            }
+            
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'teacher-id' => $this->teacherId,
+                'action' => __CLASS__ . '@' . __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred check the logs');
+
+            $this->emit('hide-delete-teacher-modal');
+            
+        }
+        
+    }
 }
