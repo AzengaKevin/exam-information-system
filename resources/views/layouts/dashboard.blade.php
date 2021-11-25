@@ -96,6 +96,14 @@
                     </div>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('guardians.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('guardians.index') }}">
+                    <div class="hstack gap-3">
+                        <span><i class="fas fa-user-tie"></i></span>
+                        <span>Guardians</span>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
     <div class="vh-100 col-md-9 col-lg-10 d-flex flex-column">
