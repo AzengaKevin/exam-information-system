@@ -8,7 +8,7 @@
                 @if (is_null($userId))
                 <h5 id="upsert-user-modal-title" class="modal-title">Add User</h5>
                 @else
-                <h5 id="upsert-user-modal-title" class="modal-title">Update User ({{ $userId }})</h5>
+                <h5 id="upsert-user-modal-title" class="modal-title">Update User</h5>
                 @endif
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -43,7 +43,11 @@
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
+                @if (is_null($userId))
+                <button type="button" class="btn btn-outline-primary">Submit</button>
+                @else
                 <button type="button" wire:click="updateUser" class="btn btn-outline-info">Update</button>
+                @endif
             </div>
         </div>
     </div>

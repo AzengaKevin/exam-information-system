@@ -61,4 +61,33 @@ class UsersManagementTest extends TestCase
         $this->assertEquals($payload['name'], $user->fresh()->name);
         $this->assertEquals($payload['email'], $user->fresh()->email);
     }
+
+    /** @group users */
+    public function testAuthorizedUserCanDeleteAUser()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+
+        Livewire::test(Users::class)
+            ->call('showDeleteUserModal', $user)
+            ->call('deleteUser');
+        
+        $this->assertFalse(User::where('id', $user->id)->exists());
+    }
+
+    /** @group users */
+    public function testAuthorizedUserCanToggleUserActiveStatus()
+    {
+        $this->withoutExceptionHandling();
+
+        $user = User::factory()->create();
+
+        $activeStatus = $user->active;
+
+        Livewire::test(Users::class)->call('toggleUserActiveStatus', $user);
+
+        $this->assertNotEquals($activeStatus, $user->fresh()->active);
+        
+    }
 }

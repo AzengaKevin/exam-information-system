@@ -2,9 +2,9 @@
 
 namespace App\Http\Livewire;
 
-use App\Actions\Fortify\UpdateUserProfileInformation;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -87,5 +87,69 @@ class Users extends Component
             ]);
 
         }
+    }
+
+    public function showDeleteUserModal(User $user)
+    {
+        $this->userId = $user->id;
+
+        $this->name = $user->name;
+
+        $this->emit('show-delete-user-modal');
+        
+    }
+
+    public function deleteUser()
+    {
+        try {
+
+            DB::beginTransaction();
+
+            /** @var User */
+            $user = User::findOrFail($this->userId);
+
+            if($user->authenticatable) $user->authenticatable->delete();
+
+            if($user->delete()){
+
+                DB::commit();
+
+                $this->reset(['userId', 'name']);
+
+                $this->resetPage();
+
+                $this->resetValidation();
+
+                $this->emit('hide-delete-user-modal');
+            }
+
+
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+            
+            Log::error($exception->getMessage(), [
+                'user-id' => $this->userId,
+                'action' => __CLASS__ . '@' . __METHOD__
+            ]);
+
+            session()->flash('error', 'A database error occurred');
+
+            $this->emit('hide-delete-user-modal');
+
+        }
+    }
+
+    public function toggleUserActiveStatus(User $user)
+    {
+        
+        $data = array('active' => !boolval($user->active));
+
+        if($user->update($data)){
+
+            session()->flash('User successfully ' . $user->fresh()->active ? 'Activated' : 'Deactivated');
+
+        }
+
     }
 }
