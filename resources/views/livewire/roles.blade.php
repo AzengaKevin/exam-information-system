@@ -7,6 +7,7 @@
                 <tr>
                     <th>#</th>
                     <th>Name</th>
+                    <th>Permissions</th>
                     <th>Description</th>
                     <th>Actions</th>
                 </tr>
@@ -17,6 +18,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $role->name }}</td>
+                    <td>{{ $role->permissions->count() }}</td>
                     <td>{{ $role->description }}</td>
                     <td>{{ $role->created_at->format('d/m/Y') }}</td>
                     <td>
@@ -24,6 +26,10 @@
                             <button wire:click="editRole({{ $role }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
+                            </button>
+                            <button wire:click="showUpdatePermissionsModal({{ $role }})" class="btn btn-sm btn-outline-success hstack gap-1 align-items-center">
+                                <i class="fa fa-check"></i>
+                                <span>Permissions</span>
                             </button>
                             <button wire:click="showDeleteRoleModal({{ $role }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
@@ -41,21 +47,22 @@
                 </tr>
                 @endif
             </tbody>
-            {{-- <tfoot>
+            <tfoot>
                 <tr>
                     <td colspan="5">
-                        {{ $users->links() }}
-                        @if ($users->count())
-                        <div class="text-muted">{{ $users->firstItem() }} - {{ $users->lastItem() }} out of
-                            {{ $users->total() }}</div>
+                        {{ $roles->links() }}
+                        @if ($roles->count())
+                        <div class="text-muted">{{ $roles->firstItem() }} - {{ $roles->lastItem() }} out of
+                            {{ $roles->total() }}</div>
                         @endif
                     </td>
                 </tr>
-            </tfoot> --}}
+            </tfoot>
         </table>
     </div>
 
     <x-modals.roles.upsert :roleId="$roleId" />
     <x-modals.roles.delete :name="$name" />
+    <x-modals.roles.update-permissions :name="$name" :permissions="$permissions" />
     
 </div>

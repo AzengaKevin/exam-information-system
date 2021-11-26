@@ -13,7 +13,7 @@ class PermissionPersistenceTest extends TestCase
     use RefreshDatabase, WithFaker;
     use RefreshDatabase, WithFaker;
 
-    /** @group roles */
+    /** @group permissions */
     public function testAPermissionCanBePersistedToTheDatabase()
     {
         $payload = [
