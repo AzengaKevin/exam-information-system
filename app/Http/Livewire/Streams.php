@@ -6,6 +6,7 @@ use App\Models\Stream;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
 class Streams extends Component
@@ -53,7 +54,7 @@ class Streams extends Component
     public function rules()
     {
         return [
-            'name' => ['bail', 'required', 'string'],
+            'name' => ['bail', 'required', 'string', Rule::unique('streams')->ignore($this->streamId)],
             'alias' => ['bail','required','string'],
             'description' => ['bail', 'nullable']
         ];

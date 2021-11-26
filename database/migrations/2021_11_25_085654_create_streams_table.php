@@ -15,7 +15,7 @@ class CreateStreamsTable extends Migration
     {
         Schema::create('streams', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->nullable();
+            $table->string('name')->unique();
             $table->string('alias')->nullable();
             $table->string('slug')->nullable();
             $table->string('description')->nullable();
