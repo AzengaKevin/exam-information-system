@@ -65,5 +65,10 @@
         </table>
     </div>
     
+    <x-modals.students.upsert 
+        :studentId="$studentId"
+        :streams="$streams"
+        :levels="$levels"
+        :genderOptions="$genderOptions" />
 
 </div>

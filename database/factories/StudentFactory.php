@@ -17,12 +17,13 @@ class StudentFactory extends Factory
     public function definition()
     {
         return [
-            'adm_no' => $this->faker->numberBetween(5000, 10000),
+            'adm_no' => $this->faker->unique()->numberBetween(5000, 10000),
             'name' => $this->faker->name(),
             'dob' => $this->faker->date(),
             'gender' => $this->faker->randomElement(User::genderOptions()),
             'admission_level_id' => Level::factory(),
-            'stream_id' => Stream::factory()
+            'stream_id' => Stream::factory(),
+            'description' => $this->faker->paragraph()
         ];
     }
 }
