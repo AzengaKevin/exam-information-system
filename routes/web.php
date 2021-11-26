@@ -1,17 +1,18 @@
 <?php
 
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DepartmentsController;
-use App\Http\Controllers\GuardiansController;
+use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\LevelsController;
-use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\ExamsController;
 use App\Http\Controllers\RolesController;
+use App\Http\Controllers\UsersController;
+use App\Http\Controllers\LevelsController;
 use App\Http\Controllers\StreamsController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
-use App\Http\Controllers\UsersController;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GuardiansController;
+use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\PermissionsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -60,4 +61,7 @@ Route::group(['middleware' => ['auth']], function(){
   
     Route::resource('guardians', GuardiansController::class)
         ->only('index');
+     
+    Route::resource('exams', ExamsController::class)
+    ->only('index');    
 });
