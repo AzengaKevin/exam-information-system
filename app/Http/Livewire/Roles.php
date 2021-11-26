@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Permission;
 use App\Models\Role;
 use Livewire\Component;
 use Illuminate\Support\Str;
@@ -20,16 +21,24 @@ class Roles extends Component
     public $slug;
     public $description;
 
+    public $selectedPermissions = [];
+
     public function render()
     {
         return view('livewire.roles', [
-            'roles' => $this->getPaginatedRoles()
+            'roles' => $this->getPaginatedRoles(),
+            'permissions' => $this->getAllPermissions()
         ]);
     }
 
     public function getPaginatedRoles()
     {
         return Role::paginate(24);
+    }
+
+    public function getAllPermissions()
+    {
+        return Permission::all(['id', 'name']);
     }
 
     /**
@@ -142,5 +151,54 @@ class Roles extends Component
 
             $this->emit('hide-delete-role-modal');
         }
+    }
+
+    public function showUpdatePermissionsModal(Role $role)
+    {
+        $this->roleId = $role->id;
+
+        $this->name = $role->name;
+
+        foreach ($role->permissions->pluck('id')->toArray() as $permission) {
+            $this->selectedPermissions[$permission] = 'true';
+        }
+
+        $this->emit('show-update-permissions-modal');
+    }
+
+    public function updatePermissions()
+    {
+        $data = $this->validate([
+            'selectedPermissions' => ['required', 'array']
+        ]);
+
+        $payload = array_filter($data['selectedPermissions'], fn($value, $key) => $value == 'true', ARRAY_FILTER_USE_BOTH);
+
+        try {
+
+            /** @var Role */
+            $role = Role::findOrFail($this->roleId);
+
+            $result = $role->permissions()->sync(array_keys($payload));
+
+            $this->reset(['roleId', 'name', 'selectedPermissions']);
+
+            session()->flash('status', 'Role permissions updated');
+
+            $this->emit('hide-update-permissions-modal');
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), [
+                'role-id' => $this->roleId,
+                'action' => __CLASS__ . '@' . __METHOD__
+            ]);
+
+            session()->flash('error', 'A database error occurred');
+
+            $this->emit('hide-update-permissions-modal');
+            
+        }
+        
     }
 }
