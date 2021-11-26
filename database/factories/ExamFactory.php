@@ -1,0 +1,28 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Models\Exam;
+use Illuminate\Database\Eloquent\Factories\Factory;
+
+class ExamFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array
+     */
+    public function definition()
+    {
+        return [
+            'name'=>$this->faker->name(),
+            'term' => $this->faker->randomElement(Exam::termOptions()),
+            'shortname'=>$this->faker->name(),
+            'year'=>$this->faker->year(),
+            'start_date'=>$this->faker->date(),
+            'end_date'=>$this->faker->end_date(),
+            'weight'=>$this->faker->numberBetween(10,100),
+            'counts'=>$this->faker->boolean() 
+        ];
+    }
+}
