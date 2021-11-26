@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Livewire\Users;
+use App\Models\Role;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -56,10 +57,34 @@ class UsersManagementTest extends TestCase
             ->set('email', $payload['email'])
             ->call('updateUser');
 
-        $this->assertNotNull($user);
+        $this->assertEquals($payload['name'], $user->fresh()->name);
+        $this->assertEquals($payload['email'], $user->fresh()->email);
+    }
+
+    /** @group users */
+    public function testAuthorizedUserCanUpdateUserWithRole()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var User */
+        $user = User::factory()->create();
+
+        $payload = User::factory()->make()->toArray();
+
+        /** @var Role */
+        $role = Role::factory()->create();
+
+        Livewire::test(Users::class)
+            ->call('editUser', $user)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('role_id', $role->id)
+            ->call('updateUser');
 
         $this->assertEquals($payload['name'], $user->fresh()->name);
         $this->assertEquals($payload['email'], $user->fresh()->email);
+        $this->assertEquals($role->id, $user->fresh()->role_id);
+        
     }
 
     /** @group users */

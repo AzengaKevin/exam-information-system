@@ -15,8 +15,8 @@
 
 @push('scripts')
 <script>
-    livewire.on('show-upsert-user-modal', () => $('#upsert-user-modal').modal('show'))
-    livewire.on('hide-upsert-user-modal', () => $('#upsert-user-modal').modal('hide'))
+    livewire.on('show-update-user-modal', () => $('#update-user-modal').modal('show'))
+    livewire.on('hide-update-user-modal', () => $('#update-user-modal').modal('hide'))
 
     livewire.on('show-delete-user-modal', () => $('#delete-user-modal').modal('show'))
     livewire.on('hide-delete-user-modal', () => $('#delete-user-modal').modal('hide'))

@@ -22,7 +22,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'name',
         'email',
         'password',
-        'active'
+        'active',
+        'role_id'
     ];
 
     /**
@@ -48,5 +49,15 @@ class User extends Authenticatable implements MustVerifyEmail
     public function authenticatable()
     {
         return $this->morphTo();
+    }
+
+    public static function genderOptions() : array
+    {
+        return ['Male', 'Female', 'Other'];
+    }
+
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
     }
 }
