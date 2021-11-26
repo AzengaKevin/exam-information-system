@@ -13,6 +13,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\ResponsibilitiesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -63,5 +64,8 @@ Route::group(['middleware' => ['auth']], function(){
         ->only('index');
      
     Route::resource('exams', ExamsController::class)
-    ->only('index');    
+    ->only('index');
+    
+    Route::resource('responsibilities', ResponsibilitiesController::class)
+    ->only('index');
 });
