@@ -7,6 +7,7 @@ use App\Http\Controllers\RolesController;
 use App\Http\Controllers\UsersController;
 use App\Http\Controllers\LevelsController;
 use App\Http\Controllers\StreamsController;
+use App\Http\Controllers\StudentsController;
 use App\Http\Controllers\SubjectsController;
 use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\DashboardController;
@@ -58,14 +59,18 @@ Route::group(['middleware' => ['auth']], function(){
         ->only('index'); 
     
     Route::resource('permissions',PermissionsController::class)
-        ->only('index'); 
+        ->only('index');
   
     Route::resource('guardians', GuardiansController::class)
         ->only('index');
+  
+    Route::resource('students', StudentsController::class)
+        ->only('index');
+
      
     Route::resource('exams', ExamsController::class)
-    ->only('index');
+        ->only('index');
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
-    ->only('index');
+        ->only('index');
 });
