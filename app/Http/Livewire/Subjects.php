@@ -2,11 +2,12 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Department;
 use App\Models\Subject;
 use Livewire\Component;
+use App\Models\Department;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
 class Subjects extends Component
@@ -64,7 +65,7 @@ class Subjects extends Component
     public function rules()
     {
         return [
-            'name' => ['bail', 'required','string'],
+            'name' => ['bail', 'required','string', Rule::unique('subjects')->ignore($this->subjectId)],
             'description' => ['bail', 'nullable'],
             'shortname' => ['bail', 'nullable'],
             'subject_code' => ['bail', 'nullable'],

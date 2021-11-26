@@ -6,6 +6,7 @@ use Livewire\Component;
 use App\Models\Department;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
 class Departments extends Component
@@ -51,7 +52,7 @@ class Departments extends Component
     public function rules()
     {
         return [
-            'name' => ['bail', 'required', 'string'],
+            'name' => ['bail', 'required', 'string', Rule::unique('departments')->ignore($this->departmentId)],
             'description' => ['bail', 'nullable']
         ];
     }

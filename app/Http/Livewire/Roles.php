@@ -172,7 +172,9 @@ class Roles extends Component
             'selectedPermissions' => ['required', 'array']
         ]);
 
-        $payload = array_filter($data['selectedPermissions'], fn($value, $key) => $value == 'true', ARRAY_FILTER_USE_BOTH);
+        $payload = array_filter($data['selectedPermissions'], function($value, $key){
+            return $value == 'true';
+        }, ARRAY_FILTER_USE_BOTH);
 
         try {
 
