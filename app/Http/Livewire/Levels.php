@@ -56,7 +56,7 @@ class Levels extends Component
     public function rules()
     {
         return [
-            'name' => ['bail', 'required', 'string'],
+            'name' => ['bail', 'required', 'string', Rule::unique('levels')->ignore($this->levelId)],
             'numeric' => ['bail','required','integer'],
             'description' => ['bail', 'nullable']
         ];
