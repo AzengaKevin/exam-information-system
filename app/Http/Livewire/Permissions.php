@@ -29,7 +29,7 @@ class Permissions extends Component
 
     public function getPaginatedPermission()
     {
-        return Permission::paginate(24);
+        return Permission::orderBy('name')->paginate(24);
     }
 
     /**

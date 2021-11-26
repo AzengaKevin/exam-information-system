@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -21,11 +22,13 @@ class Users extends Component
     public $name;
     public $email;
     public $active;
+    public $role_id;
 
     public function render()
     {
         return view('livewire.users', [
-            'users' => $this->getPaginatedUsers()
+            'users' => $this->getPaginatedUsers(),
+            'roles' => $this->getAllRoles()
         ]);
     }
 
@@ -36,8 +39,13 @@ class Users extends Component
         return User::where('id', '<>', $id)->orderBy('name')->paginate(24);
     }
 
+    public function getAllRoles()
+    {
+        return Role::all(['id', 'name']);
+    }
+
     /**
-     * Show upsert user modal for editing and updating user
+     * Show update user modal for editing and updating user
      * 
      * @param User $user
      */
@@ -50,7 +58,7 @@ class Users extends Component
         $this->email = $user->email;
         $this->active = $user->active;
 
-        $this->emit('show-upsert-user-modal');
+        $this->emit('show-update-user-modal');
     }
 
     public function rules()
@@ -58,7 +66,8 @@ class Users extends Component
         return [
             'name' => ['bail', 'required', 'string'],
             'email' => ['bail', 'required', 'email', Rule::unique('users')->ignore($this->userId)],
-            'active' => ['bail', 'nullable']
+            'active' => ['bail', 'nullable'],
+            'role_id' => ['nullable', 'integer']
         ];
     }
 
@@ -73,17 +82,18 @@ class Users extends Component
 
             if($user->update($data)){
 
+                $this->reset(['userId', 'name', 'active', 'role_id']);
+
                 session()->flash('status', 'Users successfully updated');
 
-                $this->emit('hide-upsert-user-modal');
+                $this->emit('hide-update-user-modal');
             }
 
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
         }
@@ -130,7 +140,7 @@ class Users extends Component
             
             Log::error($exception->getMessage(), [
                 'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A database error occurred');

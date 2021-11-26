@@ -41,17 +41,17 @@
                 </tr>
                 @endif
             </tbody>
-            {{-- <tfoot>
+            <tfoot>
                 <tr>
                     <td colspan="5">
-                        {{ $users->links() }}
-                        @if ($users->count())
-                        <div class="text-muted">{{ $users->firstItem() }} - {{ $users->lastItem() }} out of
-                            {{ $users->total() }}</div>
+                        {{ $permissions->links() }}
+                        @if ($permissions->count())
+                        <div class="text-muted">{{ $permissions->firstItem() }} - {{ $permissions->lastItem() }} out of
+                            {{ $permissions->total() }}</div>
                         @endif
                     </td>
                 </tr>
-            </tfoot> --}}
+            </tfoot>
         </table>
     </div>
 

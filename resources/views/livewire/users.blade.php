@@ -48,7 +48,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5">
+                    <td colspan="7">
                         <div class="py-1">No Other Users, Apart From You</div>
                     </td>
                 </tr>
@@ -56,7 +56,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="7">
                         {{ $users->links() }}
                         @if ($users->count())
                         <div class="text-muted">{{ $users->firstItem() }} - {{ $users->lastItem() }} out of
@@ -68,7 +68,7 @@
         </table>
     </div>
 
-    <x-modals.users.upsert :userId="$userId" />
+    <x-modals.users.update :roles="$roles" />
     <x-modals.users.delete :name="$name" />
     
 </div>

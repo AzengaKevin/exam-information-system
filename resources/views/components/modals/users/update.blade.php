@@ -1,15 +1,11 @@
-@props(['userId' => null])
+@props(['roles' => []])
 
-<div wire:ignore.self id="upsert-user-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
-    aria-labelledby="upsert-user-modal-title">
+<div wire:ignore.self id="update-user-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
+    aria-labelledby="update-user-modal-title">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <form wire:submit.prevent="updateUser" class="modal-content">
             <div class="modal-header">
-                @if (is_null($userId))
-                <h5 id="upsert-user-modal-title" class="modal-title">Add User</h5>
-                @else
-                <h5 id="upsert-user-modal-title" class="modal-title">Update User</h5>
-                @endif
+                <h5 id="update-user-modal-title" class="modal-title">Update User</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
@@ -40,15 +36,20 @@
                         <label for="active" class="form-check-label">Active</label>
                     </div>
                 </div>
+                <div class="mt-3">
+                    <label for="role" class="form-label">Role</label>
+                    <select wire:model="role_id" id="role" class="form-select @error('role_id') is-invalid @enderror">
+                        <option value="">-- Select Role --</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                @if (is_null($userId))
-                <button type="button" class="btn btn-outline-primary">Submit</button>
-                @else
-                <button type="button" wire:click="updateUser" class="btn btn-outline-info">Update</button>
-                @endif
+                <button type="submit" class="btn btn-outline-info">Update</button>
             </div>
-        </div>
+        </form>
     </div>
 </div>
