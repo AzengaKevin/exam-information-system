@@ -13,6 +13,7 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
 
@@ -73,4 +74,7 @@ Route::group(['middleware' => ['auth']], function(){
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');
+
+    Route::get('/level-units', [LevelUnitsController::class, 'index'])
+        ->name('level-units.index');
 });
