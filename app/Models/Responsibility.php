@@ -11,7 +11,11 @@ class Responsibility extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'slug',
+        'description'
+    ];
 
     public function setNameAttribute($value)
     {
