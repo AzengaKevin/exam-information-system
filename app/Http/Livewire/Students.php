@@ -94,4 +94,98 @@ class Students extends Component
             
         }
     }
+
+    public function editStudent(Student $student)
+    {
+        $this->studentId = $student->id;
+
+        $this->adm_no = $student->adm_no;
+        $this->upi = $student->upi;
+        $this->name = $student->name;
+        $this->dob = $student->dob->format('Y-m-d');
+        $this->gender = $student->gender;
+        $this->stream_id = $student->stream_id;
+        $this->admission_level_id = $student->admission_level_id;
+        $this->description = $student->description;
+
+        $this->emit('show-upsert-student-modal');
+    }
+
+    public function updateStudent()
+    {
+        $data = $this->validate();
+
+        try {
+
+            /** @var Student */
+            $student = Student::findOrFail($this->studentId);
+
+            if($student->update($data)){
+
+                $this->reset();
+
+                $this->resetValidation();
+
+                session()->flash('status', 'Student has been successfully updated');
+
+                $this->emit('hide-upsert-student-modal');
+
+            }
+
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'student-id' => $this->studentId
+            ]);
+
+            session()->flash('error', 'Fatal error occurred while udating student');
+
+            $this->emit('hide-upsert-student-modal');
+        }
+        
+    }
+
+    public function showDeleteStudentModal(Student $student)
+    {
+        $this->studentId = $student->id;
+
+        $this->name = $student->name;
+
+        $this->emit('show-delete-student-modal');
+    }
+
+    public function deleteStudent()
+    {
+        
+        try {
+
+            /** @var Student */
+            $student = Student::findOrFail($this->studentId);
+
+            if($student->delete()){
+
+                $this->reset();
+
+                $this->resetPage();
+
+                session()->flash('status', 'Student has been successfully deleted');
+
+                $this->emit('hide-delete-student-modal');
+            }
+
+
+        } catch (\Exception $exception) {
+         
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'student-id' => $this->studentId
+            ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to delete student');
+
+            $this->emit('hide-delete-student-modal');
+        }
+    }
 }

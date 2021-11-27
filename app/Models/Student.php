@@ -17,7 +17,8 @@ class Student extends Model
         'level_id',
         'admission_level_id',
         'stream_id',
-        'upi'
+        'upi',
+        'description'
     ];
 
     protected $casts = [
