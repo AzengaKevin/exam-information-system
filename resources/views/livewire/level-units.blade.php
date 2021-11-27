@@ -38,7 +38,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <div class="py-1 text-center">No Level Units created yet</div>
                     </td>
                 </tr>
@@ -46,7 +46,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         {{ $levelUnits->links() }}
                         @if ($levelUnits->count())
                         <div class="text-muted">{{ $levelUnits->firstItem() }} - {{ $levelUnits->lastItem() }} out of
@@ -58,7 +58,11 @@
         </table>
     </div>
 
-    {{-- <x-modals.levels.upsert :levelId="$levelId" /> --}}
+    <x-modals.level-units.upsert 
+        :levelUnitId="$levelUnitId"
+        :levels="$levels"
+        :streams="$streams" />
+        
     {{-- <x-modals.levels.delete :name="$name" /> --}}
     
 </div>
