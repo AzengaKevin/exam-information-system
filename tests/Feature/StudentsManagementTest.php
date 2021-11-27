@@ -97,4 +97,20 @@ class StudentsManagementTest extends TestCase
         $this->assertEquals($payload['admission_level_id'], $student->fresh()->admission_level_id);
         $this->assertEquals($payload['level_id'], $student->fresh()->level_id);
     }
+
+    /** @group students */
+    public function testAuthorizedUserCanDeleteAStudent()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Student */
+        $student = Student::factory()->create();
+
+        Livewire::test(Students::class)
+            ->call('showDeleteStudentModal', $student)
+            ->call('deleteStudent');
+
+        $this->assertFalse(Student::where('id', $student->id)->exists());
+        
+    }
 }

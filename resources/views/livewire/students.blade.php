@@ -71,4 +71,6 @@
         :levels="$levels"
         :genderOptions="$genderOptions" />
 
+    <x-modals.students.delete :name="$name" />
+
 </div>

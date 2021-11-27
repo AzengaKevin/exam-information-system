@@ -146,4 +146,46 @@ class Students extends Component
         }
         
     }
+
+    public function showDeleteStudentModal(Student $student)
+    {
+        $this->studentId = $student->id;
+
+        $this->name = $student->name;
+
+        $this->emit('show-delete-student-modal');
+    }
+
+    public function deleteStudent()
+    {
+        
+        try {
+
+            /** @var Student */
+            $student = Student::findOrFail($this->studentId);
+
+            if($student->delete()){
+
+                $this->reset();
+
+                $this->resetPage();
+
+                session()->flash('status', 'Student has been successfully deleted');
+
+                $this->emit('hide-delete-student-modal');
+            }
+
+
+        } catch (\Exception $exception) {
+         
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'student-id' => $this->studentId
+            ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to delete student');
+
+            $this->emit('hide-delete-student-modal');
+        }
+    }
 }
