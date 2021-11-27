@@ -104,4 +104,63 @@ class LevelUnits extends Component
         }
         
     }
+
+    public function editLevelUnit(LevelUnit $levelUnit)
+    {
+        $this->levelUnitId = $levelUnit->id;
+
+        $this->level_id = $levelUnit->level_id;
+        $this->stream_id = $levelUnit->stream_id;
+        $this->alias = $levelUnit->alias;
+        $this->description = $levelUnit->description;
+
+        $this->emit('show-upsert-level-unit-modal');
+    }
+
+    public function updateLevelUnit()
+    {
+        $data = $this->validate();
+        
+        try {
+
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::findOrFail($this->levelUnitId);
+
+            $maybeLevelUnit = LevelUnit::where([
+                ['id', '<>', $this->levelUnitId],
+                ['level_id', $data['level_id']],
+                ['stream_id', $data['stream_id'] ?? null]
+            ])->first();
+
+            if(is_null($maybeLevelUnit)){
+
+                if($levelUnit->update($data)){
+
+                    $this->reset();
+
+                    session()->flash('status', 'A Level Unit Successfully Updated');
+
+                    $this->emit('hide-upsert-level-unit-modal');
+                }
+
+            }else{
+
+                session()->flash('error', 'A similar level unit exists');
+
+                $this->emit('hide-upsert-level-unit-modal');
+
+            }
+
+        } catch (\Exception $eaxception) {
+
+            Log::error($eaxception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred, when updating level unit');
+
+            $this->emit('hide-upsert-level-unit-modal');
+            
+        }
+    }
 }
