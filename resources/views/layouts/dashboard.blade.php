@@ -120,6 +120,14 @@
                     </div>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('level-units.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('level-units.index') }}">
+                    <div class="hstack gap-3">
+                        <span><i class="fa fa-file-pdf" aria-hidden="true"></i></span>
+                        <span>Level Units</span>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
     <div class="vh-100 col-md-9 col-lg-10 d-flex flex-column">

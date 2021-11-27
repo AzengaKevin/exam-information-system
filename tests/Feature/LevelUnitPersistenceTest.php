@@ -11,6 +11,7 @@ class LevelUnitPersistenceTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /** @group level-units */
     public function testALevelUnitCanBePersisted()
     {
         

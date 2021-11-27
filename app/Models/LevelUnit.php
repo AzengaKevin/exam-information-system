@@ -15,4 +15,14 @@ class LevelUnit extends Model
         'alias',
         'description',
     ];
+
+    public function stream()
+    {
+        return $this->belongsTo(Stream::class);
+    }
+
+    public function level()
+    {
+        return $this->belongsTo(Level::class);
+    }
 }
