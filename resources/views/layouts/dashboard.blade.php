@@ -6,7 +6,7 @@
 
 @section('body')
 <div id="wrapper" class="vh-100 row g-0 bg-light">
-    <div class="min-vh-100 d-none d-md-block col-md-3 col-lg-2 bg-primary">
+    <div class="h-100 d-none d-md-block col-md-3 col-lg-2 bg-primary overflow-auto">
         <div class="p-3 text-white d-flex align-items-center">
             <div><i class="fa fa-3x fa-user"></i></div>
             <div class="ms-3">
@@ -107,7 +107,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('exams.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('exams.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fa fa-file-pdf" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-file-word" aria-hidden="true"></i></span>
                         <span>Exams</span>
                     </div>
                 </a>
@@ -115,8 +115,8 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('responsibilities.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fa fa-file-pdf" aria-hidden="true"></i></span>
-                        <span>responsibilities</span>
+                        <span><i class="fa fa-file-word" aria-hidden="true"></i></span>
+                        <span>Responsibilities</span>
                     </div>
                 </a>
             </li>
@@ -183,9 +183,7 @@
             </div>
         </nav>
         <div class="p-3 overflow-auto flex-grow-1">
-
             @yield('content')
-
         </div>
     </div>
 </div>
