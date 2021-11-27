@@ -91,4 +91,19 @@ class LevelUnitsManagementTest extends TestCase
         $this->assertEquals($payload['description'], $levelUnit->fresh()->description);
 
     }
+
+    /** @group level-units */
+    public function testAuthorizedUserCanDeleteALevelUnit()
+    {
+        $this->withoutExceptionHandling();
+
+        $levelUnit = LevelUnit::factory()->create();
+
+        Livewire::test(LevelUnits::class)
+            ->call('showDeleteLevelUnitModal', $levelUnit)
+            ->call('deleteLevelUnit');
+
+        $this->assertFalse(LevelUnit::where('id', $levelUnit->id)->exists());
+        
+    }
 }

@@ -154,12 +154,54 @@ class LevelUnits extends Component
         } catch (\Exception $eaxception) {
 
             Log::error($eaxception->getMessage(), [
-                'action' => __METHOD__
+                'action' => __METHOD__,
+                'level-unit-id' => $this->levelUnitId
             ]);
 
             session()->flash('error', 'A fatal error occurred, when updating level unit');
 
             $this->emit('hide-upsert-level-unit-modal');
+            
+        }
+    }
+
+    public function showDeleteLevelUnitModal(LevelUnit $levelUnit)
+    {
+        $this->levelUnitId = $levelUnit->id;
+
+        $this->alias = $levelUnit->alias;
+
+        $this->emit('show-delete-level-unit-modal');
+    }
+
+    public function deleteLevelUnit()
+    {
+        try {
+
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::findOrFail($this->levelUnitId);
+
+            if($levelUnit->delete()){
+
+                $this->reset();
+
+                $this->resetPage();
+
+                session()->flash('status', 'A Level Unit Successfully Been Deleted');
+
+                $this->emit('hide-delete-level-unit-modal');
+            }
+
+        } catch (\Exception $eaxception) {
+
+            Log::error($eaxception->getMessage(), [
+                'action' => __METHOD__,
+                'level-unit-id' => $this->levelUnitId
+            ]);
+
+            session()->flash('error', 'A fatal error occurred, when deleting level unit');
+
+            $this->emit('hide-delete-level-unit-modal');
             
         }
     }

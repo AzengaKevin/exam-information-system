@@ -28,7 +28,7 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
-                            <button  class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
+                            <button wire:click="showDeleteLevelUnitModal({{ $levelUnit }})"  class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                 <span>Delete</span>
                             </button>
@@ -63,6 +63,6 @@
         :levels="$levels"
         :streams="$streams" />
         
-    {{-- <x-modals.levels.delete :name="$name" /> --}}
+    <x-modals.level-units.delete :alias="$alias" />
     
 </div>
