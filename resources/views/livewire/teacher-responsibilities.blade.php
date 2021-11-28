@@ -30,11 +30,7 @@
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
-                                <i class="fa fa-edit"></i>
-                                <span>Edit</span>
-                            </button>
-                            <button class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
+                            <button wire:click="removeResponsibility({{ $responsibility }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-times" aria-hidden="true"></i>
                                 <span>Remove</span>
                             </button>

@@ -66,7 +66,7 @@ class TeacherResponsibilities extends Component
 
     public function getTeacherResponsibilities()
     {
-        return $this->teacher->responsibilities;
+        return $this->teacher->fresh()->responsibilities;
     }
 
     public function rules()
@@ -92,6 +92,12 @@ class TeacherResponsibilities extends Component
             
             $this->teacher->responsibilities()->attach($id, $data);
 
+            session()->flash('status', "{$this->teacher->auth->name} has been assigned a new responsibility");
+
+            $this->reset(['responsibility_id', 'level_unit_id', 'level_id', 'department_id', 'subject_id']);
+
+            $this->emit('hide-assign-teacher-responsibility-modal');
+
         } catch (\Exception $exception) {
             Log::error($exception->getMessage(), [
                 'action' => __METHOD__,
@@ -99,5 +105,12 @@ class TeacherResponsibilities extends Component
             ]);
         }
         
+    }
+
+    public function removeResponsibility(Responsibility $responsibility)
+    {
+        $this->teacher->responsibilities()->detach($responsibility);
+
+        session()->flash('status', "{$this->teacher->auth->name} responsibility has been removed");
     }
 }

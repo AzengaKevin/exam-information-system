@@ -19,6 +19,6 @@
 
 @push('scripts')
 <script>
-    livewire('hide-assign-teacher-responsibility-modal', () => $('#assign-teacher-responsibility-modal').modal('hide'));
+    livewire.on('hide-assign-teacher-responsibility-modal', () => $('#assign-teacher-responsibility-modal').modal('hide'));
 </script>
 @endpush

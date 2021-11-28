@@ -58,7 +58,7 @@ class TeachersResponsibilitiesManagementTest extends TestCase
         
     }
 
-    /** @group teacher-responsibilities */
+    /** @group teachers-responsibilities */
     public function testAuthorizedUserCanAssignATeacherResponsibility()
     {
         $this->withoutExceptionHandling();
@@ -84,5 +84,32 @@ class TeachersResponsibilitiesManagementTest extends TestCase
         $this->assertEquals(1, $teacher->responsibilities()->count());
 
         $this->assertNotNull($teacher->fresh()->responsibilities->first()->pivot->levelUnit);
+    }
+
+    /** @group teachers-responsibilities */
+    public function testAuthorizedUserCanRevokeTeacherResponsibilities()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+        
+        $responsibility = Responsibility::factory()->create();
+
+        $teacher->responsibilities()->attach($responsibility);
+
+        $this->assertEquals(1, $teacher->fresh()->responsibilities()->count());
+
+        Livewire::test(TeacherResponsibilities::class, ['teacher' => $teacher])
+            ->call('removeResponsibility', $responsibility);
+
+        $this->assertEquals(0, $teacher->fresh()->responsibilities()->count());
+        
     }
 }
