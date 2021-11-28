@@ -12,3 +12,17 @@
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
 
 @import "utilities";
+
+// Scrollbar
+::-webkit-scrollbar {
+    width: .25em;
+}
+
+::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 2px $light;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: $secondary;
+    outline: 1px solid rgba($color: #000000, $alpha: 0.1);
+}

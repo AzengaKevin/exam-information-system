@@ -6,7 +6,7 @@
 
 @section('body')
 <div id="wrapper" class="vh-100 row g-0 bg-light">
-    <div class="h-100 d-none d-md-block col-md-3 col-lg-2 bg-primary overflow-auto">
+    <div class="h-100 d-none d-md-block col-md-3 col-lg-2 bg-primary overflow-y-auto">
         <div class="p-3 text-white d-flex align-items-center">
             <div><i class="fa fa-3x fa-user"></i></div>
             <div class="ms-3">
@@ -59,7 +59,7 @@
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('streams.index') ? 'text-white':'text-white-50' }}" href="{{route('streams.index')}}">
                     <div class="hstack gap-3">
-                        <span><i class="fas fa-layer-group"></i></span>
+                        <span><i class="fas fa-list-ul"></i></span>
                         <span>Streams</span>
                     </div>
                 </a>
@@ -67,7 +67,7 @@
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}" href="{{route('departments.index')}}">
                     <div class="hstack gap-3">
-                        <span><i class="fas fa-layer-group"></i></span>
+                        <span><i class="fas fa-th"></i></span>
                         <span>Departments</span>
                     </div>
                 </a>
@@ -75,7 +75,7 @@
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('subjects.index') ? 'text-white':'text-white-50' }}" href="{{route('subjects.index')}}">
                     <div class="hstack gap-3">
-                        <span><i class="fas fa-user-graduate"></i></span>
+                        <span><i class="fas fa-book"></i></span>
                         <span>Subjects</span>
                     </div>
                 </a>
@@ -107,7 +107,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('exams.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('exams.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fa fa-file-word" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-file-alt" aria-hidden="true"></i></span>
                         <span>Exams</span>
                     </div>
                 </a>
@@ -115,7 +115,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('responsibilities.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fa fa-file-word" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-tasks" aria-hidden="true"></i></span>
                         <span>Responsibilities</span>
                     </div>
                 </a>
@@ -123,7 +123,7 @@
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('level-units.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('level-units.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fa fa-file-pdf" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-th" aria-hidden="true"></i></span>
                         <span>Level Units</span>
                     </div>
                 </a>

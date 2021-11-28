@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -17,7 +18,8 @@ class UsersSeeder extends Seeder
         // Create Admin
         User::factory()->create([
             'name' => 'Super Administrator',
-            'email' => 'admin@gmail.com'
+            'email' => 'admin@gmail.com',
+            'role_id' => Role::firstOrCreate(['name' => 'Administrator'])->id
         ]);
     }
 }

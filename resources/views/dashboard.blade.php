@@ -62,6 +62,24 @@
         </div>
     </a>
 
+    <a href="{{ route('students.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
+        <div class="bg-white shadow-sm card h-100 border-light">
+            <div class="card-body">
+                <div class="p-0 card-text">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Students</h6>
+                            <span class="fw-bold number-count">{{ \App\Models\Student::count() }}</span>
+                        </div>
+                        <div class="bg-danger rounded-circle p-3">
+                            <i class="text-white fa fa-2x fa-user-graduate"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+
 </div>
 
 
