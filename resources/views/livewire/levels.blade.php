@@ -32,7 +32,7 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
-                            <button wire:click="showDeleteLevelModal({{ $level }})" class="btn btn-outline-danger hstack gap-2 align-items-center">
+                            <button wire:click="showDeleteLevelModal({{ $level }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                 <span>Delete</span>
                             </button>
