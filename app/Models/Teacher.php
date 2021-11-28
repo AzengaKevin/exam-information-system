@@ -26,4 +26,12 @@ class Teacher extends Model
     {
         return $this->morphOne(User::class, 'authenticatable');
     }
+
+    public function responsibilities()
+    {
+        return $this->belongsToMany(Responsibility::class)
+            ->using(ResponsibilityTeacher::class)
+            ->withTimestamps()
+            ->withPivot(['level_id', 'level_unit_id', 'subject_id', 'department_id']);
+    }
 }

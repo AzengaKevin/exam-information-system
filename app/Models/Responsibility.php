@@ -23,4 +23,12 @@ class Responsibility extends Model
         
         $this->attributes['slug'] = Str::slug($value);
     }
+
+    public function teacher()
+    {
+        return $this->belongsToMany(Teacher::class)
+            ->using(ResponsibilityTeacher::class)
+            ->withTimestamps()
+            ->withPivot(['level_id', 'level_unit_id', 'subject_id', 'department_id']);
+    }
 }
