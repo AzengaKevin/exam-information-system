@@ -11,7 +11,7 @@ class SubjectsController extends Controller
         return $this->middleware(['auth']);
     }
 
-    public function index()
+    public function index(Request $request)
     {
         return view('subjects.index');
     }
