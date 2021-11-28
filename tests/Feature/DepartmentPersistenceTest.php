@@ -12,6 +12,7 @@ class DepartmentPersistenceTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /** @group departments */
     public function testADepartmentCanBePersistedToTheDatabase()
     {
         $payload = Department::factory()->make()->toArray();

@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\Log;
 
 class Departments extends Component
 {
-    use WithPagination;
-
-    protected $paginationTheme = 'bootstrap';
 
     public $departmentId;
 
@@ -30,7 +27,7 @@ class Departments extends Component
 
     public function getPaginatedDepartments()
     {
-        return Department::paginate(24);
+        return Department::with(['subjects'])->get();
     }
 
     /**

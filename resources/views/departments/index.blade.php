@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">Departmetns</h1>
+    <h1 class="h4 fw-bold text-muted">Departments</h1>
     <button data-bs-toggle="modal" data-bs-target="#upsert-department-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Department</span>
