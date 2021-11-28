@@ -49,7 +49,7 @@
                 @else
                 <tr>
                     <td colspan="7">
-                        <div class="py-1">No Other Users, Apart From You</div>
+                        <div class="py-1 text-center">No Other Users, Apart From You</div>
                     </td>
                 </tr>
                 @endif

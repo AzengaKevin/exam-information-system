@@ -9,6 +9,7 @@
                     <th>Name</th>
                     <th>Alias</th>
                     <th>Description</th>
+                    <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -41,23 +42,23 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5">
-                        <div class="py-1">No Streams created yet</div>
+                    <td colspan="6">
+                        <div class="py-1 text-center">No Streams created yet</div>
                     </td>
                 </tr>
                 @endif
             </tbody>
-            {{-- <tfoot>
+            <tfoot>
                 <tr>
-                    <td colspan="5">
-                        {{ $users->links() }}
-                        @if ($users->count())
-                        <div class="text-muted">{{ $users->firstItem() }} - {{ $users->lastItem() }} out of
-                            {{ $users->total() }}</div>
+                    <td colspan="6">
+                        {{ $streams->links() }}
+                        @if ($streams->count())
+                        <div class="text-muted">{{ $streams->firstItem() }} - {{ $streams->lastItem() }} out of
+                            {{ $streams->total() }}</div>
                         @endif
                     </td>
                 </tr>
-            </tfoot> --}}
+            </tfoot>
         </table>
     </div>
 

@@ -2,13 +2,14 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover text-center">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Name</th>
                     <th>Permissions</th>
-                    <th>Description</th>
+                    <th>Users</th>
+                    <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -19,10 +20,10 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $role->name }}</td>
                     <td>{{ $role->permissions->count() }}</td>
-                    <td>{{ $role->description }}</td>
+                    <td>{{ $role->users->count() }}</td>
                     <td>{{ $role->created_at->format('d/m/Y') }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center">
+                        <div class="hstack gap-2 align-items-center justify-content-center">
                             <button wire:click="editRole({{ $role }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
@@ -41,7 +42,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         <div class="py-1">No Roles created yet</div>
                     </td>
                 </tr>
@@ -49,7 +50,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="5">
+                    <td colspan="6">
                         {{ $roles->links() }}
                         @if ($roles->count())
                         <div class="text-muted">{{ $roles->firstItem() }} - {{ $roles->lastItem() }} out of

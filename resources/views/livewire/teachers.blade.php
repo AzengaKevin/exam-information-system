@@ -26,10 +26,12 @@
                     <td>{{ $teacher->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                            
+                            <a href="{{ route('teachers.responsibilities.index', $teacher) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
-                                <span>Details</span>
-                            </button>
+                                <span>Tasks</span>
+                            </a>
+
                             <button wire:click="editTeacher({{ $teacher }})"
                                 class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
