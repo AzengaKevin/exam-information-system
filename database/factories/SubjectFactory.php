@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Department;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class SubjectFactory extends Factory
@@ -16,7 +17,8 @@ class SubjectFactory extends Factory
         return [
             'name' => $this->faker->unique()->sentence(),
             'shortname' => $this->faker->unique()->word(),
-            'description' => $this->faker->paragraph()
+            'description' => $this->faker->paragraph(),
+            'department_id' => Department::factory()
         ];
     }
 }

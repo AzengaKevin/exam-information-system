@@ -9,6 +9,7 @@
                     <th>Name</th>
                     <th>Numeric</th>
                     <th>Description</th>
+                    <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -41,23 +42,23 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="5">
-                        <div class="py-1">No Levels created yet</div>
+                    <td colspan="6">
+                        <div class="py-1 text-center">No Levels created yet</div>
                     </td>
                 </tr>
                 @endif
             </tbody>
-            {{-- <tfoot>
+            <tfoot>
                 <tr>
-                    <td colspan="5">
-                        {{ $users->links() }}
-                        @if ($users->count())
-                        <div class="text-muted">{{ $users->firstItem() }} - {{ $users->lastItem() }} out of
-                            {{ $users->total() }}</div>
+                    <td colspan="6">
+                        {{ $levels->links() }}
+                        @if ($levels->count())
+                        <div class="text-muted">{{ $levels->firstItem() }} - {{ $levels->lastItem() }} out of
+                            {{ $levels->total() }}</div>
                         @endif
                     </td>
                 </tr>
-            </tfoot> --}}
+            </tfoot>
         </table>
     </div>
 
