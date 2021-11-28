@@ -2,7 +2,7 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover text-center">
             <thead>
                 <tr>
                     <th>#</th>
@@ -25,7 +25,7 @@
                     <td>{{ $responsibility->pivot->level->name }}</td>
                     <td>{{ $responsibility->pivot->department->name }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center">
+                        <div class="hstack gap-2 align-items-center justify-content-center">
                             <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
@@ -35,7 +35,7 @@
                                 <span>Edit</span>
                             </button>
                             <button class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
-                                <i class="fa fa-cross" aria-hidden="true"></i>
+                                <i class="fa fa-times" aria-hidden="true"></i>
                                 <span>Remove</span>
                             </button>
                         </div>
@@ -53,7 +53,11 @@
         </table>
     </div>
 
-    {{-- <x-modals.responsibilities.upsert :responsibilityId="$responsibilityId" /> --}}
-    {{-- <x-modals.responsibilities.delete :name="$name" /> --}}
+    <x-modals.teachers.responsibilities.assign
+        :levels="$levels"
+        :departments="$departments"
+        :levelUnits="$levelUnits"
+        :responsibilityOptions="$responsibilityOptions"
+        :subjects="$subjects" />
     
 </div>

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\TeacherResponsibilities;
+use App\Models\LevelUnit;
 use App\Models\Responsibility;
 use Tests\TestCase;
 use App\Models\User;
@@ -10,6 +12,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class TeachersResponsibilitiesManagementTest extends TestCase
 {
@@ -53,5 +56,33 @@ class TeachersResponsibilitiesManagementTest extends TestCase
 
         $response->assertSeeLivewire('teacher-responsibilities');
         
+    }
+
+    /** @group teacher-responsibilities */
+    public function testAuthorizedUserCanAssignATeacherResponsibility()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+        
+        $responsibility = Responsibility::factory()->create();
+
+        $levelUnit = LevelUnit::factory()->create();
+
+        Livewire::test(TeacherResponsibilities::class, ['teacher' => $teacher])
+            ->set('responsibility_id', $responsibility->id)
+            ->set('level_unit_id', $levelUnit->id)
+            ->call('assignResponsibility');
+
+        $this->assertEquals(1, $teacher->responsibilities()->count());
+
+        $this->assertNotNull($teacher->fresh()->responsibilities->first()->pivot->levelUnit);
     }
 }
