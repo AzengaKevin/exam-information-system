@@ -31,7 +31,7 @@ class TeachersManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        for ($i=0; $i < 2; $i++) { 
+        for ($i=0; $i < 2; $i++) {
             
             /** @var Teacher */
             $teacher = Teacher::factory()->create();

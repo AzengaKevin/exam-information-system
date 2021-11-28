@@ -16,6 +16,7 @@ use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
+use App\Http\Controllers\TeachersResponsibilitiesController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,9 @@ Route::group(['middleware' => ['auth']], function(){
            ->only(['index']);        
   
     Route::resource('teachers', TeachersController::class)
+        ->only('index');
+
+    Route::resource('teachers.responsibilities', TeachersResponsibilitiesController::class)
         ->only('index');
 
     Route::resource('departments',DepartmentsController::class)
