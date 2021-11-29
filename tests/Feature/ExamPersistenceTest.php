@@ -12,6 +12,7 @@ class ExamPersistenceTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
     
+    /** @group exams */
     public function testAnExamCanBePersistedToTheDatabase()
     {
         $payload = Exam::factory()->make()->toArray();
@@ -27,5 +28,6 @@ class ExamPersistenceTest extends TestCase
         $this->assertEquals($payload['end_date'], $exam->end_date);
         $this->assertEquals($payload['weight'], $exam->weight);
         $this->assertEquals($payload['counts'], $exam->counts);
+        $this->assertEquals($payload['description'], $exam->description);
     }
 }

@@ -11,7 +11,18 @@ class Exam extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $fillable = ['name','term','shortname', 'slug', 'year','start_date','end_date','weight','counts'];
+    protected $fillable = [
+        'name',
+        'term',
+        'shortname', 
+        'slug', 
+        'year',
+        'start_date',
+        'end_date',
+        'weight',
+        'counts',
+        'description'
+    ];
 
     protected $casts = [
         // 'start_date' => 'date',

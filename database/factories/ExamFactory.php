@@ -22,7 +22,8 @@ class ExamFactory extends Factory
             'start_date'=>$this->faker->date(),
             'end_date'=>$this->faker->date(),
             'weight'=>$this->faker->numberBetween(10,100),
-            'counts'=>$this->faker->boolean() 
+            'counts'=>$this->faker->boolean(),
+            'description' => $this->faker->paragraph()
         ];
     }
 }

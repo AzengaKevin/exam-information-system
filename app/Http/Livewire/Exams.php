@@ -24,6 +24,7 @@ class Exams extends Component
     public $end_date;
     public $weight;
     public $counts;
+    public $description;
 
     public function render()
     {
