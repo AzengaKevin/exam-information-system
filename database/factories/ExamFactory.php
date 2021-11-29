@@ -20,7 +20,7 @@ class ExamFactory extends Factory
             'shortname'=>$this->faker->name(),
             'year'=>$this->faker->year(),
             'start_date'=>$this->faker->date(),
-            'end_date'=>$this->faker->end_date(),
+            'end_date'=>$this->faker->date(),
             'weight'=>$this->faker->numberBetween(10,100),
             'counts'=>$this->faker->boolean() 
         ];
