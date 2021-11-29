@@ -2,14 +2,14 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover text-center">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Level</th>
                     <th>Stream</th>
                     <th>Alias</th>
-                    <th>Description</th>
+                    <th>Students</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -21,9 +21,9 @@
                     <td>{{ optional($levelUnit->level)->name }}</td>
                     <td>{{ optional($levelUnit->stream)->name }}</td>
                     <td>{{ $levelUnit->alias ?? 'Not Set' }}</td>
-                    <td>{{ $levelUnit->description }}</td>
+                    <td>{{ $levelUnit->students->count() }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center">
+                        <div class="hstack gap-2 align-items-center justify-content-center">
                             <button wire:click="editLevelUnit({{ $levelUnit }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>

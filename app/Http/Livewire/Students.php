@@ -119,6 +119,8 @@ class Students extends Component
         $this->name = $student->name;
         $this->dob = $student->dob->format('Y-m-d');
         $this->gender = $student->gender;
+        $this->kcpe_marks = $student->kcpe_marks;
+        $this->kcpe_grade = $student->kcpe_grade;
         $this->stream_id = $student->stream_id;
         $this->admission_level_id = $student->admission_level_id;
         $this->description = $student->description;

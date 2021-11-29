@@ -44,6 +44,11 @@ class Student extends Model
         return $this->belongsTo(Level::class);
     }
 
+    public function levelUnit()
+    {
+        return $this->belongsTo(LevelUnit::class);
+    }
+
     public static function kcpeGradeOptions() : array
     {
         return [

@@ -25,4 +25,9 @@ class LevelUnit extends Model
     {
         return $this->belongsTo(Level::class);
     }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
 }
