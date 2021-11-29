@@ -71,13 +71,14 @@ class Exams extends Component
     {
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('exams')->ignore($this->examId)],
-            'term' => ['bail', 'nullable'],
-            'shortname' => ['bail', 'nullable'],
-            'year' => ['bail', 'nullable'],
+            'term' => ['bail', 'nullable', Rule::in(Exam::termOptions())],
+            'shortname' => ['bail', 'required', 'string', 'max:20',Rule::unique('exams')->ignore($this->examId)],
+            'year' => ['bail', 'required'],
             'start_date' => ['bail', 'nullable'],
             'end_date' => ['bail', 'nullable'],
             'weight' => ['bail', 'nullable'],
-            'counts' => ['bail', 'nullable']
+            'counts' => ['bail', 'nullable'],
+            'description' => ['nullable']
         ];
     }
 
@@ -87,16 +88,19 @@ class Exams extends Component
         
         try {
 
-            Exam::create([
-                'name'=>$this->name,
-                'term'=>$this->term,
-                'shortname'=>$this->shortname,
-                'year'=>$this->year,
-                'start_date'=>$this->start_date,
-                'end_date'=>$this->end_date,
-                'weight'=>$this->weight,
-                'counts'=>boolval($this->counts)
-            ]);
+            $exam = Exam::create($data);
+
+            if($exam){
+
+                $this->reset();
+
+                $this->resetPage();
+
+                session()->flash('status', 'Exam has been successfully created');
+
+                $this->emit('hide-upsert-exam-modal');
+
+            }
             
         } catch (\Exception $exception) {
             
@@ -104,8 +108,11 @@ class Exams extends Component
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
 
+            session()->flash('error', 'A fatal error occurred while trying to add an exam');
+
+            $this->emit('hide-upsert-exam-modal');
+
         }
-        $this->emit('hide-upsert-exam-modal');
     }
 
 
@@ -115,12 +122,14 @@ class Exams extends Component
 
         try {
 
-            /** @var User */
+            /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
             if($exam->update($data)){
 
-                session()->flash('status', 'exam successfully updated');
+                $this->reset();
+
+                session()->flash('status', 'Exam successfully updated');
 
                 $this->emit('hide-upsert-exam-modal');
             }
@@ -128,9 +137,13 @@ class Exams extends Component
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->examId,
+                'exam-id' => $this->examId,
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to add an exam');
+
+            $this->emit('hide-upsert-exam-modal');
 
         }
     }
@@ -148,6 +161,7 @@ class Exams extends Component
     {
         try {
 
+            /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
             if($exam->delete()){

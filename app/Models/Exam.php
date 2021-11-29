@@ -42,4 +42,9 @@ class Exam extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
+    public function setCountsAttribute($value)
+    {
+        $this->attributes['counts'] = boolval($value);
+    }
+
 }
