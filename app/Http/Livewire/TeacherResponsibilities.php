@@ -14,7 +14,7 @@ use Livewire\Component;
 
 class TeacherResponsibilities extends Component
 {
-    public Teacher $teacher;
+    public $teacher;
 
     public $responsibility_id;
     public $level_unit_id;

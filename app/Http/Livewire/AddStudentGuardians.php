@@ -12,7 +12,7 @@ class AddStudentGuardians extends Component
 {
     use WithPagination;
 
-    public Student $student;
+    public $student;
 
     protected $paginationTheme = 'bootstrap';
 
