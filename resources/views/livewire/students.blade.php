@@ -2,11 +2,12 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover text-center">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Adm. No</th>
+                    <th>KCPE</th>
                     <th>Name</th>
                     <th>Class</th>
                     <th>Age</th>
@@ -20,12 +21,13 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $student->adm_no }}</td>
+                    <TD>{{ $student->kcpe_marks }}</TD>
                     <td>{{ $student->name }}</td>
                     <td>{{ optional($student->level)->numeric }}{{ optional($student->stream)->alias }}</td>
                     <td>{{ $student->dob->diffInYears(now()) }}</td>
                     <td>{{ $student->created_at->format('d/m/Y') }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center">
+                        <div class="hstack gap-2 align-items-center justify-content-center">
                             <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
@@ -45,7 +47,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         <div class="py-1 text-center">No Student Added Yet</div>
                     </td>
                 </tr>
@@ -53,7 +55,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         {{ $students->links() }}
                         @if ($students->count())
                         <div class="text-muted">{{ $students->firstItem() }} - {{ $students->lastItem() }} out of
@@ -69,7 +71,8 @@
         :studentId="$studentId"
         :streams="$streams"
         :levels="$levels"
-        :genderOptions="$genderOptions" />
+        :genderOptions="$genderOptions"
+        :kcpeGradeOptions="$kcpeGradeOptions" />
 
     <x-modals.students.delete :name="$name" />
 

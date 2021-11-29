@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Level;
+use App\Models\LevelUnit;
 use App\Models\Stream;
 use App\Models\Student;
 use App\Models\User;
@@ -36,7 +37,8 @@ class Students extends Component
             'students' => $this->getPaginatedStudents(),
             'levels' => $this->getAllLevels(),
             'streams' => $this->getAllStreams(),
-            'genderOptions' => User::genderOptions()
+            'genderOptions' => User::genderOptions(),
+            'kcpeGradeOptions' => Student::kcpeGradeOptions()
         ]);
     }
 
@@ -77,6 +79,12 @@ class Students extends Component
 
         try {
 
+            // Based on level and stream, get the level_unit_id and also persists
+            $data['level_unit_id'] = LevelUnit::firstOrCreate([
+                'level_id' => $data['admission_level_id'],
+                'stream_id' => $data['stream_id']
+            ])->id;
+
             $student = Student::create($data);
 
             if($student){
@@ -95,7 +103,10 @@ class Students extends Component
             Log::error($exception->getMessage(), [
                 'action' => __METHOD__
             ]);
-            
+
+            session()->flash('error', 'A fatal error occurred while trying to add student');
+
+            $this->emit('hide-upsert-student-modal');
         }
     }
 

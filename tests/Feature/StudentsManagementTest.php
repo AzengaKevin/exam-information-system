@@ -70,6 +70,8 @@ class StudentsManagementTest extends TestCase
         $this->assertEquals($payload['gender'], $student->gender);
         $this->assertEquals($payload['admission_level_id'], $student->admission_level_id);
         $this->assertEquals($payload['level_id'], $student->level_id);
+
+        $this->assertNotNull($student->level_unit_id);
         
     }
 

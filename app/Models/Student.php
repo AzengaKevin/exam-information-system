@@ -19,7 +19,7 @@ class Student extends Model
         'kcpe_grade',
         'admission_level_id',
         'stream_id',
-        'leve_unit_id',
+        'level_unit_id',
         'upi',
         'description'
     ];

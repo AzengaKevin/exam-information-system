@@ -2,7 +2,8 @@
 'studentId' => null,
 'levels' => [],
 'streams' => [],
-'genderOptions' => []
+'genderOptions' => [],
+'kcpeGradeOptions' => []
 ])
 
 <div wire:ignore.self id="upsert-student-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
@@ -20,11 +21,36 @@
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row g-3">
-                        <div class="col-md-8">
+                        <div class="col-md-6">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" wire:model.lazy="name" id="name"
                                 class="form-control @error('name') is-invalid @enderror">
                             @error('name')
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+                        <div class="col-md-3">
+                            <label for="kcpe_marks" class="form-label">KCPE Marks</label>
+                            <input type="number" step="1" min="0" max="500" wire:model.lazy="kcpe_marks" id="kcpe_marks"
+                                class="form-control @error('kcpe_marks') is-invalid @enderror">
+                            @error('kcpe_marks')
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+                        <div class="col-md-3">
+                            <label for="kcpe-grade" class="form-label">KCPE Grade</label>
+                            <select wire:model="kcpe_grade" id="kcpe-grade"
+                                class="form-select @error('kcpe_grade') is-invalid @enderror">
+                                <option value="">-- Select Grade --</option>
+                                @foreach ($kcpeGradeOptions as $item)
+                                <option value="{{ $item }}">{{ $item }}</option>
+                                @endforeach
+                            </select>
+                            @error('kcpe_grade')
                             <span class="invalid-feedback">
                                 <strong>{{ $message }}</strong>
                             </span>
@@ -52,7 +78,8 @@
                         </div>
                         <div class="col-md-6">
                             <label for="gender" class="form-label">Gender</label>
-                            <select wire:model="gender" id="gender" class="form-select @error('gender') is-invalid @enderror">
+                            <select wire:model="gender" id="gender"
+                                class="form-select @error('gender') is-invalid @enderror">
                                 <option value="">-- Select Gender --</option>
                                 @foreach ($genderOptions as $item)
                                 <option value="{{ $item }}">{{ $item }}</option>
@@ -113,9 +140,9 @@
                                 class="form-control @error('description') is-invalid @enderror">
                             </textarea>
                             @error('description')
-                                <span class="invalid-feedback">
-                                    <strong>{{ $message }}</strong>
-                                </span>
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
                             @enderror
                         </div>
                     </div>
