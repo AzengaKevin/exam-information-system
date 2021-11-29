@@ -22,6 +22,8 @@ class Students extends Component
     public $adm_no;
     public $name;
     public $upi;
+    public $kcpe_marks;
+    public $kcpe_grade;
     public $gender;
     public $dob;
     public $admission_level_id;
@@ -63,7 +65,9 @@ class Students extends Component
             'dob' => ['bail', 'string'],
             'admission_level_id' => ['bail', 'required', 'integer'],
             'stream_id' => ['bail', 'required', 'integer'],
-            'description' => ['bail', 'nullable']
+            'description' => ['bail', 'nullable'],
+            'kcpe_grade' => ['bail', 'required', Rule::in(Student::kcpeGradeOptions())],
+            'kcpe_marks' => ['bail', 'required', 'integer']
         ];
     }
 

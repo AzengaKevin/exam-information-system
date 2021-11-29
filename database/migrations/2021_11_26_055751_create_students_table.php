@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -19,6 +20,8 @@ class CreateStudentsTable extends Migration
             $table->string('name');
             $table->string('adm_no')->unique();
             $table->string('upi')->nullable();
+            $table->integer('kcpe_marks');
+            $table->enum('kcpe_grade', Student::kcpeGradeOptions());
             $table->enum('gender', User::genderOptions());
             $table->date('dob');
             $table->foreignId('level_id')->nullable()->constrained();

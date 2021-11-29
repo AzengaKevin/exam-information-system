@@ -25,6 +25,8 @@ class StudentPersistentTest extends TestCase
         $this->assertEquals($payload['adm_no'], $student->adm_no);
         $this->assertEquals($payload['name'], $student->name);
         $this->assertEquals($payload['gender'], $student->gender);
+        $this->assertEquals($payload['kcpe_marks'], $student->kcpe_marks);
+        $this->assertEquals($payload['kcpe_grade'], $student->kcpe_grade);
         $this->assertEquals($payload['admission_level_id'], $student->admission_level_id);
         $this->assertEquals($payload['level_id'], $student->level_id);
     }

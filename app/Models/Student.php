@@ -15,8 +15,11 @@ class Student extends Model
         'dob',
         'gender',
         'level_id',
+        'kcpe_marks',
+        'kcpe_grade',
         'admission_level_id',
         'stream_id',
+        'leve_unit_id',
         'upi',
         'description'
     ];
@@ -39,5 +42,12 @@ class Student extends Model
     public function level()
     {
         return $this->belongsTo(Level::class);
+    }
+
+    public static function kcpeGradeOptions() : array
+    {
+        return [
+            'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'
+        ];
     }
 }
