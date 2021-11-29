@@ -15,6 +15,8 @@
 
 <livewire:students />
 
+<livewire:add-student-guardians />
+
 @endsection
 
 @push('scripts')
@@ -24,5 +26,8 @@
 
     livewire.on('show-delete-student-modal', () => $('#delete-student-modal').modal('show'))
     livewire.on('hide-delete-student-modal', () => $('#delete-student-modal').modal('hide'))
+
+    livewire.on('show-add-student-guardians-modal', () => $('#add-student-guardians-modal').modal('show'))
+    livewire.on('hide-add-student-guardians-modal', () => $('#add-student-guardians-modal').modal('hide'))
 </script>
 @endpush

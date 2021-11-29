@@ -18,6 +18,8 @@ class Students extends Component
 
     protected $paginationTheme = 'bootstrap';
 
+    protected $listeners = ['addStudentGuardiansFeedback'];
+
     public $studentId;
 
     public $adm_no;
@@ -204,5 +206,18 @@ class Students extends Component
 
             $this->emit('hide-delete-student-modal');
         }
+    }
+
+    public function showAddStudentGuardiansModal(Student $student)
+    {
+        $this->emitTo('add-student-guardians', 'showAddStudentGuardiansModal', $student);
+    }
+
+    public function addStudentGuardiansFeedback(array $payload)
+    {
+        session()->flash($payload['type'], $payload['message']);
+
+        $this->emit('hide-add-student-guardians-modal');
+        
     }
 }
