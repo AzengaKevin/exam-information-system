@@ -55,6 +55,36 @@ class RolePermissionSeeder extends Seeder
             'Guardians Create',
             'Guardians Update',
             'Guardians Delete',
+
+            'Users Browse',
+            'Users Create',
+            'Users Update',
+            'Users Delete',
+
+            'Departments Browse',
+            'Departments Create',
+            'Departments Update',
+            'Departments Delete',
+
+            'Responsibilities Browse',
+            'Responsibilities Create',
+            'Responsibilities Update',
+            'Responsibilities Delete',
+
+            'Exams Browse',
+            'Exams Create',
+            'Exams Update',
+            'Exams Delete',
+
+            'Student Browse',
+            'Student Create',
+            'Student Update',
+            'Student Delete',
+
+            'LevelUnits Browse',
+            'LevelUnits Create',
+            'LevelUnits Update',
+            'LevelUnits Delete'
         );
 
         array_walk($permissionsPayload, function($data){
