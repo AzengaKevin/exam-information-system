@@ -24,6 +24,7 @@
                     </div>
                 </a>
             </li>
+            @can('viewAny', \App\Models\Role::class)                
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('roles.index') ? 'text-white':'text-white-50'}}" href="{{route('roles.index')}}">
                     <div class="hstack gap-3">
@@ -32,6 +33,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('permissions.index') ? 'text-white':'text-white-50'}}" href="{{route('permissions.index')}}">
                     <div class="hstack gap-3">

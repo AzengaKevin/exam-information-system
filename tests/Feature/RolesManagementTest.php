@@ -21,8 +21,25 @@ class RolesManagementTest extends TestCase
     {
         parent::setUp();
 
+        $permissions = [
+            'Roles Create',
+            'Roles Browse',
+            'Roles Read',
+            'Roles Update',
+            'Roles Delete'
+        ];
+
+        array_walk($permissions, function($name){Permission::create(compact('name'));});
+
+        /** @var Role */
+        $role = Role::factory()->create();
+
+        $role->permissions()->attach(Permission::all());
+
         /** @var Authenticatable */
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role_id' => $role->id
+        ]);
 
         $this->actingAs($user);
     }
