@@ -55,4 +55,9 @@ class Student extends Model
             'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'
         ];
     }
+
+    public function guardians()
+    {
+        return $this->belongsToMany(Guardian::class);
+    }
 }

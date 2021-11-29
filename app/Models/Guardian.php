@@ -18,4 +18,9 @@ class Guardian extends Model
     {
         return $this->morphOne(User::class, 'authenticatable');
     }
+
+    public function students()
+    {
+        return $this->belongsToMany(Student::class);
+    }
 }
