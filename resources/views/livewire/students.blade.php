@@ -32,6 +32,11 @@
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
+                            <button wire:click="showAddStudentGuardiansModal({{ $student }})"
+                                class="btn btn-sm btn-outline-success hstack gap-1 align-items-center">
+                                <i class="fa fa-plus"></i>
+                                <span>Guardians</span>
+                            </button>
                             <button wire:click="editStudent({{ $student }})"
                                 class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>

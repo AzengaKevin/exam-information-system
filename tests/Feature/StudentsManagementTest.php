@@ -2,14 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Http\Livewire\Students;
-use App\Models\Student;
+use App\Http\Livewire\AddStudentGuardians;
 use Tests\TestCase;
 use App\Models\User;
+use Livewire\Livewire;
+use App\Models\Student;
+use App\Models\Guardian;
+use App\Http\Livewire\Students;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 class StudentsManagementTest extends TestCase
 {
@@ -117,6 +120,45 @@ class StudentsManagementTest extends TestCase
             ->call('deleteStudent');
 
         $this->assertFalse(Student::where('id', $student->id)->exists());
+        
+    }
+
+    /** @group students */
+    public function testAuthorizedUserCanAddStudentGuardians()
+    {
+        $this->withoutExceptionHandling();
+
+
+        for ($i=0; $i < 2; $i++) { 
+            
+            /** @var Guardian */
+            $guardian = Guardian::factory()->create();
+
+            $guardian->auth()->create([
+                'name' => $this->faker->name(),
+                'email' => $this->faker->safeEmail(),
+                'password' => Hash::make('password')
+            ]);
+        }
+
+        /** @var Student */
+        $student = Student::factory()->create();
+
+        $guardianIds = Guardian::all()->pluck('id');
+
+        $payload = array();
+
+        foreach ($guardianIds as $id) {
+            $payload[$id] = 'true';
+        }
+
+
+        Livewire::test(AddStudentGuardians::class)
+            ->call('showAddStudentGuardiansModal', $student)
+            ->set('selectedGuardians', $payload)
+            ->call('addStudentGuardians');
+
+        $this->assertEquals(count($payload), $student->guardians()->count());
         
     }
 }
