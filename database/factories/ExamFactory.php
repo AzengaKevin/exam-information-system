@@ -15,14 +15,15 @@ class ExamFactory extends Factory
     public function definition()
     {
         return [
-            'name'=>$this->faker->name(),
+            'name'=>$this->faker->sentence(),
             'term' => $this->faker->randomElement(Exam::termOptions()),
-            'shortname'=>$this->faker->name(),
+            'shortname'=>$this->faker->unique()->word(),
             'year'=>$this->faker->year(),
             'start_date'=>$this->faker->date(),
-            'end_date'=>$this->faker->end_date(),
+            'end_date'=>$this->faker->date(),
             'weight'=>$this->faker->numberBetween(10,100),
-            'counts'=>$this->faker->boolean() 
+            'counts'=>$this->faker->boolean(),
+            'description' => $this->faker->paragraph()
         ];
     }
 }

@@ -8,6 +8,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Description</th>
+                    <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>

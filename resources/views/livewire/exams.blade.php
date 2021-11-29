@@ -1,15 +1,15 @@
 <div>
+    
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover">
+        <table class="table table-hover text-center">
             <thead>
                 <tr>
                     <th>#</th>
-                    <th>Name</th>
-                    <th>Term</th>
-                    <th>ShortName</th>
+                    <th>Shortname</th>
                     <th>Year</th>
+                    <th>Term</th>
                     <th>Start Date</th>
                     <th>End Date</th>
                     <th>Weight</th>
@@ -22,17 +22,15 @@
                 @foreach ($exams as $exam)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $exam->name }}</td>
-                    <td>{{ $exam->term }}</td>
                     <td>{{ $exam->shortname }}</td>
                     <td>{{ $exam->year }}</td>
+                    <td>{{ $exam->term }}</td>
                     <td>{{ $exam->start_date }}</td>
                     <td>{{ $exam->end_date }}</td>
                     <td>{{ $exam->weight }}</td>
-                    <td>{{ $exam->counts }}</td>
-                    <td>{{ $exam->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $exam->counts ? 'True' : 'False' }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center">
+                        <div class="hstack gap-2 align-items-center justify-content-center">
                             <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
@@ -41,7 +39,7 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
-                            <button wire:click="showDeleteExamModal({{ $exam }})" class="btn btn-outline-danger hstack gap-2 align-items-center">
+                            <button wire:click="showDeleteExamModal({{ $exam }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                 <span>Delete</span>
                             </button>
