@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Level;
+use App\Models\LevelUnit;
 use App\Models\Stream;
 use App\Models\Student;
 use App\Models\User;
@@ -22,6 +23,8 @@ class Students extends Component
     public $adm_no;
     public $name;
     public $upi;
+    public $kcpe_marks;
+    public $kcpe_grade;
     public $gender;
     public $dob;
     public $admission_level_id;
@@ -34,7 +37,8 @@ class Students extends Component
             'students' => $this->getPaginatedStudents(),
             'levels' => $this->getAllLevels(),
             'streams' => $this->getAllStreams(),
-            'genderOptions' => User::genderOptions()
+            'genderOptions' => User::genderOptions(),
+            'kcpeGradeOptions' => Student::kcpeGradeOptions()
         ]);
     }
 
@@ -63,7 +67,9 @@ class Students extends Component
             'dob' => ['bail', 'string'],
             'admission_level_id' => ['bail', 'required', 'integer'],
             'stream_id' => ['bail', 'required', 'integer'],
-            'description' => ['bail', 'nullable']
+            'description' => ['bail', 'nullable'],
+            'kcpe_grade' => ['bail', 'required', Rule::in(Student::kcpeGradeOptions())],
+            'kcpe_marks' => ['bail', 'required', 'integer']
         ];
     }
 
@@ -72,6 +78,12 @@ class Students extends Component
         $data = $this->validate();
 
         try {
+
+            // Based on level and stream, get the level_unit_id and also persists
+            $data['level_unit_id'] = LevelUnit::firstOrCreate([
+                'level_id' => $data['admission_level_id'],
+                'stream_id' => $data['stream_id']
+            ])->id;
 
             $student = Student::create($data);
 
@@ -91,7 +103,10 @@ class Students extends Component
             Log::error($exception->getMessage(), [
                 'action' => __METHOD__
             ]);
-            
+
+            session()->flash('error', 'A fatal error occurred while trying to add student');
+
+            $this->emit('hide-upsert-student-modal');
         }
     }
 
@@ -104,6 +119,8 @@ class Students extends Component
         $this->name = $student->name;
         $this->dob = $student->dob->format('Y-m-d');
         $this->gender = $student->gender;
+        $this->kcpe_marks = $student->kcpe_marks;
+        $this->kcpe_grade = $student->kcpe_grade;
         $this->stream_id = $student->stream_id;
         $this->admission_level_id = $student->admission_level_id;
         $this->description = $student->description;
