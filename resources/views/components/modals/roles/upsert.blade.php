@@ -8,7 +8,7 @@
                 @if (is_null($roleId))
                 <h5 id="upsert-role-modal-title" class="modal-title">Add Role</h5>
                 @else
-                <h5 id="upsert-role-modal-title" class="modal-title">Update Role ({{ $roleId }})</h5>
+                <h5 id="upsert-role-modal-title" class="modal-title">Update Role</h5>
                 @endif
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
