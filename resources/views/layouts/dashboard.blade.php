@@ -17,16 +17,18 @@
         <hr class="bg-white">
         <ul class="nav flex-column">
             <li class="nav-item btn-dashboard">
-                <a class="nav-link {{ request()->routeIs('dashboard') ? 'text-white' : 'text-white-50' }}" href="{{ route('dashboard') }}">
+                <a class="nav-link {{ request()->routeIs('dashboard') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('dashboard') }}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-tachometer-alt"></i></span>
                         <span>Dashboard</span>
                     </div>
                 </a>
             </li>
-            @can('viewAny', \App\Models\Role::class)                
+            @can('viewAny', \App\Models\Role::class)
             <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('roles.index') ? 'text-white':'text-white-50'}}" href="{{route('roles.index')}}">
+                <a class="nav-link {{request()->routeIs('roles.index') ? 'text-white':'text-white-50'}}"
+                    href="{{route('roles.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-users-cog"></i></span>
                         <span>Roles</span>
@@ -34,16 +36,21 @@
                 </a>
             </li>
             @endcan
+
+            @can('viewAny', \App\Models\Permission::class)
             <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('permissions.index') ? 'text-white':'text-white-50'}}" href="{{route('permissions.index')}}">
+                <a class="nav-link {{request()->routeIs('permissions.index') ? 'text-white':'text-white-50'}}"
+                    href="{{route('permissions.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-users-cog"></i></span>
                         <span>Permissions</span>
                     </div>
                 </a>
             </li>
+            @endcan
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('users.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('users.index') }}">
+                <a class="nav-link {{ request()->routeIs('users.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('users.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-users"></i></span>
                         <span>Users</span>
@@ -51,7 +58,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('levels.index') ? 'text-white' : 'text-white-50' }}" href="{{route('levels.index')}}">
+                <a class="nav-link {{ request()->routeIs('levels.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{route('levels.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-layer-group"></i></span>
                         <span>Levels</span>
@@ -59,7 +67,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('streams.index') ? 'text-white':'text-white-50' }}" href="{{route('streams.index')}}">
+                <a class="nav-link {{request()->routeIs('streams.index') ? 'text-white':'text-white-50' }}"
+                    href="{{route('streams.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-list-ul"></i></span>
                         <span>Streams</span>
@@ -67,7 +76,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}" href="{{route('departments.index')}}">
+                <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}"
+                    href="{{route('departments.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-th"></i></span>
                         <span>Departments</span>
@@ -75,7 +85,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('subjects.index') ? 'text-white':'text-white-50' }}" href="{{route('subjects.index')}}">
+                <a class="nav-link {{request()->routeIs('subjects.index') ? 'text-white':'text-white-50' }}"
+                    href="{{route('subjects.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-book"></i></span>
                         <span>Subjects</span>
@@ -83,7 +94,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('students.index') ? 'text-white':'text-white-50' }}" href="{{ route('students.index') }}">
+                <a class="nav-link {{ request()->routeIs('students.index') ? 'text-white':'text-white-50' }}"
+                    href="{{ route('students.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-user-graduate"></i></span>
                         <span>Students</span>
@@ -91,7 +103,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('teachers.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('teachers.index') }}">
+                <a class="nav-link {{ request()->routeIs('teachers.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('teachers.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-user-tie"></i></span>
                         <span>Teachers</span>
@@ -99,7 +112,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('guardians.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('guardians.index') }}">
+                <a class="nav-link {{ request()->routeIs('guardians.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('guardians.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fas fa-user-tie"></i></span>
                         <span>Guardians</span>
@@ -107,7 +121,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('exams.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('exams.index') }}">
+                <a class="nav-link {{ request()->routeIs('exams.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('exams.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-file-alt" aria-hidden="true"></i></span>
                         <span>Exams</span>
@@ -115,7 +130,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('responsibilities.index') }}">
+                <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('responsibilities.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-tasks" aria-hidden="true"></i></span>
                         <span>Responsibilities</span>
@@ -123,7 +139,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('level-units.index') ? 'text-white' : 'text-white-50' }}" href="{{ route('level-units.index') }}">
+                <a class="nav-link {{ request()->routeIs('level-units.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('level-units.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-th" aria-hidden="true"></i></span>
                         <span>Level Units</span>
