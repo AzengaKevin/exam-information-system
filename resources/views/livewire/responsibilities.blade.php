@@ -7,7 +7,8 @@
                 <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Description</th>
+                    <th>Teachers</th>
+                    <th>Created</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -17,7 +18,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $responsibility->name }}</td>
-                    <td>{{ $responsibility->description }}</td>
+                    <td>{{ $responsibility->teachers->count() }}</td>
                     <td>{{ $responsibility->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">

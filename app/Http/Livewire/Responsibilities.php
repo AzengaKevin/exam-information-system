@@ -30,7 +30,7 @@ class Responsibilities extends Component
 
     public function getPaginatedResponsibilities()
     {
-        return Responsibility::paginate(24);
+        return Responsibility::with('teachers')->paginate(24);
     }
 
     /**

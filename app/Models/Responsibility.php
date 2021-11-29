@@ -24,7 +24,7 @@ class Responsibility extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
-    public function teacher()
+    public function teachers()
     {
         return $this->belongsToMany(Teacher::class)
             ->using(ResponsibilityTeacher::class)
