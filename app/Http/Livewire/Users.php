@@ -6,6 +6,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -80,21 +81,37 @@ class Users extends Component
             /** @var User */
             $user = User::findOrFail($this->userId);
 
-            if($user->update($data)){
+            $access = Gate::inspect('update', $user);
 
-                $this->reset(['userId', 'name', 'active', 'role_id']);
+            if($access->allowed()){
 
-                session()->flash('status', 'Users successfully updated');
+                if($user->update($data)){
+    
+                    $this->reset(['userId', 'name', 'active', 'role_id']);
+    
+                    session()->flash('status', 'Users successfully updated');
+    
+                    $this->emit('hide-update-user-modal');
+                }
+
+            }else{
+    
+                session()->flash('error', $access->message());
 
                 $this->emit('hide-update-user-modal');
-            }
 
+            }
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'action' => __METHOD__
+                'action' => __METHOD__,
+                'user-id' => $user->id
             ]);
+    
+            session()->flash('error', 'A fatal error occurred when updating a user');
+
+            $this->emit('hide-update-user-modal');
 
         }
     }
@@ -112,25 +129,37 @@ class Users extends Component
     public function deleteUser()
     {
         try {
-
-            DB::beginTransaction();
-
+            
             /** @var User */
             $user = User::findOrFail($this->userId);
 
-            if($user->authenticatable) $user->authenticatable->delete();
+            $access = Gate::inspect('delete', $user);
+            
+            if($access->allowed()){
 
-            if($user->delete()){
+                DB::beginTransaction();
+    
+                if($user->authenticatable) $user->authenticatable->delete();
+    
+                if($user->delete()){
+    
+                    DB::commit();
+    
+                    $this->reset(['userId', 'name']);
+    
+                    $this->resetPage();
+    
+                    $this->resetValidation();
+    
+                    $this->emit('hide-delete-user-modal');
+                }
 
-                DB::commit();
-
-                $this->reset(['userId', 'name']);
-
-                $this->resetPage();
-
-                $this->resetValidation();
-
+            }else{
+    
+                session()->flash('error', $access->message());
+    
                 $this->emit('hide-delete-user-modal');
+
             }
 
 

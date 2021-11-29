@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Livewire\Users;
+use App\Models\Permission;
 use App\Models\Role;
 use Tests\TestCase;
 use App\Models\User;
@@ -15,11 +16,18 @@ class UsersManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    private Role $role;
+
     public function setUp(): void
     {
         parent::setUp();
+
+        $this->role = Role::factory()->create();
+
         /** @var Authenticatable */
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role_id' => $this->role->id
+        ]);
 
         $this->actingAs($user);
     }
@@ -28,6 +36,8 @@ class UsersManagementTest extends TestCase
     public function testAuthorizedUserCanVisitUsersPage()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Browse']));
 
         User::factory(2)->create();
 
@@ -45,6 +55,8 @@ class UsersManagementTest extends TestCase
     public function testAuthorizedUserCanUpdateUser()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Update']));
 
         /** @var User */
         $user = User::factory()->create();
@@ -65,6 +77,8 @@ class UsersManagementTest extends TestCase
     public function testAuthorizedUserCanUpdateUserWithRole()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Update']));
 
         /** @var User */
         $user = User::factory()->create();
@@ -91,6 +105,8 @@ class UsersManagementTest extends TestCase
     public function testAuthorizedUserCanDeleteAUser()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Delete']));
 
         $user = User::factory()->create();
 

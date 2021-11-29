@@ -7,7 +7,7 @@
                 <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Description</th>
+                    <th>Slug</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
@@ -18,7 +18,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $permission->name }}</td>
-                    <td>{{ $permission->description }}</td>
+                    <td>{{ $permission->slug }}</td>
                     <td>{{ $permission->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">

@@ -59,7 +59,7 @@
                 </ul>
                 @else
                 <a href="{{ route('login') }}" class="btn btn-outline-light">Login</a>
-                <a href="#" class="btn btn-outline-light">Register</a>
+                <a href="{{ route('register') }}" class="btn btn-outline-light">Register</a>
                 @endauth
             </div>
         </div>

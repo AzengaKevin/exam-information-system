@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Permission;
 use App\Models\Role;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
@@ -71,11 +72,30 @@ class Roles extends Component
         
         try {
 
-            Role::create([
-                'name'=>$this->name,
-                'description'=>$this->description ,
-                'slug'=>Str::slug($this->name)
-            ]);
+            $access = Gate::inspect('create', Role::class);
+
+            if($access->allowed()){
+                
+                $role = Role::create([
+                    'name'=>$this->name,
+                    'description'=>$this->description,
+                    'slug'=>Str::slug($this->name)
+                ]);
+
+                if($role){
+
+                    session()->flash('status', 'A new role has been successfully added');
+        
+                    $this->emit('hide-upsert-role-modal');
+                }
+            
+            }else{
+            
+                session()->flash('error', "You're not authorized to create a role");
+        
+                $this->emit('hide-upsert-role-modal');
+
+            }
             
         } catch (\Exception $exception) {
             
@@ -83,9 +103,11 @@ class Roles extends Component
                 'user-id' => $this->userId,
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
+            
+            session()->flash('error', 'A fatal error occurred during role addition');
 
+            $this->emit('hide-upsert-role-modal');
         }
-        $this->emit('hide-upsert-role-modal');
     }
 
 
@@ -98,12 +120,25 @@ class Roles extends Component
             /** @var User */
             $role = Role::findOrFail($this->roleId);
 
-            if($role->update($data)){
+            $access = Gate::inspect('update', $role);
 
-                session()->flash('status', 'role successfully updated');
+            if($access->allowed()){
+
+                if($role->update($data)){
+    
+                    session()->flash('status', 'role successfully updated');
+    
+                    $this->emit('hide-upsert-role-modal');
+                }
+
+            }else{
+            
+                session()->flash('error', "You're not authorized to update a role");
 
                 $this->emit('hide-upsert-role-modal');
+
             }
+
             
         } catch (\Exception $exception) {
             
@@ -111,6 +146,10 @@ class Roles extends Component
                 'user-id' => $this->userId,
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
+    
+            session()->flash('error', $exception->getMessage());
+
+            $this->emit('hide-upsert-role-modal');
 
         }
     }
@@ -131,13 +170,24 @@ class Roles extends Component
 
             $role = Role::findOrFail($this->roleId);
 
-            if($role->delete()){
+            $access = Gate::inspect('delete', $role);
 
-                $this->reset(['roleId', 'name']);
-
-                session()->flash('status', 'The role has been successfully deleted');
+            if($access->allowed()){
+    
+                if($role->delete()){
+    
+                    $this->reset(['roleId', 'name']);
+    
+                    session()->flash('status', 'The role has been successfully deleted');
+    
+                    $this->emit('hide-delete-role-modal');
+                }
+            }else{
+            
+                session()->flash('error', "You're not authorized to delete a role");
 
                 $this->emit('hide-delete-role-modal');
+
             }
 
         } catch (\Exception $exception) {
@@ -181,7 +231,7 @@ class Roles extends Component
             /** @var Role */
             $role = Role::findOrFail($this->roleId);
 
-            $result = $role->permissions()->sync(array_keys($payload));
+            $role->permissions()->sync(array_keys($payload));
 
             $this->reset(['roleId', 'name', 'selectedPermissions']);
 
