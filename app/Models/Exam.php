@@ -47,4 +47,14 @@ class Exam extends Model
         $this->attributes['counts'] = boolval($value);
     }
 
+    public function levels()
+    {
+        return $this->belongsToMany(Level::class);
+    }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class);
+    }
+
 }

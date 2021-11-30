@@ -39,6 +39,14 @@
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
+                            <button wire:click="showEnrollLevelsModal({{ $exam }})" class="btn btn-sm btn-outline-secondary hstack gap-1 align-items-center">
+                                <i class="fa fa-check"></i>
+                                <span>Levels</span>
+                            </button>
+                            <button wire:click="showEnrollSubjectsModal({{ $exam }})" class="btn btn-sm btn-outline-success hstack gap-1 align-items-center">
+                                <i class="fa fa-check"></i>
+                                <span>Subjects</span>
+                            </button>
                             <button wire:click="showDeleteExamModal({{ $exam }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                 <span>Delete</span>
@@ -71,5 +79,7 @@
 
     <x-modals.exams.upsert :examId="$examId" :terms="$terms"/>
     <x-modals.exams.delete :name="$name" />
+    <x-modals.exams.enroll-levels :shortname="$shortname" :levels="$levels" />
+    <x-modals.exams.enroll-subjects :shortname="$shortname" :subjects="$subjects" />
     
 </div>

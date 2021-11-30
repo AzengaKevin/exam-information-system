@@ -3,6 +3,8 @@
 namespace App\Http\Livewire;
 
 use App\Models\Exam;
+use App\Models\Level;
+use App\Models\Subject;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -26,17 +28,32 @@ class Exams extends Component
     public $counts;
     public $description;
 
+    public $selectedLevels = [];
+    public $selectedSubjects = [];
+
     public function render()
     {
         return view('livewire.exams', [
             'exams' => $this->getPaginatedExams(),
-            'terms'=>$this->getTerms()
+            'terms'=> $this->getTerms(),
+            'levels' => $this->getLevels(),
+            'subjects' => $this->getSubjects()
         ]);
     }
 
     public function getTerms()
     {
         return Exam::termOptions();
+    }
+
+    public function getLevels()
+    {
+        return Level::all(['id', 'name']);
+    }
+
+    public function getSubjects()
+    {
+        return Subject::all(['id', 'name']);
     }
 
     public function getPaginatedExams()
@@ -82,7 +99,7 @@ class Exams extends Component
         ];
     }
 
-    function createExam()
+    public function createExam()
     {
        $data = $this->validate();
         
@@ -185,4 +202,106 @@ class Exams extends Component
             $this->emit('hide-delete-exam-modal');
         }
     }
+    
+    public function showEnrollLevelsModal(Exam $exam)
+    {
+        $this->examId = $exam->id;
+
+        $this->shortname = $exam->shortname;
+
+        foreach ($exam->levels as $level) {
+
+            $this->selectedLevels[$level->id] = 'true';
+            
+        }
+
+        $this->emit('show-enroll-levels-modal');
+    }
+
+    public function updateExamLevels()
+    {
+
+        $data = $this->validate([
+            'selectedLevels' => ['array', 'min:1']
+        ]);
+
+        $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
+            return $value == 'true';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        try {
+
+            /** @var Exam */
+            $exam = Exam::findOrFail($this->examId);
+
+            $exam->levels()->sync(array_keys($selectedLevelData));
+
+            $this->emit('hide-enroll-levels-modal');
+
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'exam-id' => $this->examId
+            ]);
+
+            session()->flash('error', 'An error occurred when enrolling levels to an exam');
+
+            $this->emit('hide-enroll-levels-modal');
+        }
+        
+    }
+
+    public function showEnrollSubjectsModal(Exam $exam)
+    {
+        $this->examId = $exam->id;
+
+        $this->shortname = $exam->shortname;
+
+        foreach ($exam->subjects as $subject) {
+
+            $this->selectedSubjects[$subject->id] = 'true';
+            
+        }
+
+
+        $this->emit('show-enroll-subjects-modal');
+    }
+
+    public function enrollSubjects()
+    {
+        $data = $this->validate([
+            'selectedSubjects' => ['bail', 'array', 'min:1']
+        ]);
+
+        $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
+            return $value == 'true';
+        }, ARRAY_FILTER_USE_BOTH);
+
+        try {
+
+            /** @var Exam */
+            $exam = Exam::findOrFail($this->examId);
+
+            $exam->subjects()->sync(array_keys($selectedSubjectsData));
+
+            session()->flash('status', 'Enrolling subjects to an exams successfully completed');
+
+            $this->emit('hide-enroll-subjects-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'exam-id' => $exam->id
+            ]);
+
+            session()->flash('error', 'Enrolling subjects to an exam failed, contact admin');
+
+            $this->emit('hide-enroll-subjects-modal');
+        }
+        
+    }
+
 }
