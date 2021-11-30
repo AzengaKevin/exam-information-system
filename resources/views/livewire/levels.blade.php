@@ -8,7 +8,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Numeric</th>
-                    <th>Description</th>
+                    <th>Students</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
@@ -20,7 +20,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $level->name }}</td>
                     <td>{{ $level->numeric }}</td>
-                    <td>{{ $level->description }}</td>
+                    <td>{{ $level->students->count() }}</td>
                     <td>{{ $level->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">

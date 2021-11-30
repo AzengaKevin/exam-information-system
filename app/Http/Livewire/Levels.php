@@ -150,5 +150,4 @@ class Levels extends Component
             $this->emit('hide-delete-level-modal');
         }
     }
-
 }
