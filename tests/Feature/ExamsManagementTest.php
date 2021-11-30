@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Http\Livewire\Exams;
 use App\Http\Livewire\Levels;
 use App\Models\Level;
+use App\Models\Subject;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -104,6 +105,31 @@ class ExamsManagementTest extends TestCase
             ->call('updateExamLevels');
         
         $this->assertEquals(count($payload), $exam->levels()->count());
+        
+    }
+
+    /** @group exams */
+    public function testAuthorizedUsersCanEnrollSubjectsToExam()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $subjectsIds = Subject::factory(2)->create()->pluck('id')->toArray();
+
+        $payload = array();
+
+        foreach ($subjectsIds as $id) {
+            $payload[$id] = 'true';
+        }
+
+        Livewire::test(Exams::class)
+            ->call('showEnrollSubjectsModal', $exam)
+            ->set('selectedSubjects', $payload)
+            ->call('enrollSubjects');
+
+        $this->assertEquals(count($payload), $exam->subjects()->count());
         
     }
 }
