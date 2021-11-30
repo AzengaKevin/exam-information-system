@@ -7,6 +7,7 @@ use App\Models\LevelUnit;
 use App\Models\Stream;
 use App\Models\Student;
 use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -81,23 +82,35 @@ class Students extends Component
 
         try {
 
-            // Based on level and stream, get the level_unit_id and also persists
-            $data['level_unit_id'] = LevelUnit::firstOrCreate([
-                'level_id' => $data['admission_level_id'],
-                'stream_id' => $data['stream_id']
-            ])->id;
+            $access = Gate::inspect('create', Student::class);
 
-            $student = Student::create($data);
+            if($access->allowed()){
 
-            if($student){
+                // Based on level and stream, get the level_unit_id and also persists
+                $data['level_unit_id'] = LevelUnit::firstOrCreate([
+                    'level_id' => $data['admission_level_id'],
+                    'stream_id' => $data['stream_id']
+                ])->id;
+    
+                $student = Student::create($data);
+    
+                if($student){
+    
+                    $this->reset();
+    
+                    $this->resetPage();
+    
+                    session()->flash('status', 'Student successfully added');
+    
+                    $this->emit('hide-upsert-student-modal');
+                }
 
-                $this->reset();
+            }else{
 
-                $this->resetPage();
-
-                session()->flash('status', 'Student successfully added');
-
+                session()->flash('error', $access->message());
+    
                 $this->emit('hide-upsert-student-modal');
+
             }
 
         } catch (\Exception $exception) {
@@ -139,14 +152,26 @@ class Students extends Component
             /** @var Student */
             $student = Student::findOrFail($this->studentId);
 
-            if($student->update($data)){
+            $access = Gate::inspect('update', $student);
 
-                $this->reset();
+            if($access->allowed()){
+                
+                if($student->update($data)){
+    
+                    $this->reset();
+    
+                    $this->resetValidation();
+    
+                    session()->flash('status', 'Student has been successfully updated');
+    
+                    $this->emit('hide-upsert-student-modal');
+    
+                }
 
-                $this->resetValidation();
+            }else{
 
-                session()->flash('status', 'Student has been successfully updated');
-
+                session()->flash('error', $access->message());
+    
                 $this->emit('hide-upsert-student-modal');
 
             }
@@ -183,17 +208,27 @@ class Students extends Component
             /** @var Student */
             $student = Student::findOrFail($this->studentId);
 
-            if($student->delete()){
+            $access = Gate::inspect('delete', $student);
 
-                $this->reset();
+            if($access->allowed()){
 
-                $this->resetPage();
+                if($student->delete()){
+    
+                    $this->reset();
+    
+                    $this->resetPage();
+    
+                    session()->flash('status', 'Student has been successfully deleted');
+    
+                    $this->emit('hide-delete-student-modal');
+                }
 
-                session()->flash('status', 'Student has been successfully deleted');
+            }else{
 
+                session()->flash('error', $access->message());
+    
                 $this->emit('hide-delete-student-modal');
             }
-
 
         } catch (\Exception $exception) {
          
