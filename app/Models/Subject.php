@@ -22,6 +22,10 @@ class Subject extends Model
     {
         $this->attributes['name'] = $value;
         $this->attributes['slug'] = Str::slug($value);
-        
+    }
+
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class);
     }
 }
