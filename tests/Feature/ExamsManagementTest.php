@@ -4,13 +4,14 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\Exam;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Level;
 use Livewire\Livewire;
+use App\Models\Subject;
 use Illuminate\Support\Str;
 use App\Http\Livewire\Exams;
-use App\Http\Livewire\Levels;
-use App\Models\Level;
-use App\Models\Subject;
+use App\Models\Permission;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -19,12 +20,19 @@ class ExamsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /** @var Role */
+    private $role;
+
     public function setUp() : void
     {
         parent::setUp();
 
+        $this->role = Role::factory()->create();
+
         /** @var Authenticatable */
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role_id' => $this->role->id
+        ]);
 
         $this->actingAs($user);
     }
@@ -33,6 +41,8 @@ class ExamsManagementTest extends TestCase
     public function testAuthorizedUserCanVisitExamsManagementPage()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Browse']));
 
         Exam::factory(2)->create();
 
@@ -51,8 +61,9 @@ class ExamsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Create']));
+
         $payload = Exam::factory()->make()->toArray();
-        
 
         Livewire::test(Exams::class)
             ->set('name', $payload['name'])

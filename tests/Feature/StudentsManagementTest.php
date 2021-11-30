@@ -9,6 +9,8 @@ use Livewire\Livewire;
 use App\Models\Student;
 use App\Models\Guardian;
 use App\Http\Livewire\Students;
+use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -18,12 +20,17 @@ class StudentsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    /** @var Role */
+    private $role;
+
     public function setUp(): void
     {
         parent::setUp();
 
+        $this->role = Role::factory()->create();
+
         /** @var Authenticatable */
-        $user = User::factory()->create();
+        $user = User::factory()->create(['role_id' => $this->role->id]);
 
         $this->actingAs($user);
     }
@@ -32,6 +39,8 @@ class StudentsManagementTest extends TestCase
     public function testAuthorizedUserCanBrowseStudents()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Browse']));
 
         Student::factory(2)->create();
 
@@ -49,6 +58,8 @@ class StudentsManagementTest extends TestCase
     public function testAuthorizedUserCanAddAStudent()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Create']));
 
         $payload = Student::factory()->make()->toArray();
 
@@ -83,6 +94,8 @@ class StudentsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Update']));
+
         $student = Student::factory()->create();
 
         $payload = Student::factory()->make()->toArray();
@@ -112,6 +125,8 @@ class StudentsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Delete']));
+
         /** @var Student */
         $student = Student::factory()->create();
 
@@ -127,7 +142,6 @@ class StudentsManagementTest extends TestCase
     public function testAuthorizedUserCanAddStudentGuardians()
     {
         $this->withoutExceptionHandling();
-
 
         for ($i=0; $i < 2; $i++) { 
             
@@ -151,7 +165,6 @@ class StudentsManagementTest extends TestCase
         foreach ($guardianIds as $id) {
             $payload[$id] = 'true';
         }
-
 
         Livewire::test(AddStudentGuardians::class)
             ->call('showAddStudentGuardiansModal', $student)

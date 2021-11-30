@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Models\Subject;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -105,16 +106,28 @@ class Exams extends Component
         
         try {
 
-            $exam = Exam::create($data);
+            $access = Gate::inspect('create', Exam::class);
 
-            if($exam){
+            if($access->allowed()){
+    
+                $exam = Exam::create($data);
+    
+                if($exam){
+    
+                    $this->reset();
+    
+                    $this->resetPage();
+    
+                    session()->flash('status', 'Exam has been successfully created');
+    
+                    $this->emit('hide-upsert-exam-modal');
+    
+                }
 
-                $this->reset();
+            }else{
 
-                $this->resetPage();
-
-                session()->flash('status', 'Exam has been successfully created');
-
+                session()->flash('message', $access->message());
+    
                 $this->emit('hide-upsert-exam-modal');
 
             }
@@ -142,14 +155,27 @@ class Exams extends Component
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            if($exam->update($data)){
+            $access = Gate::inspect('update', $exam);
 
-                $this->reset();
+            if($access->allowed()){
 
-                session()->flash('status', 'Exam successfully updated');
+                if($exam->update($data)){
+    
+                    $this->reset();
+    
+                    session()->flash('status', 'Exam successfully updated');
+    
+                    $this->emit('hide-upsert-exam-modal');
+                }
 
+            }else{
+
+                session()->flash('message', $access->message());
+    
                 $this->emit('hide-upsert-exam-modal');
+
             }
+
             
         } catch (\Exception $exception) {
             
@@ -181,13 +207,25 @@ class Exams extends Component
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            if($exam->delete()){
+            $access = Gate::inspect('delete', $exam);
 
-                $this->reset(['examId', 'name']);
+            if($access->allowed()){
+    
+                if($exam->delete()){
+    
+                    $this->reset(['examId', 'name']);
+    
+                    session()->flash('status', 'The exam has been successfully deleted');
+    
+                    $this->emit('hide-delete-exam-modal');
+                }
 
-                session()->flash('status', 'The exam has been successfully deleted');
+            }else{
 
-                $this->emit('hide-delete-exam-modal');
+                session()->flash('message', $access->message());
+    
+                $this->emit('hide-upsert-exam-modal');
+
             }
 
         } catch (\Exception $exception) {
