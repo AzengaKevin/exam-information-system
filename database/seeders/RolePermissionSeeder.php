@@ -17,26 +17,31 @@ class RolePermissionSeeder extends Seeder
     {
         $permissionsPayload = array(
             'Roles Browse',
+            'Roles Read',
             'Roles Create',
             'Roles Update',
             'Roles Delete',
 
             'Permissions Browse',
+            'Permissions Read',
             'Permissions Create',
             'Permissions Update',
             'Permissions Delete',
 
             'Levels Browse',
+            'Levels Read',
             'Levels Create',
             'Levels Update',
             'Levels Delete',
 
             'Streams Browse',
+            'Streams Read',
             'Streams Create',
             'Streams Update',
             'Streams Delete',
 
             'Departments Browse',
+            'Departments Read',
             'Departments Create',
             'Departments Update',
             'Departments Delete',
@@ -47,42 +52,49 @@ class RolePermissionSeeder extends Seeder
             'Subjects Delete',
 
             'Teachers Browse',
+            'Teachers Read',
             'Teachers Create',
             'Teachers Update',
             'Teachers Delete',
 
             'Guardians Browse',
+            'Guardians Read',
             'Guardians Create',
             'Guardians Update',
             'Guardians Delete',
 
             'Users Browse',
+            'Users Read',
             'Users Create',
             'Users Update',
             'Users Delete',
 
             'Departments Browse',
+            'Departments Read',
             'Departments Create',
             'Departments Update',
             'Departments Delete',
 
             'Responsibilities Browse',
+            'Responsibilities Read',
             'Responsibilities Create',
             'Responsibilities Update',
             'Responsibilities Delete',
 
             'Exams Browse',
+            'Exams Read',
             'Exams Create',
             'Exams Update',
             'Exams Delete',
 
             'Students Browse',
-            'Students Create',
             'Students Read',
+            'Students Create',
             'Students Update',
             'Students Delete',
 
             'LevelUnits Browse',
+            'LevelUnits Read',
             'LevelUnits Create',
             'LevelUnits Update',
             'LevelUnits Delete'

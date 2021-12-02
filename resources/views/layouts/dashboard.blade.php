@@ -218,7 +218,7 @@
                 </ul>
             </div>
         </nav>
-        <div class="p-3 overflow-auto flex-grow-1">
+        <div class="p-3 overflow-y-auto flex-grow-1">
             @yield('content')
         </div>
     </div>

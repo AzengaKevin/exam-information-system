@@ -33,10 +33,10 @@
                     <td>{{ $exam->status }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                            <a href="{{ route('exams.show', $exam) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
-                            </button>
+                            </a>
                             <button wire:click="editExam({{ $exam }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>

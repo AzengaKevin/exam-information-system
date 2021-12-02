@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\HostelsController;
+use App\Http\Controllers\ExamsScoresController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
@@ -80,7 +81,10 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/students/{student:adm_no}',[StudentsController::class,'show'])->name('students.show');
 
     Route::resource('exams', ExamsController::class)
-        ->only('index');
+        ->only(['index', 'show']);
+
+    Route::resource('exams.scores', ExamsScoresController::class)
+        ->only(['index']);
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');
