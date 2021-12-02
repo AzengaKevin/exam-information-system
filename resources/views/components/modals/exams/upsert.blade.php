@@ -96,15 +96,20 @@
                             </div>
                         </div>
 
-                         <div class="form-group">
-                           <label for="">Status</label>
-                           <select class="form-control" wire:model,lazy="status" id="">
-                               @foreach ($examStatusOptions as $status)
-                               <option value="{{$status}}">{{$status}}</option> 
-                               @endforeach
-                           </select>
-                         </div>
- 
+                        @if (!is_null($this->examId))                            
+                        <div class="col-md-12">
+                            <div>
+                                <label for="status" class="form-label">Status</label>
+                                <select class="form-select @" wire:model="status" id="status">
+                                    <option value="">-- Select Status --</option>
+                                    @foreach ($examStatusOptions as $status)
+                                    <option value="{{$status}}">{{$status}}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        @endif
+
                         <div class="col-md-12">
                             <label for="description" class="form-label">Notes</label>
                             <textarea wire:model.lazy="description" id="description" cols="100" rows="3"
@@ -116,7 +121,7 @@
                             </span>
                             @enderror
                         </div>
-                        
+
                     </div>
                 </div>
             </div>

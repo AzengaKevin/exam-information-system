@@ -106,12 +106,14 @@ class Exams extends Component
     public function createExam()
     {
        $data = $this->validate();
-        
+
         try {
 
             $access = Gate::inspect('create', Exam::class);
 
             if($access->allowed()){
+
+                unset($data['status']);
     
                 $exam = Exam::create($data);
     

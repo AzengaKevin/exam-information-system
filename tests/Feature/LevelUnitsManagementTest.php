@@ -52,7 +52,6 @@ class LevelUnitsManagementTest extends TestCase
         Livewire::test(LevelUnits::class)
             ->set('level_id', $payload['level_id'])
             ->set('stream_id', $payload['stream_id'])
-            ->set('alias', $payload['alias'])
             ->set('description', $payload['description'])
             ->call('addLevelUnit');
 
@@ -63,7 +62,6 @@ class LevelUnitsManagementTest extends TestCase
 
         $this->assertEquals($payload['level_id'], $levelUnit->level_id);
         $this->assertEquals($payload['stream_id'], $levelUnit->stream_id);
-        $this->assertEquals($payload['alias'], $levelUnit->alias);
         $this->assertEquals($payload['description'], $levelUnit->description);
         
     }

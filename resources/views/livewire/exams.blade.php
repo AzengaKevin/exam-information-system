@@ -10,8 +10,6 @@
                     <th>Shortname</th>
                     <th>Year</th>
                     <th>Term</th>
-                    <th>StartDate</th>
-                    <th>EndDate</th>
                     <th>Weight</th>
                     <th>Counts</th>
                     <th>Status</th>
@@ -26,8 +24,6 @@
                     <td>{{ $exam->shortname }}</td>
                     <td>{{ $exam->year }}</td>
                     <td>{{ $exam->term }}</td>
-                    <td>{{ $exam->start_date }}</td>
-                    <td>{{ $exam->end_date }}</td>
                     <td>{{ $exam->weight }}</td>
                     <td>{{ $exam->counts ? 'True' : 'False' }}</td>
                     <td>{{ $exam->status }}</td>
@@ -59,7 +55,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="10">
+                    <td colspan="8">
                         <div class="py-1">No Exam created yet</div>
                     </td>
                 </tr>
@@ -67,7 +63,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="10">
+                    <td colspan="8">
                         {{ $exams->links() }}
                         @if ($exams->count())
                         <div class="text-muted">{{ $exams->firstItem() }} - {{ $exams->lastItem() }} out of
