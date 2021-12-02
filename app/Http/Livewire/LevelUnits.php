@@ -70,6 +70,13 @@ class LevelUnits extends Component
 
             if(is_null($maybeLevelUnit)){
 
+                //level
+                $level = Level::where('id',$this->level_id)->first();
+                //stream
+                $stream = Stream::where('id',$this->stream_id)->first();
+
+                $data['alias'] = $level->name." ".$stream->name;
+
                 $levelUnit = LevelUnit::create($data);
 
                 if($levelUnit){

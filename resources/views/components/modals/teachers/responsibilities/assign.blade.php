@@ -85,7 +85,7 @@
                         class="form-select @error('level_unit_id') is-invalid @enderror">
                         <option value="">-- Select Level Unit --</option>
                         @foreach ($levelUnits as $levelUnit)
-                        <option value="{{ $levelUnit->id }}">{{ $levelUnit->alias }}</option>
+                        <option value="{{ $levelUnit->id }}">{{ $levelUnit->alias }} </option>
                         @endforeach
                     </select>
                     @error('level_unit_id')
