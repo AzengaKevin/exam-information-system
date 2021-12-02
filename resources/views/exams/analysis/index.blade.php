@@ -5,7 +5,7 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">{{ $exam->name }}</h1>
+    <h1 class="h4 fw-bold text-muted">{{ $exam->name }} Analysis</h1>
 </div>
 <div class="row g-4 py-3">
     @foreach ($exam->levels as $level)
@@ -16,20 +16,6 @@
                     <div class="col-md-12">
                         <div class="d-flex justify-content-between align-items-center">
                             <h3>{{ $level->name }}</h3>
-                            <div class="hstack gap-2">
-                                <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-sm btn-outline-secondary gap-2 align-items-center">
-                                    <i class="fa fa-upload"></i>
-                                    <span>Scores</span>
-                                </a>
-                                <a href="" class="btn btn-sm btn-outline-secondary gap-2 align-items-center">
-                                    <i class="fa fa-table"></i>
-                                    <span>Results</span>
-                                </a>                                
-                                <a href="" class="btn btn-sm btn-outline-secondary gap-2 align-items-center">
-                                    <i class="fa fa-poll"></i>
-                                    <span>Analysis</span>
-                                </a>
-                            </div>
                         </div>
                     </div>
                     <hr>
