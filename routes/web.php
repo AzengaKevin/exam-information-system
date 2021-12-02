@@ -13,6 +13,7 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\ExamsAnalysisController;
 use App\Http\Controllers\HostelsController;
 use App\Http\Controllers\ExamsScoresController;
 use App\Http\Controllers\LevelUnitsController;
@@ -85,6 +86,9 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::resource('exams.scores', ExamsScoresController::class)
         ->only(['index']);
+
+    Route::resource('exams.analysis', ExamsAnalysisController::class)
+        ->only(['index']);
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');
@@ -95,8 +99,8 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/level-units/{levelUnit}', [LevelUnitsController::class, 'show'])
         ->name('level-units.show');
     
-        Route::resource('hostels',HostelsController::class)
+    Route::resource('hostels',HostelsController::class)
         ->only('index');     
 
-        Route::get('hostels/{hostel:slug}',[HostelsController::class,'show'])->name('hostels.show');
+    Route::get('hostels/{hostel:slug}',[HostelsController::class,'show'])->name('hostels.show');
 });
