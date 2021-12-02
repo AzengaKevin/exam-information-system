@@ -7,6 +7,10 @@
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="h4 fw-bold text-muted">{{ $exam->name }}</h1>
     <div class="btn-group">
+        <button data-bs-toggle="modal" data-bs-target="#upsert-exam-grades-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-plus"></i>
+            <span>Grade</span>
+        </button>
         <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
             <i class="fa fa-upload"></i>
             <span class="d-none d-md-inline">Scores</span>
@@ -77,8 +81,21 @@
     <div class="col-md-6">
         <livewire:exam-subjects :exam="$exam" />
     </div>
+    <div class="col-md-12">
+        @livewire('exam-grades',['exam'=>$exam])
+    </div>
 
     </section>
 </div>
 
 @endsection
+
+@push('scripts')
+<script>
+    livewire.on('show-upsert-exam-grades-modal', () => $('#upsert-exam-grades-modal').modal('show'))
+    livewire.on('hide-upsert-exam-grades-modal', () => $('#upsert-exam-grades-modal').modal('hide'))
+    livewire.on('show-delete-exam-grades-modal', () => $('#delete-exam-grades-modal').modal('show'))
+    livewire.on('hide-delete-exam-grades-modal', () => $('#delete-exam-grades-modal').modal('hide'))
+
+</script>
+@endpush

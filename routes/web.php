@@ -15,6 +15,7 @@ use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\HostelsController;
 use App\Http\Controllers\ExamsScoresController;
+use App\Http\Controllers\GradesController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
@@ -99,4 +100,6 @@ Route::group(['middleware' => ['auth']], function(){
         ->only('index');     
 
         Route::get('hostels/{hostel:slug}',[HostelsController::class,'show'])->name('hostels.show');
+
+        Route::get('/grades',[GradesController::class,'index'])->name('grades.index');
 });

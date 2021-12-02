@@ -65,4 +65,8 @@ class Exam extends Model
         return $this->belongsToMany(Subject::class);
     }
 
+    public function grades()
+    {
+        return $this->hasMany(Grade::class);
+    }
 }
