@@ -74,7 +74,7 @@ Route::group(['middleware' => ['auth']], function(){
 
      
     Route::resource('exams', ExamsController::class)
-        ->only('index');
+        ->only(['index', 'show']);
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');

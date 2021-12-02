@@ -143,4 +143,22 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals(count($payload), $exam->subjects()->count());
         
     }
+
+    /** @group exams */
+    public function testAuthorizedUserCanVisitExamsShowPage()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Read']));
+
+        $exam = Exam::factory()->create();
+
+        $response = $this->get(route('exams.show', $exam));
+
+        $response->assertOk();
+
+        $response->assertViewIs('exams.show');
+
+        $response->assertViewHasAll(['exam']);
+    }
 }

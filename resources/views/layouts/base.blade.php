@@ -21,6 +21,7 @@
 
     @stack('modals')
     <script src="{{ mix('js/app.js') }}"></script>
+    <script src="{{ mix('vendor/chart.min.js') }}"></script>
     <livewire:scripts />
     @stack('scripts')
 </body>
