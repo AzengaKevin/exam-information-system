@@ -76,10 +76,11 @@ class RolePermissionSeeder extends Seeder
             'Exams Update',
             'Exams Delete',
 
-            'Student Browse',
-            'Student Create',
-            'Student Update',
-            'Student Delete',
+            'Students Browse',
+            'Students Create',
+            'Students Read',
+            'Students Update',
+            'Students Delete',
 
             'LevelUnits Browse',
             'LevelUnits Create',

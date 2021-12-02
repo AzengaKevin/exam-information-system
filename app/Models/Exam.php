@@ -21,7 +21,8 @@ class Exam extends Model
         'end_date',
         'weight',
         'counts',
-        'description'
+        'description',
+        'status'
     ];
 
     protected $casts = [
@@ -40,6 +41,13 @@ class Exam extends Model
     {
         $this->attributes['shortname'] = $value;
         $this->attributes['slug'] = Str::slug($value);
+    }
+
+    public static function examStatusOptions()
+    {
+        return [
+            'published','unpublished'
+        ];
     }
 
     public function setCountsAttribute($value)

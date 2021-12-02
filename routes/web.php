@@ -13,6 +13,7 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\HostelsController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
@@ -49,8 +50,12 @@ Route::group(['middleware' => ['auth']], function(){
            ->only(['index']);        
   
     Route::resource('teachers', TeachersController::class)
-        ->only('index');
+        ->only(['index','show']);
 
+    Route::get('teachers/{teacher}/exams/{exam}', [TeachersController::class,'currentExamMarking'])->name('teachers.currentExamMarking');    
+    
+    Route::get('exams/levelUnit/{levelUnit}/subject/{subject}', [TeachersController::class,'studentToBeScored'])->name('teacher.studentToBeScored');    
+        
     Route::resource('teachers.responsibilities', TeachersResponsibilitiesController::class)
         ->only('index');
 
@@ -70,9 +75,10 @@ Route::group(['middleware' => ['auth']], function(){
         ->only('index');
   
     Route::resource('students', StudentsController::class)
-        ->only('index');
+        ->only(['index']);
 
-     
+    Route::get('/students/{student:adm_no}',[StudentsController::class,'show'])->name('students.show');
+
     Route::resource('exams', ExamsController::class)
         ->only('index');
     
@@ -81,4 +87,12 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::get('/level-units', [LevelUnitsController::class, 'index'])
         ->name('level-units.index');
+
+    Route::get('/level-units/{levelUnit}', [LevelUnitsController::class, 'show'])
+        ->name('level-units.show');
+    
+        Route::resource('hostels',HostelsController::class)
+        ->only('index');     
+
+        Route::get('hostels/{hostel:slug}',[HostelsController::class,'show'])->name('hostels.show');
 });

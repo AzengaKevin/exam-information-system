@@ -147,6 +147,15 @@
                     </div>
                 </a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link {{request()->routeIs('hostels.index') ? 'text-white':'text-white-50' }}"
+                    href="{{ route('hostels.index') }}">
+                    <div class="hstack gap-3">
+                        <span><i class="fa fa-th" aria-hidden="true"></i></span>
+                        <span>Hostels</span>
+                    </div>
+                </a>
+            </li>
         </ul>
     </div>
     <div class="vh-100 col-md-9 col-lg-10 d-flex flex-column">

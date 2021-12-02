@@ -1,4 +1,4 @@
-@props(['examId' => null,'terms'])
+@props(['examId' => null,'terms','examStatusOptions'])
 
 <div wire:ignore.self id="upsert-exam-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-exam-modal-title">
@@ -96,8 +96,17 @@
                             </div>
                         </div>
 
+                         <div class="form-group">
+                           <label for="">Status</label>
+                           <select class="form-control" wire:model,lazy="status" id="">
+                               @foreach ($examStatusOptions as $status)
+                               <option value="{{$status}}">{{$status}}</option> 
+                               @endforeach
+                           </select>
+                         </div>
+ 
                         <div class="col-md-12">
-                            <label for="description" class="form-label">Description</label>
+                            <label for="description" class="form-label">Notes</label>
                             <textarea wire:model.lazy="description" id="description" cols="100" rows="3"
                                 class="form-control @error('description') is-invalid @enderror">
                             </textarea>
@@ -107,6 +116,7 @@
                             </span>
                             @enderror
                         </div>
+                        
                     </div>
                 </div>
             </div>

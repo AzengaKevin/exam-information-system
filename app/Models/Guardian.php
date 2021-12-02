@@ -21,6 +21,6 @@ class Guardian extends Model
 
     public function students()
     {
-        return $this->belongsToMany(Student::class);
+        return $this->belongsToMany(Student::class,'student_guardians')->withTimestamps();
     }
 }

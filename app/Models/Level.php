@@ -31,4 +31,9 @@ class Level extends Model
     {
         return $this->belongsToMany(Exams::class);
     }
+
+    public function levelUnits()
+    {
+        return $this->hasMany(LevelUnit::class);
+    }
 }

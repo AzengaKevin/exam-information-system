@@ -28,6 +28,7 @@ class Exams extends Component
     public $weight;
     public $counts;
     public $description;
+    public $status;
 
     public $selectedLevels = [];
     public $selectedSubjects = [];
@@ -38,7 +39,8 @@ class Exams extends Component
             'exams' => $this->getPaginatedExams(),
             'terms'=> $this->getTerms(),
             'levels' => $this->getLevels(),
-            'subjects' => $this->getSubjects()
+            'subjects' => $this->getSubjects(),
+            'examStatusOptions'=>Exam::examStatusOptions()
         ]);
     }
 
@@ -46,7 +48,7 @@ class Exams extends Component
     {
         return Exam::termOptions();
     }
-
+    
     public function getLevels()
     {
         return Level::all(['id', 'name']);
@@ -96,7 +98,8 @@ class Exams extends Component
             'end_date' => ['bail', 'nullable'],
             'weight' => ['bail', 'nullable'],
             'counts' => ['bail', 'nullable'],
-            'description' => ['nullable']
+            'description' => ['nullable'],
+            'status' => ['nullable'],
         ];
     }
 

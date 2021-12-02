@@ -10,10 +10,11 @@
                     <th>Shortname</th>
                     <th>Year</th>
                     <th>Term</th>
-                    <th>Start Date</th>
-                    <th>End Date</th>
+                    <th>StartDate</th>
+                    <th>EndDate</th>
                     <th>Weight</th>
                     <th>Counts</th>
+                    <th>Status</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -29,6 +30,7 @@
                     <td>{{ $exam->end_date }}</td>
                     <td>{{ $exam->weight }}</td>
                     <td>{{ $exam->counts ? 'True' : 'False' }}</td>
+                    <td>{{ $exam->status }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
                             <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
@@ -77,7 +79,7 @@
         </table>
     </div>
 
-    <x-modals.exams.upsert :examId="$examId" :terms="$terms"/>
+    <x-modals.exams.upsert :examId="$examId" :terms="$terms" :examStatusOptions="$examStatusOptions"/>
     <x-modals.exams.delete :name="$name" />
     <x-modals.exams.enroll-levels :shortname="$shortname" :levels="$levels" />
     <x-modals.exams.enroll-subjects :shortname="$shortname" :subjects="$subjects" />
