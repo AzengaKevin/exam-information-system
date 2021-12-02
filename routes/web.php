@@ -13,6 +13,7 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\ExamsScoresController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
@@ -75,6 +76,9 @@ Route::group(['middleware' => ['auth']], function(){
      
     Route::resource('exams', ExamsController::class)
         ->only(['index', 'show']);
+
+    Route::resource('exams.scores', ExamsScoresController::class)
+        ->only(['index']);
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');
