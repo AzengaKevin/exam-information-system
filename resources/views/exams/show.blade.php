@@ -4,84 +4,81 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between">
+<div class="d-flex justify-content-between align-items-center">
     <h1 class="h4 fw-bold text-muted">{{ $exam->name }}</h1>
+    <div class="btn-group">
+        <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
+            <i class="fa fa-upload"></i>
+            <span class="d-none d-md-inline">Scores</span>
+        </a>
+        <a href="" class="btn btn-outline-primary gap-2 align-items-center">
+            <i class="fa fa-table"></i>
+            <span class="d-none d-md-inline">Results</span>
+        </a>
+        <a href="" class="btn btn-outline-primary gap-2 align-items-center">
+            <i class="fa fa-poll"></i>
+            <span class="d-none d-md-inline">Analysis</span>
+        </a>
+    </div>
 </div>
 <div class="row g-4 py-3">
-    @foreach ($exam->levels as $level)
     <div class="col-md-12">
-        <div class="card h-100 rounded-3">
+        <div class="card">
             <div class="card-body">
-                <div class="row g-2">
+                <h2 class="h5">Basic Details</h2>
+                <hr>
+                <div class="row g-2 align-items-center">
+                    <dl class="col-md-6">
+                        <dt>Name</dt>
+                        <dd>{{ $exam->name }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Short Name</dt>
+                        <dd>{{ $exam->shortname }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Year</dt>
+                        <dd>{{ $exam->year }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Term</dt>
+                        <dd>{{ $exam->term }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Start Date</dt>
+                        <dd>{{ $exam->start_date }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>End Date</dt>
+                        <dd>{{ $exam->end_date }}</dd>
+                    </dl>
                     <div class="col-md-12">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h3>{{ $level->name }}</h3>
-                            <a href="" class="btn btn-sm btn-outline-secondary hstack gap-1 align-items-center">
-                                <i class="fa fa-cog"></i>
-                                <span>Manage</span>
-                            </a>
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" id="counts" @if($exam->counts)checked
+                            @endif>
+                            <label for="counts" class="form-check-label">Counts on Report Form</label>
                         </div>
                     </div>
-                    <hr>
-                    <div class="col-md-6">
-                        <canvas id="myChart" width="600" height="200"></canvas>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="d-flex flex-column">
-                            <h6 class="text-secondary">Mean Points</h6>
-                            <span class="text-success fw-bolder display-6">7.5491</span>
-                            <span class="text-secondary fw-bold">+.0054</span>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="d-flex flex-column">
-                            <h6 class="text-secondary">Mean Grade</h6>
-                            <span class="text-success fw-bolder display-6">B-</span>
-                        </div>
-                    </div>
-                    <div class="col-md-2">
-                        <div class="d-flex flex-column">
-                            <h6 class="text-secondary">Students</h6>
-                            <span class="text-success fw-bolder display-6">251</span>
-                        </div>
 
-                    </div>
+                    @if($exam->counts)
+                    <dl class="col-md-12">
+                        <dt>Weight on Report Form in Percentage</dt>
+                        <dd>{{ $exam->weight }}</dd>
+                    </dl>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-    @endforeach
+
+    <div class="col-md-6">
+        <livewire:exam-levels :exam="$exam" />
+    </div>
+    <div class="col-md-6">
+        <livewire:exam-subjects :exam="$exam" />
+    </div>
+
+    </section>
 </div>
 
 @endsection
-
-@push('scripts')
-<script>
-    const ctx = document.getElementById('myChart').getContext('2d');
-
-    const myChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Red', 'Blue', 'Green', 'White', 'Yellow'],
-            datasets: [{
-                label: 'Level Performance',
-                data: [7, 6, 5, 5, 7, 6],
-                borderColor: [
-                    'red',
-                    'blue',
-                    'green',
-                    'white',
-                    'yellow'
-                ]
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    beginAtZero: true
-                }
-            }
-        }
-    });
-</script>
-@endpush

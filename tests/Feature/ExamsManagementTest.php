@@ -160,5 +160,9 @@ class ExamsManagementTest extends TestCase
         $response->assertViewIs('exams.show');
 
         $response->assertViewHasAll(['exam']);
+
+        $response->assertSeeLivewire('exam-levels');
+        
+        $response->assertSeeLivewire('exam-subjects');
     }
 }
