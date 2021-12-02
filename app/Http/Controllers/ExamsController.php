@@ -18,4 +18,11 @@ class ExamsController extends Controller
     {
         return view('exams.index');
     }
+
+    public function show(Exam $exam)
+    {
+        return view('exams.show', [
+            'exam' => $exam
+        ]);
+    }
 }
