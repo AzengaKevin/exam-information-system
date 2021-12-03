@@ -17,7 +17,7 @@ class CreateSubjectsTable extends Migration
             $table->id();
             $table->unsignedBigInteger('department_id')->nullable();
             $table->string('name')->unique();
-            $table->string('shortname')->nullable();
+            $table->string('shortname')->unique();
             $table->string('slug')->nullable();
             $table->string('description')->nullable();
             $table->string('subject_code')->nullable();

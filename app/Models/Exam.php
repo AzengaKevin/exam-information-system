@@ -13,8 +13,8 @@ class Exam extends Model
 
     protected $fillable = [
         'name',
+        'shortname',
         'term',
-        'shortname', 
         'slug', 
         'year',
         'start_date',

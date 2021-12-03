@@ -6,6 +6,7 @@
 
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="h4 fw-bold text-muted">{{ $exam->name }}</h1>
+    
     <div class="btn-group">
         <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
             <i class="fa fa-upload"></i>
@@ -22,8 +23,8 @@
     </div>
 </div>
 <div class="row g-4 py-3">
-    <div class="col-md-12">
-        <div class="card">
+    <div class="col-md-9">
+        <div class="card h-100">
             <div class="card-body">
                 <h2 class="h5">Basic Details</h2>
                 <hr>
@@ -70,6 +71,9 @@
             </div>
         </div>
     </div>
+    <div class="col-md-3">
+        <livewire:exam-quick-actions :exam="$exam" />
+    </div>
 
     <div class="col-md-6">
         <livewire:exam-levels :exam="$exam" />
@@ -78,7 +82,6 @@
         <livewire:exam-subjects :exam="$exam" />
     </div>
 
-    </section>
 </div>
 
 @endsection

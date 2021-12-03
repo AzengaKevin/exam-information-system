@@ -67,7 +67,7 @@ class Subjects extends Component
         return [
             'name' => ['bail', 'required','string', Rule::unique('subjects')->ignore($this->subjectId)],
             'description' => ['bail', 'nullable'],
-            'shortname' => ['bail', 'nullable'],
+            'shortname' => ['bail', 'required', 'max:5'],
             'subject_code' => ['bail', 'nullable'],
             'department_id' => ['bail', 'nullable'],
 
