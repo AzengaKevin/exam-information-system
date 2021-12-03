@@ -32,10 +32,14 @@
                     <td>{{ $responsibility->pivot->levelUnit->alias }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                            <a href="{{ route('exams.scores.create', [
+                                'exam' => $exam,
+                                'subject' => $responsibility->pivot->subject->id,
+                                'level-unit' => $responsibility->pivot->levelUnit->id,
+                            ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-upload"></i>
                                 <span>Scores</span>
-                            </button>
+                            </a>
                         </div>
                     </td>
                 </tr>
