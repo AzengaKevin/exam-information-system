@@ -130,6 +130,15 @@
                 </a>
             </li>
             <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('grades.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('grades.index') }}">
+                    <div class="hstack gap-3">
+                        <span><i class="fa fa-file-alt" aria-hidden="true"></i></span>
+                        <span>Grading System</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('responsibilities.index') }}">
                     <div class="hstack gap-3">
