@@ -19,7 +19,7 @@
             <i class="fa fa-table"></i>
             <span class="d-none d-md-inline">Results</span>
         </a>
-        <a href="" class="btn btn-outline-primary gap-2 align-items-center">
+        <a href="{{ route('exams.analysis.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
             <i class="fa fa-poll"></i>
             <span class="d-none d-md-inline">Analysis</span>
         </a>
