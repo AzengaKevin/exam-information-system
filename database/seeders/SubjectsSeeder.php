@@ -17,15 +17,95 @@ class SubjectsSeeder extends Seeder
         $payload = [
             [
                 'name' => 'Mathematics',
-                'shortname' => 'Math'
+                'shortname' => 'mat'
             ],
             [
                 'name' => 'Kiswahili',
-                'shortname' => 'Kisw'
+                'shortname' => 'kis'
             ],
             [
                 'name' => 'English',
-                'shortname' => 'Eng'
+                'shortname' => 'eng'
+            ],
+            [
+                'name' => 'Biology',
+                'shortname' => 'bio'
+            ],
+            [
+                'name' => 'Physics',
+                'shortname' => 'phy'
+            ],
+            [
+                'name' => 'Chemestry',
+                'shortname' => 'che'
+            ],
+            [
+                'name' => 'History',
+                'shortname' => 'his'
+            ],
+            [
+                'name' => 'Geography',
+                'shortname' => 'geo'
+            ],
+            [
+                'name' => 'CRE',
+                'shortname' => 'cre'
+            ],
+            [
+                'name' => 'IRE',
+                'shortname' => 'ire'
+            ],
+            [
+                'name' => 'Business Studies',
+                'shortname' => 'bst'
+            ],
+            [
+                'name' => 'Agriculture',
+                'shortname' => 'agr'
+            ],
+            [
+                'name' => 'Computer Studies',
+                'shortname' => 'com'
+            ],
+            [
+                'name' => 'Power Mechanics',
+                'shortname' => 'pm'
+            ],
+            [
+                'name' => 'Music',
+                'shortname' => 'mus'
+            ],
+            [
+                'name' => 'Art % Design',
+                'shortname' => 'ad'
+            ],
+            [
+                'name' => 'French',
+                'shortname' => 'fre'
+            ],
+            [
+                'name' => 'Germany',
+                'shortname' => 'ger'
+            ],
+            [
+                'name' => 'Drawing & Desing',
+                'shortname' => 'dd'
+            ],
+            [
+                'name' => 'Electricity',
+                'shortname' => 'ele'
+            ],
+            [
+                'name' => 'Home Science',
+                'shortname' => 'hs'
+            ],
+            [
+                'name' => 'Metalwork',
+                'shortname' => 'mw'
+            ],
+            [
+                'name' => 'Woodwork',
+                'shortname' => 'ww'
             ]
 
         ];
@@ -33,7 +113,6 @@ class SubjectsSeeder extends Seeder
         array_walk($payload, function($data){
             Subject::create($data);
         });
-
 
     }
 }
