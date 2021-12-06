@@ -10,8 +10,10 @@ use App\Models\LevelUnit;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Responsibility;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use App\Http\Requests\UpsertScoresRequest;
 
 class ExamsScoresController extends Controller
@@ -71,10 +73,31 @@ class ExamsScoresController extends Controller
 
             $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
 
+            // Get previous scores if available
+
+            $scores = array();
+
+            if (Schema::hasTable(Str::slug($exam->shortname))) {
+
+                $col = $subject->shortname;
+
+                /** @var Collection */
+                $data = DB::table(Str::slug($exam->shortname))
+                    ->select('admno', $col)
+                    ->where('level_unit_id', $levelUnit->id)
+                    ->get();
+                    
+                foreach ($data as $value) {
+                    $scores[$value->admno] = optional(json_decode($value->$col))->score ?? null;
+                }
+
+            }
+
             return view('exams.scores.create', [
                 'subject' => $subject,
                 'levelUnit' => $levelUnit,
-                'exam' => $exam
+                'exam' => $exam,
+                'scores' => $scores
             ]);
 
         } catch (\Exception $exception) {
@@ -98,7 +121,11 @@ class ExamsScoresController extends Controller
 
         try {
 
+            /** @var Subject */
             $subject = Subject::findOrFail(intval($request->get('subject')));
+
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
 
             foreach ($data["scores"] as $admno => $score) {
                 
@@ -108,7 +135,9 @@ class ExamsScoresController extends Controller
                     ], [
                         $subject->shortname => json_encode(
                             ['score' => $score]
-                        )
+                        ),
+                        'level_id' => $levelUnit->level->id,
+                        'level_unit_id' => $levelUnit->id
                     ]);
             }
 

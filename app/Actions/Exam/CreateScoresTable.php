@@ -18,6 +18,8 @@ class CreateScoresTable
 
         Schema::create($tableName, function(Blueprint $table) use($exam){
             $table->string('admno')->unique();
+            $table->string('level_id');
+            $table->string('level_unit_id');
             foreach ($exam->subjects as $subject) {
                 $table->jsonb($subject->shortname)->nullable();
             }
