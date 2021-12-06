@@ -2,27 +2,37 @@
 
 namespace Tests\Feature;
 
-use App\Http\Livewire\LevelUnits;
-use App\Models\LevelUnit;
 use Tests\TestCase;
+use App\Models\Role;
 use App\Models\User;
+use App\Models\Level;
+use App\Models\Stream;
+use Livewire\Livewire;
+use App\Models\LevelUnit;
+use App\Models\Permission;
+use App\Http\Livewire\LevelUnits;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 class LevelUnitsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    public function setUp() : void
+    /** @var Role */
+    private $role;
+
+    public function setUp(): void
     {
         parent::setUp();
 
-        /** @var Authenticatable */
-        $user = User::factory()->create();
+        $this->role = Role::factory()->create();
 
-        $this->be($user);
+        /** @var Authenticatable */
+        $user = User::factory()->create(['role_id' => $this->role->id]);
+
+        $this->actingAs($user);
+        
     }
 
     /** @group level-units */
@@ -103,5 +113,21 @@ class LevelUnitsManagementTest extends TestCase
 
         $this->assertFalse(LevelUnit::where('id', $levelUnit->id)->exists());
         
+    }
+
+    /** @group level-units */
+    public function testAuthorizedUserCanGenerateLevelUnits()
+    {
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'LevelUnits Create']));
+
+        $this->withoutExceptionHandling();
+
+        Stream::factory(3)->create();
+        
+        Level::factory(3)->create();
+
+        $this->post(route('level-units.store'));
+
+        $this->assertEquals(9, LevelUnit::count());
     }
 }

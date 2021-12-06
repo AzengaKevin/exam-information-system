@@ -99,6 +99,9 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::get('/level-units/{levelUnit}', [LevelUnitsController::class, 'show'])
         ->name('level-units.show');
+
+    Route::post('/level-units', [LevelUnitsController::class, 'store'])
+        ->name('level-units.store');
     
     Route::resource('hostels',HostelsController::class)
         ->only('index');
