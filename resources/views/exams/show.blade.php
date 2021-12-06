@@ -20,7 +20,7 @@
             <span class="d-none d-md-inline">Scores</span>
         </a>
         @endcan
-        <a href="" class="btn btn-outline-primary gap-2 align-items-center">
+        <a href="{{ route('exams.results.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
             <i class="fa fa-table"></i>
             <span class="d-none d-md-inline">Results</span>
         </a>
