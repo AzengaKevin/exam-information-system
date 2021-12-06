@@ -18,10 +18,18 @@
                 <span>Streams</span>
             </a>
         </div>
-        <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
-            <i class="fa fa-plus"></i>
-            <span>Level Unit</span>
-        </button>
+        <div class="btn-group">
+            <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-modal"
+                class="btn btn-outline-primary hstack gap-2 align-items-center">
+                <i class="fa fa-plus"></i>
+                <span>Level Unit</span>
+            </button>
+            <button data-bs-toggle="modal" data-bs-target="#generate-level-unit-modal"
+                class="btn btn-outline-primary hstack gap-2 align-items-center">
+                <i class="fa fa-cog"></i>
+                <span>Generate</span>
+            </button>
+        </div>
     </div>
 </div>
 <hr>
@@ -38,4 +46,8 @@
     livewire.on('show-delete-level-unit-modal', () => $('#delete-level-unit-modal').modal('show'))
     livewire.on('hide-delete-level-unit-modal', () => $('#delete-level-unit-modal').modal('hide'))
 </script>
+@endpush
+
+@push('modals')
+    <x-modals.level-units.generate />
 @endpush
