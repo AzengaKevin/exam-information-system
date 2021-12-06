@@ -17,7 +17,7 @@ class CreateScoresTable
         Schema::dropIfExists($tableName);
 
         Schema::create($tableName, function(Blueprint $table) use($exam){
-            $table->string('admno');
+            $table->string('admno')->unique();
             foreach ($exam->subjects as $subject) {
                 $table->jsonb($subject->shortname)->nullable();
             }

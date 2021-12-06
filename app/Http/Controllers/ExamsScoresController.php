@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exam;
-use App\Models\LevelUnit;
 use App\Models\User;
+use App\Models\Subject;
 use App\Models\Teacher;
+use App\Models\LevelUnit;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Responsibility;
-use App\Models\Subject;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use App\Http\Requests\UpsertScoresRequest;
 
 class ExamsScoresController extends Controller
 {
@@ -84,5 +87,48 @@ class ExamsScoresController extends Controller
             abort(404, 'Either the Subject or the Level Unit has not been specified');
             
         }
+    }
+
+    /**
+     * Record stores to the database
+     */
+    public function store(UpsertScoresRequest $request, Exam $exam)
+    {
+        $data = $request->validated();
+
+        try {
+
+            $subject = Subject::findOrFail(intval($request->get('subject')));
+
+            foreach ($data["scores"] as $admno => $score) {
+                
+                DB::table(Str::slug($exam->shortname))
+                    ->updateOrInsert([
+                        "admno" => $admno
+                    ], [
+                        $subject->shortname => json_encode(
+                            ['score' => $score]
+                        )
+                    ]);
+            }
+
+            session()->flash('status', 'Scores updated');
+
+            return back();
+            
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'exam-id' => $exam->id
+            ]);
+
+            session()->flash('error', 'A fata error occurred check with the admin');
+
+            return back();
+            
+        }
+        
     }
 }

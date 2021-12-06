@@ -86,7 +86,8 @@ Route::group(['middleware' => ['auth']], function(){
         ->only(['index', 'show']);
 
     Route::resource('exams.scores', ExamsScoresController::class)
-        ->only(['index', 'create']);
+        ->middleware('can:access-upload-scores-page')
+        ->only(['index', 'create', 'store']);
 
     Route::resource('exams.analysis', ExamsAnalysisController::class)
         ->only(['index']);
