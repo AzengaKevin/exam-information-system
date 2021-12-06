@@ -34,7 +34,8 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $student->adm_no }}</td>
                         <td>{{ $student->name }}</td>
-                        <td><input type="number" name="scores[{{ $student->adm_no }}]" min="0" max="100" class="form-control form-control-sm"></td>
+                        <td><input type="number" name="scores[{{ $student->adm_no }}]" min="0" max="100"
+                                class="form-control form-control-sm" value="{{ old("scores.{$student->adm_no}") ?? $scores[$student->adm_no] ?? null }}"></td>
                     </tr>
                     @endforeach
                     @else
