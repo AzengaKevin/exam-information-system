@@ -8,7 +8,7 @@
     <h1 class="h4 fw-bold text-muted">Responsibilites</h1>
     <button data-bs-toggle="modal" data-bs-target="#upsert-responsibility-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
         <i class="fa fa-plus"></i>
-        <span>Responsibility</span>
+        <span class="d-none d-sm-block">Responsibility</span>
     </button>
 </div>
 <hr>
