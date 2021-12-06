@@ -31,19 +31,7 @@
                     href="{{route('roles.index')}}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-users-cog"></i></span>
-                        <span>Roles</span>
-                    </div>
-                </a>
-            </li>
-            @endcan
-
-            @can('viewAny', \App\Models\Permission::class)
-            <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('permissions.index') ? 'text-white':'text-white-50'}}"
-                    href="{{route('permissions.index')}}">
-                    <div class="hstack gap-3">
-                        <span><i class="fa fa-users-cog"></i></span>
-                        <span>Permissions</span>
+                        <span>Authorization</span>
                     </div>
                 </a>
             </li>
@@ -54,24 +42,6 @@
                     <div class="hstack gap-3">
                         <span><i class="fa fa-users"></i></span>
                         <span>Users</span>
-                    </div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{ request()->routeIs('levels.index') ? 'text-white' : 'text-white-50' }}"
-                    href="{{route('levels.index')}}">
-                    <div class="hstack gap-3">
-                        <span><i class="fas fa-layer-group"></i></span>
-                        <span>Levels</span>
-                    </div>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link {{request()->routeIs('streams.index') ? 'text-white':'text-white-50' }}"
-                    href="{{route('streams.index')}}">
-                    <div class="hstack gap-3">
-                        <span><i class="fas fa-list-ul"></i></span>
-                        <span>Streams</span>
                     </div>
                 </a>
             </li>
@@ -152,7 +122,7 @@
                     href="{{ route('level-units.index') }}">
                     <div class="hstack gap-3">
                         <span><i class="fa fa-th" aria-hidden="true"></i></span>
-                        <span>Level Units</span>
+                        <span>Classes</span>
                     </div>
                 </a>
             </li>
@@ -160,7 +130,7 @@
                 <a class="nav-link {{request()->routeIs('hostels.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('hostels.index') }}">
                     <div class="hstack gap-3">
-                        <span><i class="fa fa-th" aria-hidden="true"></i></span>
+                        <span><i class="fa fa-bed" aria-hidden="true"></i></span>
                         <span>Hostels</span>
                     </div>
                 </a>

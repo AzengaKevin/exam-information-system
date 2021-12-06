@@ -5,11 +5,24 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">Level Units</h1>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
-        <i class="fa fa-plus"></i>
-        <span>Level Unit</span>
-    </button>
+    <h1 class="h4 fw-bold text-muted">Classes</h1>
+
+    <div class="hstack gap-2">
+        <div class="btn-group">
+            <a href="{{ route('levels.index') }}" class="btn btn-outline-primary hstack gap-1 align-items-center">
+                <i class="fa fa-list-ul"></i>
+                <span>Levels</span>
+            </a>
+            <a href="{{ route('streams.index') }}" class="btn btn-outline-primary hstack gap-1 align-items-center">
+                <i class="fa fa-list-ul"></i>
+                <span>Streams</span>
+            </a>
+        </div>
+        <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-plus"></i>
+            <span>Level Unit</span>
+        </button>
+    </div>
 </div>
 <hr>
 

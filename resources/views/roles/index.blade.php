@@ -6,10 +6,19 @@
 
 <div class="d-flex justify-content-between">
     <h1 class="h4 fw-bold text-muted">Roles</h1>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-role-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
-        <i class="fa fa-plus"></i>
-        <span>Role</span>
-    </button>
+    <div class="hstack gap-2">
+        @can('viewAny', \App\Models\Permission::class)
+        <a href="{{ route('permissions.index') }}" class="btn btn-outline-primary  hstack gap-2 align-items-center">
+            <i class="fa fa-users-cog"></i>
+            <span>Permissions</span>
+        </a>
+        @endcan
+        <button data-bs-toggle="modal" data-bs-target="#upsert-role-modal"
+            class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-plus"></i>
+            <span>Role</span>
+        </button>
+    </div>
 </div>
 <hr>
 
@@ -24,9 +33,8 @@
 
     livewire.on('show-delete-role-modal', () => $('#delete-role-modal').modal('show'))
     livewire.on('hide-delete-role-modal', () => $('#delete-role-modal').modal('hide'))
-    
+
     livewire.on('show-update-permissions-modal', () => $('#update-permissions-modal').modal('show'))
     livewire.on('hide-update-permissions-modal', () => $('#update-permissions-modal').modal('hide'))
-
 </script>
 @endpush
