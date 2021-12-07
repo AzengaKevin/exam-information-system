@@ -16,7 +16,7 @@
     'level-unit' => $levelUnit->id,
 ]) }}" method="post" class="row g-3">
     @csrf
-    <div class="col-md-7 col-lg-5">
+    <div class="col-md-7 col-lg-6">
         <div class="table-responsive">
             <table class="table table-hover">
                 <thead>
@@ -35,7 +35,9 @@
                         <td>{{ $student->adm_no }}</td>
                         <td>{{ $student->name }}</td>
                         <td><input type="number" name="scores[{{ $student->adm_no }}]" min="0" max="100"
-                                class="form-control form-control-sm" value="{{ old("scores.{$student->adm_no}") ?? $scores[$student->adm_no] ?? null }}"></td>
+                                class="form-control form-control-sm"
+                                value="{{ old("scores.{$student->adm_no}") ?? $scores[$student->adm_no] ?? null }}">
+                        </td>
                     </tr>
                     @endforeach
                     @else
@@ -49,6 +51,17 @@
         </div>
         <div class="mt-3">
             <button type="submit" class="btn btn-primary d-block w-100 btn-lg">Submit</button>
+        </div>
+    </div>
+    <div class="col-md-5 col-lg-6">
+        <div class="py-o py-md-3 py-lg-5">
+            <label for="grading" class="form-label">Grading System</label>
+            <select name="grading_id" id="grading" class="form-select @error('grading_id') is-invalid @enderror">
+                <option value="">-- Select --</option>
+                @foreach ($gradings as $grading)
+                <option value="{{ $grading->id }}">{{ $grading->name }}</option>
+                @endforeach
+            </select>
         </div>
     </div>
 </form>

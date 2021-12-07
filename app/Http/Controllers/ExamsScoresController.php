@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Requests\UpsertScoresRequest;
+use App\Models\Grading;
 
 class ExamsScoresController extends Controller
 {
@@ -73,8 +74,9 @@ class ExamsScoresController extends Controller
 
             $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
 
-            // Get previous scores if available
+            $gradings = Grading::all(['id', 'name']);
 
+            // Get previous scores if available
             $scores = array();
 
             if (Schema::hasTable(Str::slug($exam->shortname))) {
@@ -97,7 +99,8 @@ class ExamsScoresController extends Controller
                 'subject' => $subject,
                 'levelUnit' => $levelUnit,
                 'exam' => $exam,
-                'scores' => $scores
+                'scores' => $scores,
+                'gradings' => $gradings
             ]);
 
         } catch (\Exception $exception) {
@@ -127,15 +130,35 @@ class ExamsScoresController extends Controller
             /** @var LevelUnit */
             $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
 
+            $grading = Grading::find($data['grading_id'] ?? 1) ?? Grading::first();
+
+            $values = $grading->values;
+
             foreach ($data["scores"] as $admno => $score) {
+
+                $grade = null;
+                $points = null;
+
+                foreach ($values as $value) {
+
+                    if($score >= $value['min'] && $score <= $value['max']){
+                        $grade = $value['grade'];
+                        $points = $value['points'];
+                        break;
+                    }
+
+                }
+                
                 
                 DB::table(Str::slug($exam->shortname))
                     ->updateOrInsert([
                         "admno" => $admno
                     ], [
-                        $subject->shortname => json_encode(
-                            ['score' => $score]
-                        ),
+                        $subject->shortname => json_encode([
+                                'score' => $score,
+                                'grade' => $grade,
+                                'points' => $points,
+                        ]),
                         'level_id' => $levelUnit->level->id,
                         'level_unit_id' => $levelUnit->id
                     ]);

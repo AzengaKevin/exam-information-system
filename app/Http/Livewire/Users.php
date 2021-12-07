@@ -59,6 +59,8 @@ class Users extends Component
         $this->email = $user->email;
         $this->active = $user->active;
 
+        $this->role_id = $user->role_id;
+
         $this->emit('show-update-user-modal');
     }
 

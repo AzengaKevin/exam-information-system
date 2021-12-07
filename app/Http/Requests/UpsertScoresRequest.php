@@ -25,6 +25,7 @@ class UpsertScoresRequest extends FormRequest
     public function rules()
     {
         return [
+            'grading_id' => ['nullable', 'integer'],
             'scores' => ['required', 'array'],
             'scores.*.score' => ['nullable', 'integer'],
         ];

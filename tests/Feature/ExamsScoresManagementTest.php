@@ -103,7 +103,7 @@ class ExamsScoresManagementTest extends TestCase
 
         $response->assertViewIs('exams.scores.create');
 
-        $response->assertViewHasAll(['exam', 'subject', 'levelUnit']);
+        $response->assertViewHasAll(['exam', 'subject', 'levelUnit', 'gradings']);
         
     }
 
@@ -111,6 +111,8 @@ class ExamsScoresManagementTest extends TestCase
     public function testAuthorizedTeacherCanUploadScores()
     {
         $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
 
         // Create the Level Unit
         /** @var LevelUnit */
