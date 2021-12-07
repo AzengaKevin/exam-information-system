@@ -91,4 +91,20 @@ class GradingsManagementTest extends TestCase
         $this->assertTrue(is_array($grading->fresh()->values));
         
     }
+
+    /** @group gradings */
+    public function testAuthorizedUserCanDeleteGradingSystem()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Grading */
+        $grading = Grading::factory()->create();
+
+        Livewire::test(Gradings::class)
+            ->call('showDeleteGradingModal', $grading)
+            ->call('deleteGrading');
+
+        $this->assertFalse(Grading::where('id', $grading->id)->exists());
+        
+    }
 }

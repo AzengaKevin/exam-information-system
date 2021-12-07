@@ -128,4 +128,47 @@ class Gradings extends Component
             
         }
     }
+
+    public function showDeleteGradingModal(Grading $grading)
+    {
+        $this->gradingId = $grading->id;
+
+        $this->name = $grading->name;
+
+        $this->emit('show-delete-grading-modal');
+    }
+
+    public function deleteGrading()
+    {
+
+        try {
+
+            /** @var Grading */
+            $grading = Grading::findOrFail($this->gradingId);
+
+            if ($grading->delete()) {
+
+                $this->reset(['gradingId', 'name', 'values']);
+
+                $this->resetValidation();
+
+                session()->flash('status', 'Grading system Has been successfully deleted');
+
+                $this->emit('hide-delete-grading-modal');
+                
+            }
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-delete-grading-modal');
+            
+        }
+        
+    }
 }

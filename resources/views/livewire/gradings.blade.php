@@ -26,7 +26,7 @@
                                 <i class="fa fa-eye"></i>
                                 <span>Edit</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
+                            <button wire:click="showDeleteGradingModal({{ $grading }})" class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
                                 <i class="fa fa-trash-alt"></i>
                                 <span>Delete</span>
                             </button>
@@ -46,4 +46,5 @@
     </div>
 
     <x-modals.gradings.upsert :gradingId="$gradingId" :grades="$grades" :values="$values" />
+    <x-modals.gradings.delete :name="$name" />
 </div>
