@@ -18,10 +18,10 @@ class GradingFactory extends Factory
 
         foreach (array_reverse(Grading::gradeOptions()) as $key => $value) {
             array_push($payload, [
-                "low" => $this->faker->numberBetween(0, 100),
-                "high" => $this->faker->numberBetween(0, 100),
+                "min" => $this->faker->numberBetween(0, 100),
+                "max" => $this->faker->numberBetween(0, 100),
                 "grade" => $value,
-                "points" => $key + 1
+                "points" => (($key + 1) <= 12) ? $key + 1 : 0
             ]);
         }
 

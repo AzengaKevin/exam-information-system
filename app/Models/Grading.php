@@ -21,7 +21,7 @@ class Grading extends Model
     public static function gradeOptions(): array
     {
         return [
-            'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'
+            'Y', 'X', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'
         ];
     }
 }

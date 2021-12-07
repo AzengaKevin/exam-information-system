@@ -44,4 +44,6 @@
             </tbody>
         </table>
     </div>
+
+    <x-modals.gradings.upsert :gradingId="$gradingId" :grades="$grades" :values="$values" />
 </div>

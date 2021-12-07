@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\Gradings;
 use App\Models\Grading;
 use Tests\TestCase;
 use App\Models\Role;
@@ -9,6 +10,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class GradingsManagementTest extends TestCase
 {
@@ -43,6 +45,28 @@ class GradingsManagementTest extends TestCase
         $response->assertViewIs('gradings.index');
 
         $response->assertSeeLivewire('gradings');
+        
+    }
+
+    /** @group gradings */
+    public function testAuthorizedUserCanCreateAGradingSystem()
+    {
+        $this->withoutExceptionHandling();
+
+        $payload = Grading::factory()->make()->toArray();
+
+        Livewire::test(Gradings::class)
+            ->set('name', $payload['name'])
+            ->set('values', $payload['values'])
+            ->call('addGrading');
+
+        $grading = Grading::first();
+
+        $this->assertNotNull($grading);
+
+        $this->assertEquals($payload["name"], $grading->name);
+
+        $this->assertTrue(is_array($grading->values));
         
     }
 }
