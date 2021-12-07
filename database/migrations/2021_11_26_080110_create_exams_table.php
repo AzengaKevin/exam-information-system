@@ -26,7 +26,7 @@ class CreateExamsTable extends Migration
             $table->double('weight')->nullable();
             $table->boolean('counts')->default(false);
             $table->mediumText('description')->nullable();
-            $table->enum('status',['published','unpublished'])->default('unpublished');
+            $table->enum('status', Exam::examStatusOptions())->default('Preparation');
             $table->softDeletesTz();
             $table->timestamps();
         });
