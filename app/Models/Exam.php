@@ -43,11 +43,24 @@ class Exam extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
-    public static function examStatusOptions()
+    public static function examStatusOptions() : array
     {
         return [
-            'published','unpublished'
+            'Preparation',
+            'In Progress',
+            'Marking',
+            'Published'
         ];
+    }
+
+    public function isInMarking(): bool
+    {
+        return $this->status == 'Marking';
+    }
+
+    public function isPublished(): bool
+    {
+        return $this->status == 'Published';
     }
 
     public function setCountsAttribute($value)
@@ -58,6 +71,11 @@ class Exam extends Model
     public function levels()
     {
         return $this->belongsToMany(Level::class);
+    }
+
+    public function levelUnits()
+    {
+        return $this->hasManyThrough(LevelUnit::class, Level::class);
     }
 
     public function subjects()

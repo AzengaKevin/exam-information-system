@@ -9,9 +9,11 @@ use App\Models\User;
 use App\Models\Level;
 use Livewire\Livewire;
 use App\Models\Subject;
+use App\Models\Permission;
 use Illuminate\Support\Str;
 use App\Http\Livewire\Exams;
-use App\Models\Permission;
+use Illuminate\Support\Facades\Schema;
+use App\Http\Livewire\ExamQuickActions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -164,5 +166,55 @@ class ExamsManagementTest extends TestCase
         $response->assertSeeLivewire('exam-levels');
         
         $response->assertSeeLivewire('exam-subjects');
+    }
+
+    /** @group exams */
+    public function testAuthorizedUserCanChangeExamStatus()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        $subjects = Subject::all();
+        
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->subjects()->attach($subjects);
+
+        $this->assertEquals('Preparation', $exam->fresh()->status);
+
+        Livewire::test(ExamQuickActions::class, ['exam' => $exam])
+            ->set('status', 'In Progress')
+            ->call('changeExamStatus');
+        
+        $this->assertEquals('In Progress', $exam->fresh()->status);
+            
+    }
+
+    /** @group exams */
+    public function testScoresTableIsCreatedWhenExamStatusIsChangedToMarking()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        $subjects = Subject::all();
+        
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->subjects()->attach($subjects);
+
+        $this->assertEquals('Preparation', $exam->fresh()->status);
+
+        Livewire::test(ExamQuickActions::class, ['exam' => $exam])
+            ->set('status', 'Marking')
+            ->call('changeExamStatus');
+        
+        $this->assertEquals('Marking', $exam->fresh()->status);
+
+        $this->assertTrue(Schema::hasTable(Str::slug($exam->shortname)));
+        
     }
 }
