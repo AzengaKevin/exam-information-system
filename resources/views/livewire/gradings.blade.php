@@ -22,7 +22,7 @@
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
-                            <button class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                            <button wire:click="editGrading({{ $grading }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Edit</span>
                             </button>

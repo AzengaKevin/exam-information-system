@@ -84,4 +84,48 @@ class Gradings extends Component
         }
         
     }
+
+    public function editGrading(Grading $grading)
+    {
+        $this->gradingId = $grading->id;
+
+        $this->name = $grading->name;
+        $this->values = $grading->values;
+
+        $this->emit('show-upsert-grading-modal');
+    }
+
+    public function updateGrading()
+    {
+        $data = $this->validate();
+
+        try {
+
+            /** @var Grading */
+            $grading = Grading::findOrFail($this->gradingId);
+
+            if ($grading->update($data)) {
+
+                $this->reset(['gradingId', 'name', 'values']);
+
+                $this->resetValidation();
+
+                session()->flash('status', 'Grading system Has been successfully updated');
+
+                $this->emit('hide-upsert-grading-modal');
+                
+            }
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-upsert-grading-modal');
+            
+        }
+    }
 }

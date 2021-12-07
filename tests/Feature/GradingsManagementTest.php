@@ -69,4 +69,26 @@ class GradingsManagementTest extends TestCase
         $this->assertTrue(is_array($grading->values));
         
     }
+
+    /** @group gradings */
+    public function testAuthorizedUserCanUpdateAGradingSystem()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Grading */
+        $grading = Grading::factory()->create();
+
+        $payload = Grading::factory()->make()->toArray();
+
+        Livewire::test(Gradings::class)
+            ->call('editGrading', $grading)
+            ->set('name', $payload['name'])
+            ->set('values', $payload['values'])
+            ->call('updateGrading');
+
+        $this->assertEquals($payload["name"], $grading->fresh()->name);
+
+        $this->assertTrue(is_array($grading->fresh()->values));
+        
+    }
 }
