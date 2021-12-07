@@ -37,14 +37,15 @@ class ExamsScoresController extends Controller
 
         /** @var Responsibility */
         $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+        $classTeacherResponsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
 
         $examLevels = $exam->levels;
 
-        $examSubjects = $exam->subjects;
+        // $examSubjects = $exam->subjects;
 
         $responsibilities = $teacher->responsibilities()
-            ->where('responsibilities.id', $responsibility->id)
-            ->wherePivotIn('subject_id', $examSubjects->pluck('id')->toArray())
+            ->whereIn('responsibilities.id', [$responsibility->id, $classTeacherResponsibility->id])
+            // ->wherePivotIn('subject_id', $examSubjects->pluck('id')->toArray())
             ->wherePivotIn('level_unit_id', function($query) use($examLevels) {
                 $query->from('level_units')
                     ->select(['level_unit_id'])
@@ -70,7 +71,7 @@ class ExamsScoresController extends Controller
 
         try {
 
-            $subject = Subject::findOrFail(intval($request->get('subject')));
+            $subject = Subject::find(intval($request->get('subject')));
 
             $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
 
@@ -81,16 +82,20 @@ class ExamsScoresController extends Controller
 
             if (Schema::hasTable(Str::slug($exam->shortname))) {
 
-                $col = $subject->shortname;
+                if($subject){
 
-                /** @var Collection */
-                $data = DB::table(Str::slug($exam->shortname))
-                    ->select('admno', $col)
-                    ->where('level_unit_id', $levelUnit->id)
-                    ->get();
+                    $col = $subject->shortname;
+    
+                    /** @var Collection */
+                    $data = DB::table(Str::slug($exam->shortname))
+                        ->select('admno', $col)
+                        ->where('level_unit_id', $levelUnit->id)
+                        ->get();
+                        
+                    foreach ($data as $value) {
+                        $scores[$value->admno] = optional(json_decode($value->$col))->score ?? null;
+                    }
                     
-                foreach ($data as $value) {
-                    $scores[$value->admno] = optional(json_decode($value->$col))->score ?? null;
                 }
 
             }

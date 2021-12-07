@@ -18,6 +18,7 @@
                 </tr>
                 <tr>
                     <th>#</th>
+                    <th>Responsibility</th>
                     <th>Subject</th>
                     <th>Level Unit</th>
                     <th>Actions</th>
@@ -28,6 +29,7 @@
                 @foreach ($responsibilities as $responsibility)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
+                    <td>{{ $responsibility->name }}</td>
                     <td>{{ $responsibility->pivot->subject->name }}</td>
                     <td>{{ $responsibility->pivot->levelUnit->alias }}</td>
                     <td>
@@ -37,8 +39,13 @@
                                 'subject' => $responsibility->pivot->subject->id,
                                 'level-unit' => $responsibility->pivot->levelUnit->id,
                             ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                                @if ($responsibility->pivot->subject->id)                                    
                                 <i class="fa fa-upload"></i>
                                 <span>Scores</span>
+                                @else
+                                <i class="fa fa-cog"></i>
+                                <span>Manage Class</span>                                
+                                @endif
                             </a>
                         </div>
                     </td>
