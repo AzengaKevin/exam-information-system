@@ -23,5 +23,8 @@
     livewire.on('hide-upsert-grading-modal', () => $('#upsert-grading-modal').modal('hide'))
     livewire.on('show-delete-grading-modal', () => $('#delete-grading-modal').modal('show'))
     livewire.on('hide-delete-grading-modal', () => $('#delete-grading-modal').modal('hide'))
+
+    livewire.on('show-grading-instance-modal', () => $('#grading-instance-modal').modal('show'))
+
 </script>
 @endpush

@@ -171,4 +171,13 @@ class Gradings extends Component
         }
         
     }
+
+    public function showGrading(Grading $grading)
+    {
+        $this->name = $grading->name;
+        $this->values = $grading->values;
+
+        $this->emit('show-grading-instance-modal');
+        
+    }
 }

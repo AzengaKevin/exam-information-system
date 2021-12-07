@@ -18,7 +18,7 @@
                     <td>{{ $grading->updated_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                            <button wire:click="showGrading({{ $grading }})" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
@@ -47,4 +47,5 @@
 
     <x-modals.gradings.upsert :gradingId="$gradingId" :grades="$grades" :values="$values" />
     <x-modals.gradings.delete :name="$name" />
+    <x-modals.gradings.show :name="$name" :values="$values" />
 </div>

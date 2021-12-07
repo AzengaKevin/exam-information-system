@@ -107,4 +107,17 @@ class GradingsManagementTest extends TestCase
         $this->assertFalse(Grading::where('id', $grading->id)->exists());
         
     }
+
+    /** @group gradings */
+    public function testAuthorizedCanViewGradingsValues()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Grading */
+        $grading = Grading::factory()->create();
+
+        Livewire::test(Gradings::class)
+            ->call('showGrading', $grading);
+        
+    }
 }
