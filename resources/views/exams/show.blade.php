@@ -5,7 +5,14 @@
 @section('content')
 
 <div class="d-flex justify-content-between align-items-center">
-    <h1 class="h4 fw-bold text-muted">{{ $exam->name }}</h1>
+
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }}</li>
+        </ol>
+    </nav>
 
     <div class="btn-group">
         @can('access-upload-scores-page')
