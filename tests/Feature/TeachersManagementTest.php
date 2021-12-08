@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Livewire\Teachers;
+use App\Models\Subject;
 use Tests\TestCase;
 use App\Models\User;
 use App\Models\Teacher;
@@ -86,6 +87,52 @@ class TeachersManagementTest extends TestCase
     }
 
     /** @group teachers */
+    public function testAuthorizedUserCanAddATeacherWhilstAssigningSubjects()
+    {
+        $this->withoutExceptionHandling();
+
+        $subjectsIds = Subject::factory()->create()->pluck('id')->toArray();
+
+        $selectedSubjects = array();
+
+        foreach ($subjectsIds as $id) {
+            $selectedSubjects[$id] = true;
+        }
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'employer' => $this->faker->randomElement(Teacher::employerOptions()),
+            'tsc_number' => $this->faker->numberBetween(123456, 999999),
+            'selectedSubjects' => $selectedSubjects
+        ];
+
+        Livewire::test(Teachers::class)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('employer', $payload['employer'])
+            ->set('tsc_number', $payload['tsc_number'])
+            ->set('selectedSubjects', $payload['selectedSubjects'])
+            ->call('addTeacher');
+
+        /** @var Teacher */
+        $teacher = Teacher::first();
+
+        $this->assertNotNull($teacher);
+
+        $this->assertEquals($payload['employer'], $teacher->employer);
+        $this->assertEquals($payload['tsc_number'], $teacher->tsc_number);
+
+        $this->assertNotNull($teacher->auth);
+
+        $this->assertEquals($payload['name'], $teacher->auth->name);
+        $this->assertEquals($payload['email'], $teacher->auth->email);
+
+        $this->assertEquals(count($selectedSubjects), $teacher->subjects()->count());
+        
+    }
+
+    /** @group teachers */
     public function testAuthorizedUserCanUpdateATeacher()
     {
         $this->withoutExceptionHandling();
@@ -121,6 +168,58 @@ class TeachersManagementTest extends TestCase
 
         $this->assertEquals($payload['name'], $teacher->fresh()->auth->name);
         $this->assertEquals($payload['email'], $teacher->fresh()->auth->email);
+        
+    }
+
+    /** @group teachers */
+    public function testAuthorizedUserCanUpdateATeacherWhilstUpdatingTeacherSubjects()
+    {        
+        
+        $this->withoutExceptionHandling();
+
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+
+        $subjectsIds = Subject::factory()->create()->pluck('id')->toArray();
+
+        $selectedSubjects = array();
+
+        foreach ($subjectsIds as $id) {
+            $selectedSubjects[$id] = true;
+        }
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'employer' => $this->faker->randomElement(Teacher::employerOptions()),
+            'tsc_number' => $this->faker->numberBetween(123456, 999999),
+            'selectedSubjects' => $selectedSubjects
+        ];
+
+        Livewire::test(Teachers::class)
+            ->call('editTeacher', $teacher)
+            ->set('name', $payload['name'])
+            ->set('email', $payload['email'])
+            ->set('employer', $payload['employer'])
+            ->set('tsc_number', $payload['tsc_number'])
+            ->set('selectedSubjects', $payload['selectedSubjects'])
+            ->call('updateTeacher');
+
+        $this->assertEquals($payload['employer'], $teacher->fresh()->employer);
+        $this->assertEquals($payload['tsc_number'], $teacher->fresh()->tsc_number);
+
+        $this->assertNotNull($teacher->fresh()->auth);
+
+        $this->assertEquals($payload['name'], $teacher->fresh()->auth->name);
+        $this->assertEquals($payload['email'], $teacher->fresh()->auth->email);
+
+        $this->assertEquals(count($selectedSubjects), $teacher->fresh()->subjects()->count());
         
     }
 
