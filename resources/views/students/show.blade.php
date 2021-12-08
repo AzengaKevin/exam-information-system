@@ -5,7 +5,13 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">{{$student->name}}</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('students.index') }}">Students</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $student->name }}</li>
+        </ol>
+    </nav>
 </div>
 
 <div class="row">

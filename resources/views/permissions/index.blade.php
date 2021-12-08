@@ -5,7 +5,13 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">Permissions</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('roles.index') }}">Authorization</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Permissions</li>
+        </ol>
+    </nav>
     <button data-bs-toggle="modal" data-bs-target="#upsert-permission-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Permission</span>

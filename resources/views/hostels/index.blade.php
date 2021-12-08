@@ -5,7 +5,12 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">Hostels</h1>
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Hostels</li>
+        </ol>
+    </nav>
     <button data-bs-toggle="modal" data-bs-target="#upsert-hostel-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Hostel</span>
