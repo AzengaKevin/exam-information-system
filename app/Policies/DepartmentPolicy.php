@@ -19,7 +19,9 @@ class DepartmentPolicy
      */
     public function viewAny(User $user)
     {
-       return $user->role->permission->pluck('slug')->contains('Departments Browse');
+        return $user->role->permissions->pluck('slug')->contains('departments-browse')
+            ? Response::allow()
+            : Response::deny('You are not allowed to browse the departments page');
     }
 
     /**

@@ -3,11 +3,11 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\LevelUnit;
+use App\Models\Hostel;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class LevelUnitPolicy
+class HostelPolicy
 {
     use HandlesAuthorization;
 
@@ -19,19 +19,19 @@ class LevelUnitPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('levelunits-browse')
+        return $user->role->permissions->pluck('slug')->contains('hostels-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the classes page');
+            : Response::deny('You are not allowed to browse the hostels page');
     }
 
     /**
      * Determine whether the user can view the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\LevelUnit  $levelUnit
+     * @param  \App\Models\Hostel  $hostel
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function view(User $user, LevelUnit $levelUnit)
+    public function view(User $user, Hostel $hostel)
     {
         //
     }
@@ -44,20 +44,17 @@ class LevelUnitPolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('levelunits-create')
-            ? Response::allow()
-            : Response::deny('You are not allowed to create a class');
-        
+        //
     }
 
     /**
      * Determine whether the user can update the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\LevelUnit  $levelUnit
+     * @param  \App\Models\Hostel  $hostel
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function update(User $user, LevelUnit $levelUnit)
+    public function update(User $user, Hostel $hostel)
     {
         //
     }
@@ -66,10 +63,10 @@ class LevelUnitPolicy
      * Determine whether the user can delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\LevelUnit  $levelUnit
+     * @param  \App\Models\Hostel  $hostel
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function delete(User $user, LevelUnit $levelUnit)
+    public function delete(User $user, Hostel $hostel)
     {
         //
     }
@@ -78,10 +75,10 @@ class LevelUnitPolicy
      * Determine whether the user can restore the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\LevelUnit  $levelUnit
+     * @param  \App\Models\Hostel  $hostel
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function restore(User $user, LevelUnit $levelUnit)
+    public function restore(User $user, Hostel $hostel)
     {
         //
     }
@@ -90,10 +87,10 @@ class LevelUnitPolicy
      * Determine whether the user can permanently delete the model.
      *
      * @param  \App\Models\User  $user
-     * @param  \App\Models\LevelUnit  $levelUnit
+     * @param  \App\Models\Hostel  $hostel
      * @return \Illuminate\Auth\Access\Response|bool
      */
-    public function forceDelete(User $user, LevelUnit $levelUnit)
+    public function forceDelete(User $user, Hostel $hostel)
     {
         //
     }

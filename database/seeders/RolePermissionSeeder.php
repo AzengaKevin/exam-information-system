@@ -97,7 +97,19 @@ class RolePermissionSeeder extends Seeder
             'LevelUnits Read',
             'LevelUnits Create',
             'LevelUnits Update',
-            'LevelUnits Delete'
+            'LevelUnits Delete',
+
+            'Hostels Browse',
+            'Hostels Read',
+            'Hostels Create',
+            'Hostels Update',
+            'Hostels Delete',
+
+            'Gradings Browse',
+            'Gradings Read',
+            'Gradings Create',
+            'Gradings Update',
+            'Gradings Delete'
         );
 
         array_walk($permissionsPayload, function($data){

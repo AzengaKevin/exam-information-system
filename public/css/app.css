@@ -17421,6 +17421,14 @@ readers do not read off random characters that represent icons */
   overflow-x: hidden;
 }
 
+.w-4 {
+  width: 4rem;
+}
+
+.h-4 {
+  height: 4rem;
+}
+
 ::-webkit-scrollbar {
   width: 0.25em;
 }

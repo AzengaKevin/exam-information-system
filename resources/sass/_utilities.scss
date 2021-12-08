@@ -3,7 +3,15 @@
     -moz-osx-font-smoothing: grayscale
 }
 
-.overflow-y-auto{
+.overflow-y-auto {
     overflow-y: auto;
     overflow-x: hidden;
+}
+
+.w-4 {
+    width: 4rem;
+}
+
+.h-4 {
+    height: 4rem;
 }

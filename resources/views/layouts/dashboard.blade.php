@@ -59,7 +59,7 @@
                 <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}"
                     href="{{route('departments.index')}}">
                     <div class="hstack gap-3">
-                        <span><i class="fas fa-th"></i></span>
+                        <span><i class="fas fa-list"></i></span>
                         <span>Departments</span>
                     </div>
                 </a>
