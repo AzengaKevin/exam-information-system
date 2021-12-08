@@ -42,7 +42,7 @@ class AuthenticationTest extends TestCase
 
         $this->assertAuthenticatedAs(User::first());
 
-        $response->assertRedirect(route('home'));
+        $response->assertRedirect(route('dashboard'));
     }
 
     /** @group auth */
