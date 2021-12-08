@@ -43,6 +43,8 @@
                 </a>
             </li>
             @endcan
+
+            @can('viewAny', \App\Models\User::class)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('users.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('users.index') }}">
@@ -52,6 +54,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}"
                     href="{{route('departments.index')}}">
@@ -70,6 +73,7 @@
                     </div>
                 </a>
             </li>
+            @can('viewAny', \App\Models\Student::class)                
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('students.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('students.index') }}">
@@ -79,6 +83,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('teachers.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('teachers.index') }}">
@@ -97,6 +102,7 @@
                     </div>
                 </a>
             </li>
+            @can('viewAny', \App\Models\Exam::class)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('exams.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('exams.index') }}">
@@ -106,6 +112,7 @@
                     </div>
                 </a>
             </li>
+            @endcan
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('gradings.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('gradings.index') }}">
@@ -200,18 +207,18 @@
 
 @push('scripts')
 <script>
-    $("#sidebar-toggler").click(function(){
+    $("#sidebar-toggler").click(function () {
 
         const width = $(window).width();
 
-        if(width < 768){
+        if (width < 768) {
 
             $("#sidebar").toggleClass("d-none");
             $("#content").toggleClass("d-none");
-            
+
             $("#hide-sidebar").toggleClass('d-none');
 
-        }else{
+        } else {
 
             $("#sidebar").toggleClass('d-md-block');
             $("#content").toggleClass('col-md-9 col-lg-10').toggleClass('col-12');
@@ -219,11 +226,11 @@
         }
     });
 
-    $("#hide-sidebar").click(function(){
+    $("#hide-sidebar").click(function () {
 
         const width = $(window).width();
 
-        if(width < 768){
+        if (width < 768) {
             $("#sidebar").toggleClass("d-none");
             $("#content").toggleClass("d-none");
 
@@ -231,6 +238,5 @@
         }
 
     });
-
 </script>
 @endpush

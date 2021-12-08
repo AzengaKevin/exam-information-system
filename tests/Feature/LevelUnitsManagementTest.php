@@ -122,12 +122,29 @@ class LevelUnitsManagementTest extends TestCase
 
         $this->withoutExceptionHandling();
 
-        Stream::factory(3)->create();
+        $streamsPayload = [
+            [
+                'name' => 'Blue',
+                'alias' => 'B'
+            ],
+            [
+                'name' => 'Green',
+                'alias' => 'G'
+            ],
+            [
+                'name' => 'Red',
+                'alias' => 'R'
+            ]
+        ];
+
+        array_walk($streamsPayload, function($data){
+            Stream::create($data);
+        });
         
-        Level::factory(3)->create();
+        $this->artisan('db:seed --class=LevelsSeeder');
 
         $this->post(route('level-units.store'));
 
-        $this->assertEquals(9, LevelUnit::count());
+        $this->assertEquals((Level::count() * Stream::count()), LevelUnit::count());
     }
 }
