@@ -40,7 +40,7 @@ class Subjects extends Component
 
     public function getPaginatedSubjects()
     {
-        return Subject::paginate(24);
+        return Subject::with(['teachers'])->paginate(24);
     }
 
     /**

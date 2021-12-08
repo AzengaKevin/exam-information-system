@@ -169,6 +169,7 @@ class TeachersManagementTest extends TestCase
         $response->assertViewHasAll(['teacher']);
 
         $response->assertSeeLivewire('teacher-responsibilities');
+        $response->assertSeeLivewire('teacher-subjects');
         
     }
 }

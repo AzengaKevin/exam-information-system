@@ -9,7 +9,7 @@
                     <th>Name</th>
                     <th>Department</th>
                     <th>Shortname</th>
-                    <th>Subject Code</th>
+                    <th>Teachers</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
@@ -22,7 +22,7 @@
                     <td>{{ $subject->name }}</td>
                     <td>{{ optional($subject->department)->name ?? 'Not Set' }}</td>
                     <td>{{ $subject->shortname }}</td>
-                    <td>{{ $subject->subject_code }}</td>
+                    <td>{{ $subject->teachers->count() }}</td>
                     <td>{{ $subject->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">

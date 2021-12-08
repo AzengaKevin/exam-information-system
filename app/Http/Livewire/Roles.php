@@ -243,7 +243,7 @@ class Roles extends Component
             
             Log::error($exception->getMessage(), [
                 'role-id' => $this->roleId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A database error occurred');
