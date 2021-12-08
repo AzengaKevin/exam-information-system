@@ -34,4 +34,9 @@ class Teacher extends Model
             ->withTimestamps()
             ->withPivot(['level_id', 'level_unit_id', 'subject_id', 'department_id']);
     }
+
+    public function subjects()
+    {
+        return $this->belongsToMany(Subject::class)->withTimestamps();
+    }
 }
