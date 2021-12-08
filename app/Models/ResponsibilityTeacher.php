@@ -14,28 +14,28 @@ class ResponsibilityTeacher extends Pivot
     public function level()
     {
         return $this->belongsTo(Level::class)->withDefault([
-            'name' => 'N/A'
+            'name' => '-'
         ]);
     }
 
     public function subject()
     {
         return $this->belongsTo(Subject::class)->withDefault([
-            'name' => 'N/A'
+            'name' => '-'
         ]);
     }
 
     public function department()
     {
         return $this->belongsTo(Department::class)->withDefault([
-            'name' => 'N/A'
+            'name' => '-'
         ]);
     }
 
     public function levelUnit()
     {
         return $this->belongsTo(LevelUnit::class)->withDefault([
-            'alias' => 'N/A'
+            'alias' => '-'
         ]);
     }
 

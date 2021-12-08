@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\User;
+use App\Models\Subject;
 use App\Models\Teacher;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -25,11 +26,14 @@ class Teachers extends Component
     public $employer;
     public $tsc_number;
 
+    public $selectedSubjects = [];
+
     public function render()
     {
         return view('livewire.teachers', [
             'teachers' => $this->getPaginatedTeachers(),
-            'employers' => Teacher::employerOptions()
+            'employers' => Teacher::employerOptions(),
+            'subjects' => $this->getAllSubjects()
         ]);
     }
 
@@ -38,13 +42,19 @@ class Teachers extends Component
         return Teacher::latest()->paginate(24);
     }
 
+    public function getAllSubjects()
+    {
+        return Subject::all(['id', 'name']);
+    }
+
     public function rules()
     {
         return [
             'name' => ['bail', 'required', 'string'],
             'email' => ['bail', 'required', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
             'employer' => ['bail', 'required', Rule::in(Teacher::employerOptions())],
-            'tsc_number' => ['bail', 'nullable', Rule::unique('teachers')->ignore($this->teacherId)]
+            'tsc_number' => ['bail', 'nullable', Rule::unique('teachers')->ignore($this->teacherId)],
+            'selectedSubjects' => ['bail', 'nullable', 'array']
         ];
     }
 
@@ -69,6 +79,16 @@ class Teachers extends Component
                 //$user->sendEmailVerificationNotification();
 
                 if($user){
+
+                    if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
+
+                        $payload = array_filter($data['selectedSubjects'], function($value, $key){
+                            return $value == 'true';
+                        }, ARRAY_FILTER_USE_BOTH);
+
+                        $teacher->subjects()->sync(array_keys($payload));
+
+                    }
 
                     DB::commit();
 
@@ -110,6 +130,10 @@ class Teachers extends Component
         $this->employer = $teacher->employer;
         $this->tsc_number = $teacher->tsc_number;
 
+        foreach ($teacher->subjects->pluck('id')->toArray() as $subject) {
+            $this->selectedSubjects[$subject] = 'true';
+        }
+
         $this->emit('show-upsert-teacher-modal');
         
     }
@@ -128,6 +152,16 @@ class Teachers extends Component
             if($teacher->update($data)){
 
                 if($teacher->auth->update($data)){
+
+                    if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
+
+                        $payload = array_filter($data['selectedSubjects'], function($value, $key){
+                            return $value == 'true';
+                        }, ARRAY_FILTER_USE_BOTH);
+
+                        $teacher->subjects()->sync(array_keys($payload));
+
+                    }
 
                     DB::commit();
 

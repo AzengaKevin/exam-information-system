@@ -6,7 +6,6 @@ use App\Models\Department;
 use App\Models\Level;
 use App\Models\LevelUnit;
 use App\Models\Responsibility;
-use App\Models\ResponsibilityTeacher;
 use App\Models\Subject;
 use App\Models\Teacher;
 use Illuminate\Support\Facades\Log;
@@ -21,6 +20,8 @@ class TeacherResponsibilities extends Component
     public $level_id;
     public $department_id;
     public $subject_id;
+
+    public $type = null;
 
     public function mount(Teacher $teacher)
     {

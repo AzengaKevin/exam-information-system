@@ -2,13 +2,13 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover text-center">
+        <table class="table {{ $type }} table-hover text-center">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Responsibility</th>
                     <th>Subject</th>
-                    <th>Level Unit</th>
+                    <th>Class</th>
                     <th>Level</th>
                     <th>Department</th>
                     <th>Actions</th>

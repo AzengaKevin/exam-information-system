@@ -70,7 +70,7 @@
         </table>
     </div>
 
-    <x-modals.teachers.upsert :teacherId="$teacherId" :employers="$employers" />
+    <x-modals.teachers.upsert :teacherId="$teacherId" :employers="$employers" :subjects="$subjects" />
     <x-modals.teachers.delete :name="$name" />
 
 </div>
