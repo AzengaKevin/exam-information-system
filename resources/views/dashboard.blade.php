@@ -25,7 +25,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\User::count() }}</span>
                         </div>
                         <div
-                            class="bg-success w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-user-alt"></i>
                         </div>
                     </div>
@@ -44,7 +44,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\User::count() }}</span>
                         </div>
                         <div
-                            class="bg-success w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-user-alt"></i>
                         </div>
                     </div>
@@ -105,7 +105,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Guardian::count() }}</span>
                         </div>
                         <div
-                            class="bg-info w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-user-alt"></i>
                         </div>
                     </div>
@@ -124,7 +124,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Guardian::count() }}</span>
                         </div>
                         <div
-                            class="bg-info w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-user-alt"></i>
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Student::count() }}</span>
                         </div>
                         <div
-                            class="bg-danger w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-user-graduate"></i>
                         </div>
                     </div>
@@ -164,7 +164,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Student::count() }}</span>
                         </div>
                         <div
-                            class="bg-danger w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-user-graduate"></i>
                         </div>
                     </div>
@@ -186,7 +186,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Department::count() }}</span>
                         </div>
                         <div
-                            class="bg-secondary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-list"></i>
                         </div>
                     </div>
@@ -205,7 +205,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Department::count() }}</span>
                         </div>
                         <div
-                            class="bg-secondary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-list"></i>
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Exam::count() }}</span>
                         </div>
                         <div
-                            class="bg-dark w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-file-alt"></i>
                         </div>
                     </div>
@@ -246,7 +246,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Exam::count() }}</span>
                         </div>
                         <div
-                            class="bg-dark w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-file-alt"></i>
                         </div>
                     </div>
@@ -307,7 +307,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\LevelUnit::count() }}</span>
                         </div>
                         <div
-                            class="bg-success bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-th"></i>
                         </div>
                     </div>
@@ -326,7 +326,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\LevelUnit::count() }}</span>
                         </div>
                         <div
-                            class="bg-success bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-th"></i>
                         </div>
                     </div>
@@ -347,7 +347,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Subject::count() }}</span>
                         </div>
                         <div
-                            class="bg-info bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-book"></i>
                         </div>
                     </div>
@@ -366,7 +366,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Subject::count() }}</span>
                         </div>
                         <div
-                            class="bg-info bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-book"></i>
                         </div>
                     </div>
@@ -387,8 +387,8 @@
                             <span class="fw-bold number-count">{{ \App\Models\Grading::count() }}</span>
                         </div>
                         <div
-                            class="bg-danger bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
-                            <i class="text-white fa fa-2x fa-file-excel"></i>
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            <i class="text-white fa fa-2x fa-equals"></i>
                         </div>
                     </div>
                 </div>
@@ -406,8 +406,8 @@
                             <span class="fw-bold number-count">{{ \App\Models\Grading::count() }}</span>
                         </div>
                         <div
-                            class="bg-danger bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
-                            <i class="text-white fa fa-2x fa-file-excel"></i>
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            <i class="text-white fa fa-2x fa-equals"></i>
                         </div>
                     </div>
                 </div>
@@ -427,7 +427,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Responsibility::count() }}</span>
                         </div>
                         <div
-                            class="bg-dark bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-tasks"></i>
                         </div>
                     </div>
@@ -446,7 +446,7 @@
                             <span class="fw-bold number-count">{{ \App\Models\Responsibility::count() }}</span>
                         </div>
                         <div
-                            class="bg-dark bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
                             <i class="text-white fa fa-2x fa-tasks"></i>
                         </div>
                     </div>
