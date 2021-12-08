@@ -18,8 +18,7 @@ class TeachersController extends Controller
 
     public function show(Teacher $teacher)
     {
-        $currentExams = Exam::where('status','unpublished')->get();
-        return view('teachers.show',compact('teacher','currentExams'));
+        return view('teachers.show',compact('teacher'));
     }
 
     public function currentExamMarking(Teacher $teacher,Exam $exam)

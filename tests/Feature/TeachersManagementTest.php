@@ -145,4 +145,30 @@ class TeachersManagementTest extends TestCase
         $this->assertFalse(Teacher::where('id', $teacher->id)->exists());
         $this->assertFalse(User::where('id', $teacher->auth->id)->exists());
     }
+
+    /** @group teachers */
+    public function testAuthorizedTeacherCanViewTeacherDetailsPage()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'password' => Hash::make('password')
+        ]);
+
+        $response = $this->get(route('teachers.show', $teacher));
+
+        $response->assertOk();
+
+        $response->assertViewIs('teachers.show');
+
+        $response->assertViewHasAll(['teacher']);
+
+        $response->assertSeeLivewire('teacher-responsibilities');
+        
+    }
 }

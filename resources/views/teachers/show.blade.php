@@ -5,87 +5,62 @@
 @section('content')
 
 <div class="d-flex justify-content-between">
-    <h1 class="h4 fw-bold text-muted">{{$teacher->auth->name}}</h1>
+    <h1 class="h4 fw-bold text-muted">Teacher {{ $teacher->auth->name }} Details</h1>
 </div>
 
-<div class="row">
-    <div class="col-lg-4">
-        <div class="avatar avatar-5xl avatar-profile"><img class="rounded-circle img-thumbnail shadow-sm"
-                src="/profile.png" alt="" width="200"></div>
-    </div>
-    <div class="col-lg-8">
-        <h4 class="mb-1"> {{$teacher->auth->name}}
-        </h4>
-        <div class="row">
-            <div class="col-6">
-                <p class="mx-0 my-0">Employer:</p>
-                <p class="mx-0 my-0">Tsc No:</p>
-                <p class="mx-0 my-0">Responsibilities:</p>
-                <p class="mx-0 my-0">Tasks:</p>
-            </div>
-            <div class="col-6">
-                <p class="mx-0 my-0">My classes:</p>
-                <p class="mx-0 my-0">Stream:</p>
+<div class="row g-4 py-3">
 
-                <p class="mx-0 my-0">Description</p>
-            
+    <div class="col-md-12">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="h5">Basic Details</h2>
+                <hr>
+                <div class="row g-2 align-items-center">
+                    <dl class="col-md-6">
+                        <dt>Name</dt>
+                        <dd>{{ $teacher->auth->name }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Email</dt>
+                        <dd>{{ $teacher->auth->email }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Phone</dt>
+                        <dd>{{ $teacher->auth->phone  ?? 'N/A'}}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>TSC Number</dt>
+                        <dd>{{ $teacher->tsc_number }}</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h5">Responsibilities</h2>
+
+    <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal" class="btn btn-sm btn-outline-primary hstack gap-2 align-items-center">
+        <i class="fa fa-plus"></i>
+        <span>Responsibility</span>
+    </button>
+                </div>
+                <hr>
+                <livewire:teacher-responsibilities :teacher="$teacher" type="table-sm table-bordered" />
             </div>
         </div>
     </div>
 </div>
 
-<div class="row">
-    <h4 class="font-weight-bold text-center">Current Exams</h4>
-    <div class="table-responsive">
-        <table class="table table-hover text-center">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Shortname</th>
-                    <th>Year</th>
-                    <th>Term</th>
-                    <th>StartDate</th>
-                    <th>EndDate</th>
-                    <th>Weight</th>
-                    <th>Counts</th>
-                    <th>Status</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($currentExams->count())
-                @foreach ($currentExams as $exam)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $exam->shortname }}</td>
-                    <td>{{ $exam->year }}</td>
-                    <td>{{ $exam->term }}</td>
-                    <td>{{ $exam->start_date }}</td>
-                    <td>{{ $exam->end_date }}</td>
-                    <td>{{ $exam->weight }}</td>
-                    <td>{{ $exam->counts ? 'True' : 'False' }}</td>
-                    <td>{{ $exam->status }}</td>
-                    <td>
-                        <div class="hstack gap-2 align-items-center justify-content-center">
-                            <a href="{{route('teachers.currentExamMarking',['teacher'=>$teacher,'exam'=>$exam])}}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
-                                <i class="fa fa-eye"></i>
-                                <span>Details</span>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-                @else
-                <tr>
-                    <td colspan="10">
-                        <div class="py-1">No Exam created yet</div>
-                    </td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
-    </div>
-</div>
-
-
 @endsection
+
+
+
+@push('scripts')
+<script>
+    livewire.on('hide-assign-teacher-responsibility-modal', () => $('#assign-teacher-responsibility-modal').modal('hide'));
+</script>
+@endpush
