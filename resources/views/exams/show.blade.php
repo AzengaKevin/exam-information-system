@@ -95,9 +95,6 @@
     <div class="col-md-6">
         <livewire:exam-subjects :exam="$exam" />
     </div>
-    <div class="col-md-12">
-        @livewire('exam-grades',['exam'=>$exam])
-    </div>
 
 </div>
 
