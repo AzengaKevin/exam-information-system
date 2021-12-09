@@ -75,7 +75,9 @@ class Exam extends Model
 
     public function levelUnits()
     {
-        return $this->hasManyThrough(LevelUnit::class, Level::class);
+        return $this->belongsToMany(LevelUnit::class)
+            ->withTimestamps()
+            ->withPivot(['points', 'grade', 'average']);
     }
 
     public function subjects()

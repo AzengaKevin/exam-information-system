@@ -15,6 +15,11 @@ class CreateExamLevelUnitTable extends Migration
     {
         Schema::create('exam_level_unit', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('exam_id')->constrained()->onDelete('cascade');
+            $table->foreignId('level_unit_id')->constrained()->onDelete('cascade');
+            $table->double('points', 6, 4);
+            $table->char('grade', 2);
+            $table->double('average', 6, 2);
             $table->timestamps();
         });
     }
