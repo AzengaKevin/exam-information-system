@@ -14,9 +14,10 @@ use Illuminate\Support\Facades\Schema;
 
 class LevelUnitExamScores extends Component
 {
-    public $exam;
+    /** @var Exam */
+    public Exam $exam;
 
-    public $levelUnit;
+    public LevelUnit $levelUnit;
 
     public $admno;
 
@@ -215,6 +216,51 @@ class LevelUnitExamScores extends Component
 
             $this->emit('hide-generate-scores-aggreagetes');
             
+        }
+        
+    }
+
+    public function publishClassScores()
+    {
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            $data = DB::table($tblName)
+                ->where("level_unit_id", $this->levelUnit->id)
+                ->selectRaw("AVG(total) AS avg_total, AVG(points) avg_points")
+                ->first();
+            
+            $avgTotal = number_format($data->avg_total, 2);
+            $avgPoints = number_format($data->avg_points, 4);
+
+            $pgm = Grading::pointsGradeMap();
+
+            $avgGrade = $pgm[intval(round($avgPoints))];
+
+            $this->exam->levelUnits()->syncWithoutDetaching([
+                $this->levelUnit->id => [
+                    "points" => $avgPoints,
+                    "grade" => $avgGrade,
+                    "average" => $avgTotal
+                ]
+            ]);
+
+            session()->flash('status', 'Your class scores have been successfully published, you can republish the scores incase of any changes');
+
+            $this->emit('hide-publish-class-scores-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-publish-class-scores-modal');
+
         }
         
     }
