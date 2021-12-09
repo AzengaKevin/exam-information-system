@@ -87,8 +87,11 @@ class Exam extends Model
         return $this->belongsToMany(Subject::class);
     }
 
-    public function grades()
+    public function levelGradesDist()
     {
-        return $this->hasMany(Grade::class);
+        return $this->belongsToMany(Level::class, 'exam_level_grade_distribution')
+            ->withPivot(['grade', 'count'])
+            ->withTimestamps();
     }
+
 }
