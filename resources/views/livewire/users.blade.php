@@ -9,6 +9,7 @@
                     <th>Name</th>
                     <th>Email</th>
                     <th>Type</th>
+                    <th>Role</th>
                     <th>Active?</th>
                     <th>Joined</th>
                     <th>Actions</th>
@@ -22,6 +23,7 @@
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
                     <td>{{ ucfirst($user->authenticatable_type ?? 'Anonymous') }}</td>
+                    <td>{{ $user->role->name }}</td>
                     <td>{{ $user->active ? 'True' : 'False' }}</td>
                     <td>{{ $user->created_at->format('d/m/Y') }}</td>
                     <td>

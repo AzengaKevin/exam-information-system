@@ -21,7 +21,7 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th colspan="4">My Classes</th>
+                    <th colspan="6">My Classes</th>
                 </tr>
                 <tr>
                     <th>#</th>

@@ -131,7 +131,7 @@ class Exams extends Component
 
             }else{
 
-                session()->flash('message', $access->message());
+                session()->flash('error', $access->message());
     
                 $this->emit('hide-upsert-exam-modal');
 

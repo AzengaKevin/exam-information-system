@@ -13,7 +13,7 @@ use Livewire\Component;
 
 class TeacherResponsibilities extends Component
 {
-    public $teacher;
+    public Teacher $teacher;
 
     public $responsibility_id;
     public $level_unit_id;
@@ -52,7 +52,7 @@ class TeacherResponsibilities extends Component
 
     public function getSubjects()
     {
-        return Subject::all(['id', 'name']);
+        return $this->teacher->subjects;
     }
 
     public function getLevelUnits()
