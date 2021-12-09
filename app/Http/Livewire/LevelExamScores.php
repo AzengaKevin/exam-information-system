@@ -115,6 +115,9 @@ class LevelExamScores extends Component
         
     }
 
+    /**
+     * Publish Level Students Grade Distribution
+     */
     public function publishLevelGradeDistribution()
     {
         try {
@@ -147,7 +150,7 @@ class LevelExamScores extends Component
 
             DB::commit();
 
-            session()->flash('status', 'Level grade distribution hs been successfully published');
+            session()->flash('status', 'Level grade distribution has been successfully published');
 
             $this->emit('hide-publish-level-grade-dist-modal');
             
@@ -165,5 +168,72 @@ class LevelExamScores extends Component
             
         }
         
+    }
+
+    /**
+     * Publish level subject performance
+     */
+    public function publishLevelSubjectPerformance()
+    {
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            DB::beginTransaction();
+
+            DB::table('exam_level_subject_performance')
+            ->where([
+                'exam_id' => $this->exam->id,
+                'level_id' => $this->level->id,
+            ])->delete();
+
+            foreach ($this->exam->subjects as $subject) {
+
+                $col = $subject->shortname;
+
+                $data = DB::table($tblName)
+                    ->selectRaw("AVG({$col}->>\"$.points\") AS avg_points, AVG({$col}->>\"$.score\") AS avg_score")
+                    ->where('level_id', $this->level->id)
+                    ->whereNotNull($col)
+                    ->first();
+
+                $avgTotal = number_format($data->avg_score, 2);
+                $avgPoints = number_format($data->avg_points, 4);
+
+                $pgm = Grading::pointsGradeMap();
+
+                $avgGrade = $pgm[intval(round($avgPoints))];
+                
+                $this->exam->levelSubjectPerformance()
+                    ->attach([
+                        $this->level->id => [
+                            'subject_id' => $subject->id,
+                            'average' => $avgTotal,
+                            'points' => $avgPoints,
+                            'grade' => $avgGrade
+                        ]
+                    ]);
+            }
+
+            DB::commit();
+
+            session()->flash('status', 'Level subject performance has been successfully published');
+
+            $this->emit('hide-publish-subjects-performance-modal');
+            
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-publish-subjects-performance-modal');
+            
+        }
     }
 }

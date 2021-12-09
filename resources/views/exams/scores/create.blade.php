@@ -58,6 +58,13 @@
                     <span>Publish Scores</span>
                 </a>
             </li>
+            <li>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#publish-subjects-performance-modal" role="button"
+                    class="dropdown-item hstack gap-2">
+                    <i class="fa fa-upload"></i>
+                    <span>Publish Subject Performance.</span>
+                </a>
+            </li>            
         </ul>
     </div>
     @endif
@@ -81,8 +88,9 @@
 <script>
     livewire.on('hide-generate-scores-aggregates-modal', () => $('#generate-scores-aggregates-modal').modal('hide'));
     livewire.on('show-generate-scores-aggregates-modal', () => $('#generate-scores-aggregates-modal').modal('show'));
-    //
+    
     livewire.on('hide-publish-class-scores-modal', () => $('#publish-class-scores-modal').modal('hide'));
     livewire.on('hide-publish-level-grade-dist-modal', () => $('#publish-level-grade-dist-modal').modal('hide'));
+    livewire.on('hide-publish-subjects-performance-modal', () => $('#publish-subjects-performance-modal').modal('hide'));
 </script>
 @endpush
