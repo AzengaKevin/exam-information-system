@@ -3,7 +3,12 @@
         <div class="row g-2">
             <div class="col-md-12">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h3>{{ $level->name }}</h3>
+                    <h3 class="my-0">{{ $level->name }}</h3>
+                    <a href="{{ route('exams.analysis.index', ['exam' => $exam, 'level' => $level->id]) }}"
+                        class="btn btn-sm btn-outline-primary hstack gap-2 align-items-center">
+                        <i class="fa fa-eye"></i>
+                        <span>Details</span>
+                    </a>
                 </div>
             </div>
             <hr>
