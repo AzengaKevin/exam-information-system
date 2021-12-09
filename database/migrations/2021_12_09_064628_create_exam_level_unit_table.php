@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateExamLevelTable extends Migration
+class CreateExamLevelUnitTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,13 +13,13 @@ class CreateExamLevelTable extends Migration
      */
     public function up()
     {
-        Schema::create('exam_level', function (Blueprint $table) {
+        Schema::create('exam_level_unit', function (Blueprint $table) {
             $table->id();
             $table->foreignId('exam_id')->constrained()->onDelete('cascade');
-            $table->foreignId('level_id')->constrained()->onDelete('cascade');
-            $table->double('points', 6, 4)->nullable();
-            $table->char('grade', 2)->nullable();
-            $table->double('average', 6, 2)->nullable();
+            $table->foreignId('level_unit_id')->constrained()->onDelete('cascade');
+            $table->double('points', 6, 4);
+            $table->char('grade', 2);
+            $table->double('average', 6, 2);
             $table->timestamps();
         });
     }
@@ -31,6 +31,6 @@ class CreateExamLevelTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('exam_level');
+        Schema::dropIfExists('exam_level_unit');
     }
 }

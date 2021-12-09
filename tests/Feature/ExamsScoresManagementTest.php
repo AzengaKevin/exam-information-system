@@ -280,11 +280,13 @@ class ExamsScoresManagementTest extends TestCase
 
         $this->assertEquals(2, DB::table($tblName)->count());
 
-        $data = DB::table($tblName)->select(["average", "total"])->get();
+        $data = DB::table($tblName)->select(["average", "total", "points", "grade"])->get();
 
         foreach ($data as $item) {
             $this->assertTrue(!is_null($item->total));
-            $this->assertTrue(is_array(json_decode($item->average, true)));
+            $this->assertTrue(!is_null($item->points));
+            $this->assertTrue(!is_null($item->grade));
+            $this->assertTrue(!is_null($item->average));
         }
     }
 
@@ -358,10 +360,12 @@ class ExamsScoresManagementTest extends TestCase
 
         $tblName = Str::slug($exam->shortname);
 
-        $data = DB::table($tblName)->where('admno', $students->first()->adm_no)->select(["average", "total"])->first();
-
+        $data = DB::table($tblName)->where('admno', $students->first()->adm_no)->select(["average", "total", "points", "grade"])->first();
+        
         $this->assertTrue(!is_null($data->total));
-        $this->assertTrue(is_array(json_decode($data->average, true)));
+        $this->assertTrue(!is_null($data->points));
+        $this->assertTrue(!is_null($data->grade));
+        $this->assertTrue(!is_null($data->average));
     }    
 
     /** @group exams-scores */

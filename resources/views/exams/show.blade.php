@@ -7,7 +7,7 @@
 <div class="d-flex justify-content-between align-items-center">
 
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }}</li>
@@ -17,9 +17,8 @@
     <div class="btn-group">
         @can('access-upload-scores-page')
         @if ($exam->isInMarking())
-        <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
-            <i class="fa fa-upload"></i>
-            <span class="d-none d-md-inline">Scores</span>
+        <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
+            <span class="d-none d-md-inline">Manage Scores</span>
         </a>
         @endif
         @endcan

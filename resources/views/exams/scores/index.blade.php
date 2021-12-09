@@ -6,7 +6,7 @@
 
 <div>
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
+        <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.show', $exam) }}">{{ $exam->name }}</a></li>
@@ -28,6 +28,7 @@
                     <th>Responsibility</th>
                     <th>Subject</th>
                     <th>Level Unit</th>
+                    <th>Level</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -39,19 +40,24 @@
                     <td>{{ $responsibility->name }}</td>
                     <td>{{ $responsibility->pivot->subject->name }}</td>
                     <td>{{ $responsibility->pivot->levelUnit->alias }}</td>
+                    <td>{{ $responsibility->pivot->level->name }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">
                             <a href="{{ route('exams.scores.create', [
                                 'exam' => $exam,
                                 'subject' => $responsibility->pivot->subject->id,
                                 'level-unit' => $responsibility->pivot->levelUnit->id,
+                                'level' => $responsibility->pivot->level->id,
                             ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 @if ($responsibility->pivot->subject->id)
                                 <i class="fa fa-upload"></i>
-                                <span>Scores</span>
-                                @else
+                                <span>Subject Scores</span>
+                                @elseif($responsibility->pivot->levelUnit->id)
                                 <i class="fa fa-cog"></i>
-                                <span>Manage Class</span>
+                                <span>Class Scores</span>
+                                @elseif($responsibility->pivot->level->id)
+                                <i class="fa fa-cog"></i>
+                                <span>Level Scores</span>
                                 @endif
                             </a>
                         </div>

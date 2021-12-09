@@ -14,9 +14,10 @@ use Illuminate\Support\Facades\Schema;
 
 class LevelUnitExamScores extends Component
 {
-    public $exam;
+    /** @var Exam */
+    public Exam $exam;
 
-    public $levelUnit;
+    public LevelUnit $levelUnit;
 
     public $admno;
 
@@ -44,7 +45,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total");
+        $aggregateCols = array("average", "total", "grade", "points");
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -68,7 +69,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total");
+        $aggregateCols = array("average", "total", "grade", "points");
 
         /** @var array */
         $studentLevelCols = array("name", "alias");
@@ -106,8 +107,8 @@ class LevelUnitExamScores extends Component
                     }
                 }
 
-                $avgPoints = intval($totalPoints / $populatedCols);
-                $avgScore = intval($totalScore / $populatedCols);
+                $avgPoints = round($totalPoints / $populatedCols);
+                $avgScore = round($totalScore / $populatedCols);
 
                 $pgm = Grading::pointsGradeMap();
 
@@ -117,18 +118,16 @@ class LevelUnitExamScores extends Component
                 ->updateOrInsert([
                     "admno" => $stuData->admno
                 ], [
-                    "average" => json_encode([
-                        'score' => $avgScore,
-                        'grade' => $avgGrade,
-                        'points' => $avgPoints,
-                    ]),
+                    "average" => $avgScore,
+                    "grade" => $avgGrade,
+                    'points' => $avgPoints,
                     'total' => $totalScore
                 ]);
             });
 
             session()->flash('status', 'Aggregates for the whole class successfully generated');
 
-            $this->emit('hide-generate-scores-aggreagetes');
+            $this->emit('hide-generate-scores-aggregates-modal');
 
         } catch (\Exception $exception) {
 
@@ -138,7 +137,7 @@ class LevelUnitExamScores extends Component
 
             session()->flash('error', 'A fatal error occurred');
 
-            $this->emit('hide-generate-scores-aggreagetes');
+            $this->emit('hide-generate-scores-aggregates-modal');
             
         }
         
@@ -148,7 +147,7 @@ class LevelUnitExamScores extends Component
     {
         $this->admno = $admno;
 
-        $this->emit('show-generate-scores-aggreagetes');
+        $this->emit('show-generate-scores-aggregates-modal');
         
     }
 
@@ -193,11 +192,9 @@ class LevelUnitExamScores extends Component
             ->updateOrInsert([
                 "admno" => $stuData->admno
             ], [
-                "average" => json_encode([
-                    'score' => $avgScore,
-                    'grade' => $avgGrade,
-                    'points' => $avgPoints,
-                ]),
+                "average" => $avgScore,
+                "grade" => $avgGrade,
+                'points' => $avgPoints,
                 'total' => $totalScore
             ]);
 
@@ -205,7 +202,7 @@ class LevelUnitExamScores extends Component
 
             session()->flash('status', "Aggregates for {$this->admno} class successfully generated");
 
-            $this->emit('hide-generate-scores-aggreagetes');   
+            $this->emit('hide-generate-scores-aggregates-modal');   
 
         } catch (\Exception $exception) {
 
@@ -217,10 +214,53 @@ class LevelUnitExamScores extends Component
 
             session()->flash('error', 'A fatal error occurred');
 
-            $this->emit('hide-generate-scores-aggreagetes');
+            $this->emit('hide-generate-scores-aggregates-modal');
             
         }
         
     }
-        
+
+    public function publishClassScores()
+    {
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            $data = DB::table($tblName)
+                ->where("level_unit_id", $this->levelUnit->id)
+                ->selectRaw("AVG(total) AS avg_total, AVG(points) avg_points")
+                ->first();
+            
+            $avgTotal = number_format($data->avg_total, 2);
+            $avgPoints = number_format($data->avg_points, 4);
+
+            $pgm = Grading::pointsGradeMap();
+
+            $avgGrade = $pgm[intval(round($avgPoints))];
+
+            $this->exam->levelUnits()->syncWithoutDetaching([
+                $this->levelUnit->id => [
+                    "points" => $avgPoints,
+                    "grade" => $avgGrade,
+                    "average" => $avgTotal
+                ]
+            ]);
+
+            session()->flash('status', 'Your class scores have been successfully published, you can republish the scores incase of any changes');
+
+            $this->emit('hide-publish-class-scores-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-publish-class-scores-modal');
+
+        }
+    }   
 }

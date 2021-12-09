@@ -22,6 +22,7 @@ class ResponsibilitySeeder extends Seeder
             'Games Coordinator',
             'Guiding and Counselling Teacher',
             'Head of Department',
+            'Level Supervisor',
             'Class Teacher',
             'Subject Teacher'
         ];
