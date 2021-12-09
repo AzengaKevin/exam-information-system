@@ -17,6 +17,9 @@ class CreateExamLevelTable extends Migration
             $table->id();
             $table->foreignId('exam_id')->constrained()->onDelete('cascade');
             $table->foreignId('level_id')->constrained()->onDelete('cascade');
+            $table->double('points', 6, 4)->nullable();
+            $table->char('grade', 2)->nullable();
+            $table->double('average', 6, 2)->nullable();
             $table->timestamps();
         });
     }

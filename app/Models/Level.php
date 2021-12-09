@@ -29,7 +29,9 @@ class Level extends Model
 
     public function exams()
     {
-        return $this->belongsToMany(Exams::class);
+        return $this->belongsToMany(Exams::class)
+            ->withTimestamps()
+            ->withPivot(['points', 'grade', 'average']);
     }
 
     public function levelUnits()
