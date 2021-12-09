@@ -24,7 +24,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="{{ count($cols) }}">No data found yet</td>
+                    <td colspan="{{ count($cols) }}" class="text-center">No data found yet</td>
                 </tr>
                 @endif
             </tbody>
@@ -32,5 +32,7 @@
     </div>
 
     <x-modals.exams.scores.levels.publish-scores :level="$level" />
+    <x-modals.exams.scores.levels.publish-grade-distribution :level="$level" />
+    <x-modals.exams.scores.levels.publish-subject-performance :level="$level" />
 
 </div>
