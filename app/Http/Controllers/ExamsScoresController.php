@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Requests\UpsertScoresRequest;
 use App\Models\Grading;
+use App\Models\Level;
 
 class ExamsScoresController extends Controller
 {
@@ -38,19 +39,14 @@ class ExamsScoresController extends Controller
         /** @var Responsibility */
         $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
         $classTeacherResponsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-
-        $examLevels = $exam->levels;
-
-        // $examSubjects = $exam->subjects;
+        $levelSupervisorResponsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
 
         $responsibilities = $teacher->responsibilities()
-            ->whereIn('responsibilities.id', [$responsibility->id, $classTeacherResponsibility->id])
-            // ->wherePivotIn('subject_id', $examSubjects->pluck('id')->toArray())
-            ->wherePivotIn('level_unit_id', function($query) use($examLevels) {
-                $query->from('level_units')
-                    ->select(['level_unit_id'])
-                    ->whereIn('level_id', $examLevels->pluck('id')->toArray());
-            })->get();
+            ->whereIn('responsibilities.id', [
+                $responsibility->id, 
+                $classTeacherResponsibility->id, 
+                $levelSupervisorResponsibility->id
+            ])->get();
 
         return view('exams.scores.index', [
             'exam' => $exam,
@@ -71,31 +67,45 @@ class ExamsScoresController extends Controller
 
         try {
 
+            /** @var Subject */
             $subject = Subject::find(intval($request->get('subject')));
 
-            $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
+
+            /** @var Level */
+            $level = Level::find(intval($request->get('level')));
 
             $gradings = Grading::all(['id', 'name']);
 
             // Get previous scores if available
             $scores = array();
 
-            if (Schema::hasTable(Str::slug($exam->shortname))) {
+            $title = "Manage Scores";
 
-                if($subject){
+            if($subject) $title = "Upload {$exam->name} - {$levelUnit->alias} - {$subject->name} Scores";
+            elseif($levelUnit) $title = "{$levelUnit->alias} Scores Management";
+            elseif($level) $title = "{$level->name} Scores Management";
 
-                    $col = $subject->shortname;
+            if ($subject) {
+                
+                if (Schema::hasTable(Str::slug($exam->shortname))) {
     
-                    /** @var Collection */
-                    $data = DB::table(Str::slug($exam->shortname))
-                        ->select('admno', $col)
-                        ->where('level_unit_id', $levelUnit->id)
-                        ->get();
+                    if($subject){
+    
+                        $col = $subject->shortname;
+        
+                        /** @var Collection */
+                        $data = DB::table(Str::slug($exam->shortname))
+                            ->select('admno', $col)
+                            ->where('level_unit_id', $levelUnit->id)
+                            ->get();
+                            
+                        foreach ($data as $value) {
+                            $scores[$value->admno] = optional(json_decode($value->$col))->score ?? null;
+                        }
                         
-                    foreach ($data as $value) {
-                        $scores[$value->admno] = optional(json_decode($value->$col))->score ?? null;
                     }
-                    
                 }
 
             }
@@ -103,9 +113,11 @@ class ExamsScoresController extends Controller
             return view('exams.scores.create', [
                 'subject' => $subject,
                 'levelUnit' => $levelUnit,
+                'level' => $level,
                 'exam' => $exam,
                 'scores' => $scores,
-                'gradings' => $gradings
+                'gradings' => $gradings,
+                'title' => $title
             ]);
 
         } catch (\Exception $exception) {
@@ -115,7 +127,7 @@ class ExamsScoresController extends Controller
                 'exam-id' => $exam->id
             ]);
 
-            abort(404, 'Either the Subject or the Level Unit has not been specified');
+            abort(500, 'A fatal server error occurred');
             
         }
     }

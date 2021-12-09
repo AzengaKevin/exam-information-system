@@ -17,9 +17,8 @@
     <div class="btn-group">
         @can('access-upload-scores-page')
         @if ($exam->isInMarking())
-        <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
-            <i class="fa fa-upload"></i>
-            <span class="d-none d-md-inline">Scores</span>
+        <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
+            <span class="d-none d-md-inline">Manage Scores</span>
         </a>
         @endif
         @endcan

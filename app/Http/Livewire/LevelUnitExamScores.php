@@ -127,7 +127,7 @@ class LevelUnitExamScores extends Component
 
             session()->flash('status', 'Aggregates for the whole class successfully generated');
 
-            $this->emit('hide-generate-scores-aggreagetes');
+            $this->emit('hide-generate-scores-aggregates-modal');
 
         } catch (\Exception $exception) {
 
@@ -137,7 +137,7 @@ class LevelUnitExamScores extends Component
 
             session()->flash('error', 'A fatal error occurred');
 
-            $this->emit('hide-generate-scores-aggreagetes');
+            $this->emit('hide-generate-scores-aggregates-modal');
             
         }
         
@@ -147,7 +147,7 @@ class LevelUnitExamScores extends Component
     {
         $this->admno = $admno;
 
-        $this->emit('show-generate-scores-aggreagetes');
+        $this->emit('show-generate-scores-aggregates-modal');
         
     }
 
@@ -202,7 +202,7 @@ class LevelUnitExamScores extends Component
 
             session()->flash('status', "Aggregates for {$this->admno} class successfully generated");
 
-            $this->emit('hide-generate-scores-aggreagetes');   
+            $this->emit('hide-generate-scores-aggregates-modal');   
 
         } catch (\Exception $exception) {
 
@@ -214,7 +214,7 @@ class LevelUnitExamScores extends Component
 
             session()->flash('error', 'A fatal error occurred');
 
-            $this->emit('hide-generate-scores-aggreagetes');
+            $this->emit('hide-generate-scores-aggregates-modal');
             
         }
         

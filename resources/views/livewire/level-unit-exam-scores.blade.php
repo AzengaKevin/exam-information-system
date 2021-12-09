@@ -38,6 +38,6 @@
         </table>
     </div>
 
-    <x-modals.exams.scores.generate-aggregates :admno="$admno" :levelUnit="$levelUnit" />
-    <x-modals.exams.scores.publish-class-scores :levelUnit="$levelUnit" />
+    <x-modals.exams.scores.level-units.generate-aggregates :admno="$admno" :levelUnit="$levelUnit" />
+    <x-modals.exams.scores.level-units.publish-scores :levelUnit="$levelUnit" />
 </div>

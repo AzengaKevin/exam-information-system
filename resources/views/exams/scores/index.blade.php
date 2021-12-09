@@ -48,10 +48,10 @@
                             ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 @if ($responsibility->pivot->subject->id)
                                 <i class="fa fa-upload"></i>
-                                <span>Scores</span>
+                                <span>Subject Scores</span>
                                 @else
                                 <i class="fa fa-cog"></i>
-                                <span>Manage Class</span>
+                                <span>Class Scores</span>
                                 @endif
                             </a>
                         </div>
