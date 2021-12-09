@@ -94,4 +94,11 @@ class Exam extends Model
             ->withTimestamps();
     }
 
+    public function levelSubjectPerformance()
+    {
+        return $this->belongsToMany(Level::class, 'exam_level_subject_performance')
+            ->withTimestamps()
+            ->withPivot(['points', 'grade', 'average']);
+    }
+
 }
