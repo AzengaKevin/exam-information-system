@@ -68,14 +68,10 @@
             labels: ['Red', 'Blue', 'Green', 'White', 'Yellow'],
             datasets: [{
                 label: 'Level Performance',
+                backgroundColor: 'rgb(0, 0, 0)',
+                borderColor: 'rgb(255, 99, 132)',
                 data: [7, 6, 5, 5, 7, 6],
-                borderColor: [
-                    'red',
-                    'blue',
-                    'green',
-                    'white',
-                    'yellow'
-                ]
+                tension: 0.1
             }]
         },
         options: {

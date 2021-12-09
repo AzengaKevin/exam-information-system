@@ -23,8 +23,10 @@ class CreateScoresTable
             foreach ($exam->subjects as $subject) {
                 $table->jsonb($subject->shortname)->nullable();
             }
-            $table->jsonb('average')->nullable();
-            $table->integer('total')->nullable();
+            $table->tinyInteger('points', false, true)->nullable();
+            $table->char('grade', 2)->nullable();
+            $table->double('average')->nullable();
+            $table->integer('total', false, true)->nullable();
         });
         
     }

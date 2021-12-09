@@ -44,7 +44,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total");
+        $aggregateCols = array("average", "total", "grade", "points");
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -68,7 +68,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total");
+        $aggregateCols = array("average", "total", "grade", "points");
 
         /** @var array */
         $studentLevelCols = array("name", "alias");
@@ -106,8 +106,8 @@ class LevelUnitExamScores extends Component
                     }
                 }
 
-                $avgPoints = intval($totalPoints / $populatedCols);
-                $avgScore = intval($totalScore / $populatedCols);
+                $avgPoints = round($totalPoints / $populatedCols);
+                $avgScore = round($totalScore / $populatedCols);
 
                 $pgm = Grading::pointsGradeMap();
 
@@ -117,11 +117,9 @@ class LevelUnitExamScores extends Component
                 ->updateOrInsert([
                     "admno" => $stuData->admno
                 ], [
-                    "average" => json_encode([
-                        'score' => $avgScore,
-                        'grade' => $avgGrade,
-                        'points' => $avgPoints,
-                    ]),
+                    "average" => $avgScore,
+                    "grade" => $avgGrade,
+                    'points' => $avgPoints,
                     'total' => $totalScore
                 ]);
             });
@@ -193,11 +191,9 @@ class LevelUnitExamScores extends Component
             ->updateOrInsert([
                 "admno" => $stuData->admno
             ], [
-                "average" => json_encode([
-                    'score' => $avgScore,
-                    'grade' => $avgGrade,
-                    'points' => $avgPoints,
-                ]),
+                "average" => $avgScore,
+                "grade" => $avgGrade,
+                'points' => $avgPoints,
                 'total' => $totalScore
             ]);
 

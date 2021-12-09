@@ -11,7 +11,7 @@
                 @foreach ($data as $item)
                 <tr>
                     @foreach ($cols as $col)
-                    @if (in_array($col, $subjectCols) || ($col == "average"))
+                    @if (in_array($col, $subjectCols))
                     <td>{{ optional(json_decode($item->$col))->score ?? null }}{{ optional(json_decode($item->$col))->grade ?? null }}</td>
                     @else
                     <td>{{ $item->$col }}</td>
