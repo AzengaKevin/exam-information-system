@@ -114,4 +114,56 @@ class LevelExamScores extends Component
         }
         
     }
+
+    public function publishLevelGradeDistribution()
+    {
+        try {
+
+            DB::beginTransaction();
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            $data = DB::table($tblName)
+                ->where('level_id', $this->level->id)
+                ->selectRaw("grade, COUNT(grade) AS grade_count")
+                ->groupBy('grade')
+                ->get()
+                ->pluck('grade_count', 'grade');
+            
+            DB::table('exam_level_grade_distribution')
+                ->where([
+                    'exam_id' => $this->exam->id,
+                    'level_id' => $this->level->id,
+                ])->delete();
+
+            foreach (Grading::gradeOptions() as $grade) {
+                $this->exam->levelGradesDist()->attach([
+                    $this->level->id => [
+                        'grade' => $grade,
+                        'grade_count' => $data[$grade] ?? 0
+                    ]
+                ]);
+            }
+
+            DB::commit();
+
+            session()->flash('status', 'Level grade distribution hs been successfully published');
+
+            $this->emit('hide-publish-level-grade-dist-modal');
+            
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-publish-level-grade-dist-modal');
+            
+        }
+        
+    }
 }

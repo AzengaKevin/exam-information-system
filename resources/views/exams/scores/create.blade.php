@@ -21,7 +21,7 @@
     <div class="dropdown">
         <button type="button" class="btn btn-outline-primary" id="exam-class-action-button" data-bs-toggle="dropdown"
             aria-expanded="false">Class Actions</button>
-        <ul class="dropdown-menu dropdwon-menu-end" aria-labelledby="exam-class-action-button">
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exam-class-action-button">
             <li>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#generate-scores-aggregates-modal" role="button"
                     class="dropdown-item hstack gap-2">
@@ -39,8 +39,27 @@
         </ul>
     </div>
     @elseif($level)
-    <button type="button" data-bs-toggle="modal" data-bs-target="#publish-class-scores-modal"
-        class="btn btn-outline-primary">Publish Scores</button>
+
+    <div class="dropdown">
+        <button type="button" class="btn btn-outline-primary" id="exam-class-action-button" data-bs-toggle="dropdown"
+            aria-expanded="false">Level Actions</button>
+        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exam-class-action-button">
+            <li>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#publish-level-grade-dist-modal" role="button"
+                    class="dropdown-item hstack gap-2">
+                    <i class="fa fa-upload"></i>
+                    <span>Publish Grade Dist.</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#publish-class-scores-modal" role="button"
+                    class="dropdown-item hstack gap-2">
+                    <i class="fa fa-upload"></i>
+                    <span>Publish Scores</span>
+                </a>
+            </li>
+        </ul>
+    </div>
     @endif
 </div>
 <x-feedback />
@@ -62,7 +81,8 @@
 <script>
     livewire.on('hide-generate-scores-aggregates-modal', () => $('#generate-scores-aggregates-modal').modal('hide'));
     livewire.on('show-generate-scores-aggregates-modal', () => $('#generate-scores-aggregates-modal').modal('show'));
-
+    //
     livewire.on('hide-publish-class-scores-modal', () => $('#publish-class-scores-modal').modal('hide'));
+    livewire.on('hide-publish-level-grade-dist-modal', () => $('#publish-level-grade-dist-modal').modal('hide'));
 </script>
 @endpush
