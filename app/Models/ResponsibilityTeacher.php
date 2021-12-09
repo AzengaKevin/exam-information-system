@@ -49,9 +49,4 @@ class ResponsibilityTeacher extends Pivot
         return $this->belongsTo(Teacher::class);
     }
 
-    public function scopeFor($query, Teacher $teacher)
-    {
-        return $query->where('teacher_id', $teacher->id);
-    }
-
 }

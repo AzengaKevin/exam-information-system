@@ -262,7 +262,5 @@ class LevelUnitExamScores extends Component
             $this->emit('hide-publish-class-scores-modal');
 
         }
-        
-    }
-        
+    }   
 }

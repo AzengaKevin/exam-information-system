@@ -17,7 +17,7 @@
         </ol>
     </nav>
 
-    @if (!is_null($levelUnit))
+    @if (!is_null($levelUnit) && is_null($subject))
     <div class="dropdown">
         <button type="button" class="btn btn-outline-primary" id="exam-class-action-button" data-bs-toggle="dropdown"
             aria-expanded="false">Class Actions</button>
@@ -38,6 +38,9 @@
             </li>
         </ul>
     </div>
+    @elseif($level)
+    <button type="button" data-bs-toggle="modal" data-bs-target="#publish-class-scores-modal"
+        class="btn btn-outline-primary">Publish Scores</button>
     @endif
 </div>
 <x-feedback />
