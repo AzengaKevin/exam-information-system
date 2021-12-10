@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', $exam->name)
+@section('title', $title)
 
 @section('content')
 
@@ -10,10 +10,17 @@
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.show', $exam) }}">{{ $exam->name }}</a></li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }} Analysis</li>
+            @if (request()->has('level'))
+            <li class="breadcrumb-item"><a href="{{ route('exams.analysis.index', $exam) }}">{{ $exam->name }} Analysis</a></li>
+            @endif
+            <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
         </ol>
     </nav>
 </div>
+
+@if ($level)
+@include('partials.exams.analysis.level')
+@else
 <div class="row g-4 py-3">
     @foreach ($exam->levels as $level)
     <div class="col-md-12">
@@ -21,5 +28,6 @@
     </div>
     @endforeach
 </div>
+@endif
 
 @endsection

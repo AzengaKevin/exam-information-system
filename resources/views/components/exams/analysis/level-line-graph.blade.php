@@ -4,11 +4,14 @@
             <div class="col-md-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <h3 class="my-0">{{ $level->name }}</h3>
+
+                    @if (!request()->has('level'))
                     <a href="{{ route('exams.analysis.index', ['exam' => $exam, 'level' => $level->id]) }}"
                         class="btn btn-sm btn-outline-primary hstack gap-2 align-items-center">
                         <i class="fa fa-eye"></i>
                         <span>Details</span>
                     </a>
+                    @endif
                 </div>
             </div>
             <hr>
@@ -18,14 +21,14 @@
             <div class="col-md-2">
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Mean Points</h6>
-                    <span class="text-success fw-bolder display-6">{{ $level->pivot->points ?? '-' }}</span>
+                    <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->points ?? '-' }}</span>
                     <span class="text-secondary fw-bold">+.0054</span>
                 </div>
             </div>
             <div class="col-md-2">
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Mean Grade</h6>
-                    <span class="text-success fw-bolder display-6">{{ $level->pivot->grade ?? '-' }}</span>
+                    <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->grade ?? '-' }}</span>
                 </div>
             </div>
             <div class="col-md-2">
