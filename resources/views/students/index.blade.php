@@ -11,11 +11,24 @@
             <li class="breadcrumb-item active" aria-current="page">Students</li>
         </ol>
     </nav>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-student-modal"
-        class="btn btn-outline-primary hstack gap-2 align-items-center">
-        <i class="fa fa-plus"></i>
-        <span>Student</span>
-    </button>
+    <div class="hstack gap-2">
+        <button data-bs-toggle="modal" data-bs-target="#import-student-spreadsheet-modal"
+            class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-file-upload"></i>
+            <span>Import</span>
+        </button>
+        <button data-bs-toggle="modal" data-bs-target="#export-student-spreadsheet-modal"
+            class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-file-excel"></i>
+            <span>Download</span>
+        </button>
+
+        <button data-bs-toggle="modal" data-bs-target="#upsert-student-modal"
+            class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-plus"></i>
+            <span>Student</span>
+        </button>
+    </div>
 </div>
 <hr>
 
@@ -35,5 +48,8 @@
 
     livewire.on('show-add-student-guardians-modal', () => $('#add-student-guardians-modal').modal('show'))
     livewire.on('hide-add-student-guardians-modal', () => $('#add-student-guardians-modal').modal('hide'))
+
+    livewire.on('hide-import-student-spreadsheet-modal', () => $('#import-student-spreadsheet-modal').modal('hide'))
+
 </script>
 @endpush

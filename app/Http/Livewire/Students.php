@@ -2,20 +2,26 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\User;
 use App\Models\Level;
-use App\Models\LevelUnit;
 use App\Models\Stream;
 use App\Models\Student;
-use App\Models\User;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
+use App\Models\LevelUnit;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
+use App\Exports\StudentsExport;
+use App\Imports\StudentsImport;
+use Illuminate\Validation\Rule;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Students extends Component
 {
-    use WithPagination;
+    use WithPagination, WithFileUploads;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -33,6 +39,8 @@ class Students extends Component
     public $admission_level_id;
     public $stream_id;
     public $description;
+
+    public $studentsFile;
 
     public function render()
     {
@@ -254,5 +262,56 @@ class Students extends Component
 
         $this->emit('hide-add-student-guardians-modal');
         
+    }
+
+    public function downloadSpreadSheet()
+    {
+        return Excel::download(new StudentsExport, 'students.xlsx');
+    }
+
+    public function downloadUploadStudentsExcelFile()
+    {
+        $cols = [["Adm. No.", "Name", "KCPE Marks", "KCPE Grade", "Gender (Male, Female, Other)", "DOB (YYYY-MM-DD)", "class (1B)"]];
+        
+        $headers = collect($cols);
+
+        return $headers->downloadExcel("new-student.xlsx");
+        
+    }
+
+    public function importStudents()
+    {
+        $data = $this->validate(['studentsFile' => ['file', 'mimes:xlsx,csv,ods,xlsm,xltx,xltm,xls,xlt,xml']]);
+
+        /** @var UploadedFile */
+        $file = $data['studentsFile'];
+
+        try {
+            
+            // $filename = $file->store("excel/students", 'public');
+    
+            // /** @var Storage */
+            // $publicDisk = Storage::disk('public');
+    
+            // $result = Excel::import(new StudentsImport, $publicDisk->path($filename));
+    
+            $result = Excel::import(new StudentsImport, $file);
+    
+            session()->flash('status', 'Students Successfully imported');
+            
+            $this->emit('hide-import-student-spreadsheet-modal');
+
+        } catch (\Exception $exception) {
+         
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to import students');
+            
+            $this->emit('hide-import-student-spreadsheet-modal');
+            
+        }
+
     }
 }

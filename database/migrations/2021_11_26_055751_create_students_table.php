@@ -25,7 +25,7 @@ class CreateStudentsTable extends Migration
             $table->enum('gender', User::genderOptions());
             $table->date('dob');
             $table->foreignId('level_id')->nullable()->constrained();
-            $table->foreignId('stream_id')->constrained();
+            $table->foreignId('stream_id')->nullable()->constrained();
             $table->unsignedBigInteger('hostel_id')->nullable();
             $table->foreignId('admission_level_id')->nullable()->constrained('levels');
             $table->mediumText('description')->nullable();
