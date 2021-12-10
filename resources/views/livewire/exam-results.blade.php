@@ -27,4 +27,7 @@
             </tbody>
         </table>
     </div>
+
+    @include('partials.exams.results.modal.filter')
+
 </div>

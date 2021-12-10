@@ -13,7 +13,15 @@
             <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }} Results</li>
         </ol>
     </nav>
+
+    <button data-bs-toggle="modal" data-bs-target="#filter-exam-results"
+        class="btn btn-outline-primary hstack gap-2 align-items-center">
+        <i class="fa fa-filter"></i>
+        <span>Filter Results</span>
+    </button>
 </div>
+
+<hr>
 
 <livewire:exam-results :exam="$exam" />
 
