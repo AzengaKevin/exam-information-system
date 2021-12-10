@@ -95,6 +95,68 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals($payload['description'], $exam->description);
     }
 
+    /** @group exams */
+    public function testAuthorizedUsersCanCreateAnExamAndEnrollSubjectsAndLevelsWhileAtIt()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Create']));
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+        $this->artisan('db:seed --class=LevelsSeeder');
+        
+        $subjectsIds = Subject::limit(2)->get(['id'])->pluck('id');
+        $levelsIds = Level::limit(2)->get(['id'])->pluck('id');
+        
+        $selectedSubjects = array();
+        
+        foreach ($subjectsIds as $id) {
+            $selectedSubjects[$id] = 'true';
+        }
+        
+        $selectedLevels = array();
+        
+        foreach ($levelsIds as $id) {
+            $selectedLevels[$id] = 'true';
+        }
+
+        $payload = Exam::factory()->make()->toArray();
+        
+        Livewire::test(Exams::class)
+            ->set('name', $payload['name'])
+            ->set('shortname', $payload['shortname'])
+            ->set('year', $payload['year'])
+            ->set('term', $payload['term'])
+            ->set('start_date', $payload['start_date'])
+            ->set('end_date', $payload['end_date'])
+            ->set('weight', $payload['weight'])
+            ->set('counts', $payload['counts'])
+            ->set('description', $payload['description'])
+            ->set('selectedSubjects', $selectedSubjects)
+            ->set('selectedLevels', $selectedLevels)
+            ->call('createExam');
+
+        /** @var Exam */
+        $exam = Exam::first();
+
+        $this->assertNotNull($exam);
+
+        $this->assertEquals($payload['name'], $exam->name);
+        $this->assertEquals($payload['term'], $exam->term);
+        $this->assertEquals($payload['shortname'], $exam->shortname);
+        $this->assertEquals(Str::slug($payload['shortname']), $exam->slug);
+        $this->assertEquals($payload['year'], $exam->year);
+        $this->assertEquals($payload['start_date'], $exam->start_date);
+        $this->assertEquals($payload['end_date'], $exam->end_date);
+        $this->assertEquals($payload['weight'], $exam->weight);
+        $this->assertEquals($payload['counts'], $exam->counts);
+        $this->assertEquals($payload['description'], $exam->description);
+
+        $this->assertEquals(count($selectedLevels), $exam->levels()->count());
+        $this->assertEquals(count($selectedSubjects), $exam->subjects()->count());
+        
+    }
+
 
     /** @group exams */
     public function testAuthorizedUserCanEnrollLevels()
