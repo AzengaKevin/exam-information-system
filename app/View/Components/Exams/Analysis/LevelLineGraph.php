@@ -15,6 +15,8 @@ class LevelLineGraph extends Component
 
     public array $levelUnitsPointsData;
 
+    public $levelWithData;
+
     /**
      * Create a new component instance.
      *
@@ -26,6 +28,10 @@ class LevelLineGraph extends Component
         $this->level = $level;
 
         $this->levelUnitsPointsData = $this->levelUnitsData();
+
+        $this->levelWithData = $this->exam->levels()
+            ->where('exam_level.level_id', $this->level->id)
+            ->first();
     }
 
     public function levelUnitsData()
