@@ -82,5 +82,6 @@
     <x-modals.students.delete :name="$name" />
     
     <x-modals.students.export-spreadsheet />
+    <x-modals.students.import-spreadsheet />
 
 </div>
