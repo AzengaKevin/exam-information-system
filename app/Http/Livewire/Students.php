@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Exports\StudentsExport;
 use App\Models\Level;
 use App\Models\LevelUnit;
 use App\Models\Stream;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Students extends Component
 {
@@ -254,5 +256,10 @@ class Students extends Component
 
         $this->emit('hide-add-student-guardians-modal');
         
+    }
+
+    public function downloadSpreadSheet()
+    {
+        return Excel::download(new StudentsExport, 'students.xlsx');
     }
 }

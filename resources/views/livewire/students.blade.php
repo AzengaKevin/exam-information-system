@@ -80,5 +80,7 @@
         :kcpeGradeOptions="$kcpeGradeOptions" />
 
     <x-modals.students.delete :name="$name" />
+    
+    <x-modals.students.export-spreadsheet />
 
 </div>
