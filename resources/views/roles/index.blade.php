@@ -4,9 +4,9 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
+        <ol class="breadcrumb mb-md-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Roles</li>
         </ol>
