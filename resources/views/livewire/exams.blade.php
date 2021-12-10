@@ -75,7 +75,12 @@
         </table>
     </div>
 
-    <x-modals.exams.upsert :examId="$examId" :terms="$terms" :examStatusOptions="$examStatusOptions"/>
+    <x-modals.exams.upsert 
+        :examId="$examId" 
+        :terms="$terms" 
+        :examStatusOptions="$examStatusOptions"
+        :levels="$levels"
+        :subjects="$subjects" />
     <x-modals.exams.delete :name="$name" />
     <x-modals.exams.enroll-levels :shortname="$shortname" :levels="$levels" />
     <x-modals.exams.enroll-subjects :shortname="$shortname" :subjects="$subjects" />

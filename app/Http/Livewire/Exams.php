@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Models\Subject;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -100,6 +101,8 @@ class Exams extends Component
             'counts' => ['bail', 'nullable'],
             'description' => ['nullable'],
             'status' => ['nullable'],
+            'selectedLevels' => ['nullable', 'array'],
+            'selectedSubjects' => ['nullable', 'array']
         ];
     }
 
@@ -114,11 +117,34 @@ class Exams extends Component
             if($access->allowed()){
 
                 unset($data['status']);
+
+                DB::beginTransaction();
     
                 $exam = Exam::create($data);
     
                 if($exam){
+
+                    if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
+
+                        $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
+                            return $value == 'true';
+                        }, ARRAY_FILTER_USE_BOTH);
     
+                        $exam->subjects()->sync(array_keys($selectedSubjectsData));
+                    }
+
+                    if (isset($data['selectedLevels']) && !empty($data['selectedLevels'])) {
+
+                        $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
+                            return $value == 'true';
+                        }, ARRAY_FILTER_USE_BOTH);
+
+                        $exam->levels()->sync(array_keys($selectedLevelData));
+                        
+                    }
+
+                    DB::commit();
+
                     $this->reset();
     
                     $this->resetPage();
@@ -138,9 +164,11 @@ class Exams extends Component
             }
             
         } catch (\Exception $exception) {
+
+            DB::rollBack();
             
             Log::error($exception->getMessage(), [
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A fatal error occurred while trying to add an exam');

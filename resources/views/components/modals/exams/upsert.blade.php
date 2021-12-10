@@ -1,4 +1,10 @@
-@props(['examId' => null,'terms','examStatusOptions'])
+@props([
+'examId' => null,
+'terms',
+'examStatusOptions',
+'levels' => [],
+'subjects' => []
+])
 
 <div wire:ignore.self id="upsert-exam-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-exam-modal-title">
@@ -96,7 +102,7 @@
                             </div>
                         </div>
 
-                        @if (!is_null($this->examId))                            
+                        @if (!is_null($this->examId))
                         <div class="col-md-12">
                             <div>
                                 <label for="status" class="form-label">Status</label>
@@ -109,6 +115,37 @@
                             </div>
                         </div>
                         @endif
+
+                        <div class="col-md-12">
+                            <label for="levels" class="form-label fw-bold">Select Levels Taking Exam</label>
+                            <fieldset id="levels" class="row g-3">
+                                @foreach ($levels as $level)
+                                <div class="col-md-6">
+                                    <div class="form-check">
+                                        <input type="checkbox" wire:model="selectedLevels.{{ $level->id }}"
+                                            id="level-{{ $loop->iteration }}" class="form-check-control" value="true">
+                                        <label for="level-{{ $loop->iteration }}"
+                                            class="form-check-label">{{ $level->name }}</label>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </fieldset>
+                        </div>
+                        <div class="col-md-12">
+                            <label for="subjects" class="form-label fw-bold">Select Subjects Taking Exams</label>
+                            <fieldset id="subjects" class="row g-3">
+                                @foreach ($subjects as $subject)
+                                <div class="col-md-4">
+                                    <div class="form-check">
+                                        <input type="checkbox" wire:model="selectedSubjects.{{ $subject->id }}"
+                                            id="subject-{{ $loop->iteration }}" class="form-check-control" value="true">
+                                        <label for="subject-{{ $loop->iteration }}"
+                                            class="form-check-label">{{ $subject->name }}</label>
+                                    </div>
+                                </div>
+                                @endforeach
+                            </fieldset>
+                        </div>
 
                         <div class="col-md-12">
                             <label for="description" class="form-label">Notes</label>
