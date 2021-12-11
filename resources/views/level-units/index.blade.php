@@ -4,15 +4,15 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex flex-column flex-md-row justify-content-between alig-items-start align-items-md-center">
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
+        <ol class="breadcrumb mb-md-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item active" aria-current="page">Classes</li>
         </ol>
     </nav>
 
-    <div class="hstack gap-2">
+    <div class="d-inline-flex gap-2 flex-column flex-md-row align-items-start align-items-md-center">
         <div class="btn-group">
             <a href="{{ route('levels.index') }}" class="btn btn-outline-primary hstack gap-1 align-items-center">
                 <i class="fa fa-list-ul"></i>

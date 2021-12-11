@@ -48,10 +48,15 @@
         <div class="card h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h2 class="h5">Responsibilities</h2>
+                    <h2 class="h5 my-0">Responsibilities</h2>
 
                     <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
-                        class="btn btn-sm btn-outline-primary hstack gap-2 align-items-center">
+                        class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
+                        <i class="fa fa-plus"></i>
+                    </button>
+
+                    <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
+                        class="d-none d-md-inline-flex btn btn-sm btn-outline-primary gap-2 align-items-center">
                         <i class="fa fa-plus"></i>
                         <span>Responsibility</span>
                     </button>

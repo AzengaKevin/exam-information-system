@@ -11,7 +11,11 @@
             <li class="breadcrumb-item active" aria-current="page">Hostels</li>
         </ol>
     </nav>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-hostel-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
+
+    <button data-bs-toggle="modal" data-bs-target="#upsert-hostel-modal" class="d-md-none btn btn-outline-primary rounded-circle">
+        <i class="fa fa-plus"></i>
+    </button>
+    <button data-bs-toggle="modal" data-bs-target="#upsert-hostel-modal" class="d-none d-md-inline-flex btn btn-outline-primary gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Hostel</span>
     </button>

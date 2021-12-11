@@ -4,10 +4,10 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start">
 
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
+        <ol class="breadcrumb mb-md-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.show', $exam) }}">{{ $exam->name }}</a></li>
@@ -19,7 +19,7 @@
 
     @if (!is_null($levelUnit) && is_null($subject))
     <div class="dropdown">
-        <button type="button" class="btn btn-outline-primary" id="exam-class-action-button" data-bs-toggle="dropdown"
+        <button type="button" class="btn text-nowrap btn-outline-primary dropdown-toggle" id="exam-class-action-button" data-bs-toggle="dropdown"
             aria-expanded="false">Class Actions</button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exam-class-action-button">
             <li>
@@ -41,7 +41,7 @@
     @elseif($level)
 
     <div class="dropdown">
-        <button type="button" class="btn btn-outline-primary" id="exam-class-action-button" data-bs-toggle="dropdown"
+        <button type="button" class="btn btn-outline-primary text-nowrap dropdown-toggle" id="exam-class-action-button" data-bs-toggle="dropdown"
             aria-expanded="false">Level Actions</button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exam-class-action-button">
             <li>
