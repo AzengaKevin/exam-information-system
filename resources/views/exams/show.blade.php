@@ -4,21 +4,21 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center">
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
 
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
+        <ol class="breadcrumb mb-md-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
             <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }}</li>
         </ol>
     </nav>
 
-    <div class="btn-group">
+    <div class="btn-group flex-wrap">
         @can('access-upload-scores-page')
         @if ($exam->isInMarking())
         <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
-            <span class="d-none d-md-inline">Manage Scores</span>
+            <span class="">Manage Scores</span>
         </a>
         @endif
         @endcan
@@ -26,11 +26,11 @@
         @if ($exam->isPublished())
         <a href="{{ route('exams.results.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
             <i class="fa fa-table"></i>
-            <span class="d-none d-md-inline">Results</span>
+            <span class="">Results</span>
         </a>
         <a href="{{ route('exams.analysis.index', $exam) }}" class="btn btn-outline-primary gap-2 align-items-center">
             <i class="fa fa-poll"></i>
-            <span class="d-none d-md-inline">Analysis</span>
+            <span class="">Analysis</span>
         </a>
         @endif
     </div>
