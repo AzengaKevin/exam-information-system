@@ -193,7 +193,7 @@ class LevelExamScores extends Component
                 $col = $subject->shortname;
 
                 $data = DB::table($tblName)
-                    ->selectRaw("AVG({$col}->>\"$.points\") AS avg_points, AVG({$col}->>\"$.score\") AS avg_score")
+                    ->selectRaw("AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.points\"))) AS avg_points, AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.score\"))) AS avg_score")
                     ->where('level_id', $this->level->id)
                     ->whereNotNull($col)
                     ->first();
