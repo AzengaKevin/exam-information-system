@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Subject;
 use App\Models\Teacher;
+use Illuminate\Support\Facades\DB;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 
@@ -30,7 +31,14 @@ class TeacherSubjects extends Component
 
     public function getTeacherSubjects()
     {
-        return $this->teacher->fresh()->subjects;
+        return $this->teacher->fresh()->subjects()
+            ->addSelect(['subject_classes_count' => DB::table('responsibility_teacher')
+                ->selectRaw("COUNT(responsibility_teacher.subject_id)")
+                ->whereColumn('subjects.id', 'responsibility_teacher.subject_id')
+                ->where('responsibility_teacher.teacher_id', $this->teacher->id)
+                ->take(1)
+            ])
+            ->get();
     }
 
     public function getAllSubjects()

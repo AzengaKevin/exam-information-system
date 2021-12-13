@@ -25,14 +25,14 @@ class Responsibilities extends Component
     public function render()
     {
         return view('livewire.responsibilities', [
-            'responsibilities' => $this->getPaginatedResponsibilities(),
+            'responsibilities' => $this->getResponsibilities(),
             'requirementOptions' => Responsibility::requirementOptions()
         ]);
     }
 
-    public function getPaginatedResponsibilities()
+    public function getResponsibilities()
     {
-        return Responsibility::with('teachers')->paginate(24);
+        return Responsibility::with('teachers')->get();
     }
 
     /**
@@ -46,6 +46,9 @@ class Responsibilities extends Component
         $this->responsibilityId = $responsibility->id;
 
         $this->name = $responsibility->name;
+
+        $this->requirements = $responsibility->requirements;
+
         $this->description = $responsibility->description;
 
         $this->emit('show-upsert-responsibility-modal');
