@@ -35,11 +35,14 @@ class LevelUnitsController extends Controller
                     ->whereNull('streams.deleted_at')
                     ->get()
                     ->each(function($item){
-                        LevelUnit::create([
-                            'stream_id' => $item->stream_id,
-                            'level_id' => $item->level_id,
-                            'alias' => "{$item->numeric}{$item->alias}"
-                        ]);
+
+                        DB::table('level_units')
+                            ->updateOrInsert([
+                                'stream_id' => $item->stream_id,
+                                'level_id' => $item->level_id
+                            ],[
+                                'alias' => "{$item->numeric}{$item->alias}"
+                            ]);
                     });
                 
                 session()->flash('status', 'Successfully Created Classes');
