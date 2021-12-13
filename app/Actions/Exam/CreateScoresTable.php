@@ -42,6 +42,8 @@ class CreateScoresTable
             $table->char('grade', 2)->nullable();
             $table->double('average')->nullable();
             $table->integer('total', false, true)->nullable();
+            $table->integer('level_unit_position')->nullable();
+            $table->integer('level_position')->nullable();
         });
         
     }

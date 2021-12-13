@@ -102,6 +102,7 @@
                             @enderror
                         </div>
 
+                        @if (is_null($studentId))
                         <div class="col-md-6">
                             <label for="level" class="form-label">Admission Level</label>
                             <select wire:model.lazy="admission_level_id" id="level"
@@ -117,6 +118,23 @@
                             </span>
                             @enderror
                         </div>
+                        @else
+                        <div class="col-md-6">
+                            <label for="level" class="form-label">Current Level</label>
+                            <select wire:model.lazy="level_id" id="level"
+                                class="form-select @error('level_id') is-invalid @enderror">
+                                <option value="">-- Select Level --</option>
+                                @foreach ($levels as $level)
+                                <option value="{{ $level->id }}">{{ $level->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('level_id')
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+                        @endif
 
                         <div class="col-md-6">
                             <label for="stream" class="form-label">Stream</label>
@@ -133,7 +151,7 @@
                             </span>
                             @enderror
                         </div>
-                        
+
                         <div class="col-md-12">
                             <label for="description" class="form-label">Description</label>
                             <textarea wire:model.lazy="description" id="description" cols="100" rows="3"

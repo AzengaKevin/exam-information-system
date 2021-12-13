@@ -4,6 +4,12 @@
         <hr>
         <x-feedback />
         <div class="d-flex gap-3 flex-wrap">
+
+            <a href="#"
+                class="btn btn-outline-primary gap-2 align-items-center disabled" >
+                <i class="fa fa-table"></i>
+                <span class="">Exam Timetable</span>
+            </a>
             @can('updateScoresTable', $exam)
             <button data-bs-toggle="modal" data-bs-target="#update-scores-table-modal"
                 class="btn btn-primary hstack gap-2">

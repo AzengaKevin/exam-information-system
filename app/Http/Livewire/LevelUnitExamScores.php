@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 
 class LevelUnitExamScores extends Component
 {
@@ -20,6 +21,8 @@ class LevelUnitExamScores extends Component
     public LevelUnit $levelUnit;
 
     public $admno;
+
+    public $col;
 
     public function mount(Exam $exam, LevelUnit $levelUnit)
     {
@@ -32,8 +35,17 @@ class LevelUnitExamScores extends Component
         return view('livewire.level-unit-exam-scores', [
             'data' => $this->getResults(),
             'cols' => $this->getColumns(),
-            'subjectCols' => $this->getSubjectColumns()
+            'subjectCols' => $this->getSubjectColumns(),
+            'rankCols' => $this->getRankColumns()
         ]);
+    }
+
+    public function getRankColumns() : array
+    {
+        return [
+            'points' => 'Aggregate Points',
+            'total' => 'Total Score'
+        ];
     }
 
 
@@ -45,7 +57,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points");
+        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -54,6 +66,7 @@ class LevelUnitExamScores extends Component
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_unit_id", $this->levelUnit->id)
+                ->orderBy("level_unit_position")
                 ->paginate(24)
             : collect([]);
     }
@@ -69,7 +82,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points");
+        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
 
         /** @var array */
         $studentLevelCols = array("name", "alias");
@@ -77,6 +90,9 @@ class LevelUnitExamScores extends Component
         return array_merge($studentLevelCols, $columns, $aggregateCols);;
     }
 
+    /**
+     * Generate aggregates for each and every record in the current exam scores table
+     */
     public function generateBulkAggregates()
     {
         try {
@@ -143,6 +159,11 @@ class LevelUnitExamScores extends Component
         
     }
 
+    /**
+     * Triggers Javascript to show modal for generating aggregates
+     * 
+     * @param string $admno
+     */
     public function showGenerateAggregatesModal(string $admno)
     {
         $this->admno = $admno;
@@ -151,6 +172,9 @@ class LevelUnitExamScores extends Component
         
     }
 
+    /**
+     * Generate aggregates for a single scores table record i.e student
+     */
     public function generateAggregates()
     {
 
@@ -220,9 +244,11 @@ class LevelUnitExamScores extends Component
         
     }
 
+    /**
+     * Publishes scores for the current level unit | class
+     */
     public function publishClassScores()
     {
-
         try {
 
             $tblName = Str::slug($this->exam->shortname);
@@ -262,5 +288,72 @@ class LevelUnitExamScores extends Component
             $this->emit('hide-publish-class-scores-modal');
 
         }
-    }   
+    }
+
+    /**
+     * Generate ranks based on the selected aggregate columns
+     */
+    public function generateRanks()
+    {
+        $data = $this->validate(['col' => ['nullable', 'string', Rule::in(array_keys($this->getRankColumns()))]]);
+
+        $col = $data['col'] ?? 'total';
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            // Get order records from the databas with the admno number as the primary key
+
+            /** @var Collection */
+            $data = DB::table($tblName)
+                ->select(['admno', $col])
+                ->where('level_unit_id', $this->levelUnit->id)
+                ->orderBy($col, 'desc')
+                ->get();
+
+            $prevRank = -1;
+            $currRank = -1;
+            $prevVal = 0;
+            $currVal = 0;
+
+            foreach ($data as $key => $record) {
+
+                if($key == 0) $currRank = 1;
+
+                $currVal = $record->$col;
+
+                if($key != 0){
+                    if($prevVal == $currVal){
+                        $currRank = $prevRank;
+                    }
+                }
+
+                DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
+                    'level_unit_position' => $currRank
+                ]);
+
+                $prevVal = $currVal;
+
+                $prevRank = $currRank;
+
+                ++$currRank;
+            }
+
+            session()->flash('status', 'Student ranking operation completed successfully');
+
+            $this->emit('hide-rank-class-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to rank students');
+
+            $this->emit('hide-rank-class-modal');
+        }   
+        
+    }
 }

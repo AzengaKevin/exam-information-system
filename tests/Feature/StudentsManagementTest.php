@@ -9,8 +9,11 @@ use Livewire\Livewire;
 use App\Models\Student;
 use App\Models\Guardian;
 use App\Http\Livewire\Students;
+use App\Models\Level;
+use App\Models\LevelUnit;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\Stream;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -61,7 +64,22 @@ class StudentsManagementTest extends TestCase
 
         $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Create']));
 
-        $payload = Student::factory()->make()->toArray();
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        /** @var Stream */
+        $stream = Stream::factory()->create();
+
+        LevelUnit::create([
+            'level_id' => $level->id,
+            'stream_id' => $stream->id,
+            'alias' => "{$level->numeric}{$stream->alias}"
+        ]);
+
+        $payload = Student::factory([
+            'admission_level_id' => $level->id,
+            'stream_id' => $stream->id,
+        ])->make()->toArray();
 
         Livewire::test(Students::class)
             ->set('adm_no', $payload['adm_no'])
@@ -96,9 +114,24 @@ class StudentsManagementTest extends TestCase
 
         $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Update']));
 
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        /** @var Stream */
+        $stream = Stream::factory()->create();
+
+        $LevelUnit = LevelUnit::create([
+            'level_id' => $level->id,
+            'stream_id' => $stream->id,
+            'alias' => "{$level->numeric}{$stream->alias}"
+        ]);        
+
         $student = Student::factory()->create();
 
-        $payload = Student::factory()->make()->toArray();
+        $payload = Student::factory([
+            'level_id' => $level->id,
+            'stream_id' => $stream->id
+        ])->make()->toArray();
 
         Livewire::test(Students::class)
             ->call('editStudent', $student)
@@ -108,7 +141,7 @@ class StudentsManagementTest extends TestCase
             ->set('kcpe_marks', $payload['kcpe_marks'])
             ->set('kcpe_grade', $payload['kcpe_grade'])
             ->set('dob', $payload['dob'])
-            ->set('admission_level_id', $payload['admission_level_id'])
+            ->set('level_id', $payload['level_id'])
             ->set('stream_id', $payload['stream_id'])
             ->set('description', $payload['description'])
             ->call('updateStudent');
@@ -116,8 +149,9 @@ class StudentsManagementTest extends TestCase
         $this->assertEquals($payload['adm_no'], $student->fresh()->adm_no);
         $this->assertEquals($payload['name'], $student->fresh()->name);
         $this->assertEquals($payload['gender'], $student->fresh()->gender);
-        $this->assertEquals($payload['admission_level_id'], $student->fresh()->admission_level_id);
         $this->assertEquals($payload['level_id'], $student->fresh()->level_id);
+
+        $this->assertEquals($LevelUnit->id, $student->fresh()->level_unit_id);
     }
 
     /** @group students */

@@ -29,16 +29,18 @@ class LevelUnitsController extends Controller
             try {
 
                 DB::table('levels')
-                ->crossJoin('streams')
-                ->selectRaw("levels.id as level_id, streams.id as stream_id, levels.numeric AS `numeric`, streams.alias AS `alias`")
-                ->get()
-                ->each(function($item){
-                    LevelUnit::create([
-                        'stream_id' => $item->stream_id,
-                        'level_id' => $item->level_id,
-                        'alias' => "{$item->numeric}{$item->alias}"
-                    ]);
-                });
+                    ->crossJoin('streams')
+                    ->selectRaw("levels.id as level_id, streams.id as stream_id, levels.numeric AS `numeric`, streams.alias AS `alias`")
+                    ->whereNull('levels.deleted_at')
+                    ->whereNull('streams.deleted_at')
+                    ->get()
+                    ->each(function($item){
+                        LevelUnit::create([
+                            'stream_id' => $item->stream_id,
+                            'level_id' => $item->level_id,
+                            'alias' => "{$item->numeric}{$item->alias}"
+                        ]);
+                    });
                 
                 session()->flash('status', 'Successfully Created Classes');
                 

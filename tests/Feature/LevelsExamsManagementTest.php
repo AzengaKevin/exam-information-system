@@ -22,7 +22,8 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LevelsExamsManagementTest extends TestCase
-{    use RefreshDatabase, WithFaker;
+{    
+    use RefreshDatabase, WithFaker;
 
     /** @var Teacher */
     private Teacher $teacher;
@@ -436,5 +437,130 @@ class LevelsExamsManagementTest extends TestCase
 
         $this->assertEquals(2, $exam->levelSubjectPerformance()->count());
     
+    }
+
+    /** @group exam-scores */
+    public function testAuthorizedTeacherCanRankLevelStudents()
+    {
+        
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        // Create the Level Unit
+        /** @var LevelUnit */
+        $levelUnit = LevelUnit::factory()->create();
+
+        $students = Student::factory(2)->create([
+            'admission_level_id' => $levelUnit->level->id,
+            'level_id' => $levelUnit->level->id,
+            'stream_id' => $levelUnit->stream->id,
+            'level_unit_id' => $levelUnit->id
+        ]);
+
+        // Create the Subject
+        $subjects = Subject::limit(2)->get();
+
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_id' => $levelUnit->level->id,
+        ]);        
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($levelUnit->level);
+
+        $exam->subjects()->attach($subjects);
+
+        // Create Scores Table
+        CreateScoresTable::invoke($exam);
+
+        // Upload students scores
+        foreach ($students as $student) {
+
+            foreach ($subjects as $subject) {
+
+                DB::table(Str::slug($exam->shortname))
+                ->updateOrInsert([
+                    "admno" => $student->adm_no
+                ], [
+                    $subject->shortname => json_encode([
+                            'score' => $this->faker->numberBetween(0, 100),
+                            'grade' => $this->faker->randomElement(Grading::gradeOptions()),
+                            'points' => $this->faker->numberBetween(0, 12),
+                    ]),
+                    'level_id' => $levelUnit->level->id,
+                    'level_unit_id' => $levelUnit->id
+                ]);
+    
+            }
+
+        }
+            
+        $cols = $exam->subjects->pluck("shortname")->toArray();
+
+        $tblName = Str::slug($exam->shortname);
+
+        /** @var Collection */
+        $data = DB::table($tblName)
+            ->where("level_id", $levelUnit->level->id)
+            ->select(array_merge(["admno"], $cols))->get();
+
+        $data->each(function($stuData) use($tblName, $cols){
+            $totalScore = 0;
+            $totalPoints = 0;
+            $populatedCols = 0;
+
+            foreach ($cols as $col) {
+
+                if(!is_null($stuData->$col)){
+                    $populatedCols++;
+
+                    $subData = json_decode($stuData->$col);
+
+                    $totalScore += $subData->score ?? 0;
+                    $totalPoints += $subData->points ?? 0;
+                }
+            }
+
+            $avgPoints = round($totalPoints / $populatedCols);
+            $avgScore = round($totalScore / $populatedCols);
+
+            $pgm = Grading::pointsGradeMap();
+
+            $avgGrade = $pgm[$avgPoints];
+
+            DB::table($tblName)->updateOrInsert(["admno" => $stuData->admno], [
+                "average" => $avgScore,
+                "grade" => $avgGrade,
+                'points' => $avgPoints,
+                'total' => $totalScore
+            ]);
+
+        });
+
+        // Action => Call the student ranking method
+
+        $col = 'total';
+
+        Livewire::test(LevelExamScores::class, ['exam' =>$exam, 'level' => $levelUnit->level])
+            ->set('col', $col)
+            ->call('generateRanks');
+    
+        // Assertions
+        $tblName = Str::slug($exam->shortname);
+
+        $firstRecordInRank = DB::table($tblName)
+            ->where('level_id', $levelUnit->level->id)
+            ->select(['admno', $col, 'level_position'])
+            ->orderBy($col, 'desc')
+            ->first();
+
+        $this->assertEquals(1, $firstRecordInRank->level_position);
+        
     }
 }
