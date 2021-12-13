@@ -19,12 +19,14 @@ class Responsibilities extends Component
 
     public $name;
     public $slug;
+    public $requirements = [];
     public $description;
 
     public function render()
     {
         return view('livewire.responsibilities', [
-            'responsibilities' => $this->getPaginatedResponsibilities()
+            'responsibilities' => $this->getPaginatedResponsibilities(),
+            'requirementOptions' => Responsibility::requirementOptions()
         ]);
     }
 
@@ -53,26 +55,25 @@ class Responsibilities extends Component
     {
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('responsibilities')->ignore($this->responsibilityId)],
+            'requirements' => ['nullable', 'array', Rule::in(Responsibility::requirementOptions())],
             'description' => ['bail', 'nullable']
         ];
     }
 
     function createResponsibility()
     {
-        $this->validate();
+        $data = $this->validate();
         
         try {
 
-            Responsibility::create([
-                'name'=>$this->name,
-                'description'=>$this->description ,
-                'slug'=>Str::slug($this->name)
-            ]);
+            Responsibility::create($data);
+
+            session()->flash('status', 'Responsibility successfully created');
+
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
 
@@ -101,7 +102,7 @@ class Responsibilities extends Component
             
             Log::error($exception->getMessage(), [
                 'user-id' => $this->responsibilityId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
         }
