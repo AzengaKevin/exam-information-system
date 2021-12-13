@@ -14,8 +14,11 @@ class Responsibility extends Model
     protected $fillable = [
         'name',
         'slug',
-        'description'
+        'requirements',
+        'description',
     ];
+
+    protected $casts = ['requirements' => 'array'];
 
     public function setNameAttribute($value)
     {
@@ -30,5 +33,20 @@ class Responsibility extends Model
             ->using(ResponsibilityTeacher::class)
             ->withTimestamps()
             ->withPivot(['level_id', 'level_unit_id', 'subject_id', 'department_id']);
+    }
+
+    /**
+     * States all responsibility requirement options
+     * 
+     * @return array
+     */
+    public static function requirementOptions() : array
+    {
+        return [
+            'level',
+            'class',
+            'subject',
+            'department'
+        ];
     }
 }

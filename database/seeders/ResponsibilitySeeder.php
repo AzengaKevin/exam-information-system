@@ -15,20 +15,49 @@ class ResponsibilitySeeder extends Seeder
     public function run()
     {
         $payload = [
-            'Principal',
-            'Deputy Principal',
-            'Senior Teacher',
-            'Director of Studies',
-            'Games Coordinator',
-            'Guiding and Counselling Teacher',
-            'Head of Department',
-            'Level Supervisor',
-            'Class Teacher',
-            'Subject Teacher'
+            [
+                'name' => 'Principal',
+                'requirements' => []
+            ],
+            [
+                'name' => 'Deputy Principal',
+                'requirements' => []
+            ],
+            [
+                'name' => 'Senior Teacher',
+                'requirements' => []
+            ],
+            [
+                'name' => 'Director of Studies',
+                'requirements' => []
+            ],
+            [
+                'name' => 'Games Coordinator',
+                'requirements' => []
+            ],
+            [
+                'name' => 'Guiding and Counselling Teacher',
+                'requirements' => []
+            ],
+            [
+                'name' => 'Head of Department',
+                'requirements' => ['department']
+            ],
+            [
+                'name' => 'Level Supervisor',
+                'requirements' => ['level']
+            ],
+            [
+                'name' => 'Class Teacher',
+                'requirements' => ['class']
+            ],
+            [
+                'name' => 'Subject Teacher',
+                'requirements' => ['class', 'subject']]
         ];
 
         array_walk($payload, function($data){
-            Responsibility::create(['name' => $data]); 
+            Responsibility::create($data); 
         });
     }
 }

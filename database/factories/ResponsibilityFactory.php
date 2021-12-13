@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Responsibility;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class ResponsibilityFactory extends Factory
@@ -15,7 +16,8 @@ class ResponsibilityFactory extends Factory
     {
         return [
             'name' => $this->faker->unique()->sentence(),
-            'description' => $this->faker->paragraph()
+            'description' => $this->faker->paragraph(),
+            'requirements' => $this->faker->randomElements(Responsibility::requirementOptions())
         ];
     }
 }
