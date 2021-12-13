@@ -40,6 +40,6 @@
 
     <x-modals.exams.scores.level-units.generate-aggregates :admno="$admno" :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-scores :levelUnit="$levelUnit" />
-    <x-modals.exams.scores.level-units.rank />
+    <x-modals.exams.scores.level-units.rank :columns="$rankCols" />
     
 </div>

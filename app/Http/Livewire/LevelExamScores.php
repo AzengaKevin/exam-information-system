@@ -7,6 +7,7 @@ use App\Models\Level;
 use App\Models\Grading;
 use Livewire\Component;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -15,6 +16,8 @@ class LevelExamScores extends Component
 {
     public Exam $exam;
     public Level $level;
+
+    public $col;
 
     public function mount(Exam $exam, Level $level)
     {
@@ -27,7 +30,8 @@ class LevelExamScores extends Component
         return view('livewire.level-exam-scores', [
             'data' => $this->getResults(),
             'cols' => $this->getColumns(),
-            'subjectCols' => $this->getSubjectColumns()
+            'subjectCols' => $this->getSubjectColumns(),
+            'columns' => $this->getRankColumns()
         ]);
     }
 
@@ -48,6 +52,7 @@ class LevelExamScores extends Component
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
+                ->orderBy('level_position')
                 ->paginate(24)
             : collect([]);
     }
@@ -236,4 +241,83 @@ class LevelExamScores extends Component
             
         }
     }
+
+    /**
+     * Columns that can be used for ranking students
+     */
+    public function getRankColumns() : array
+    {
+        return [
+            'points' => 'Aggregate Points',
+            'total' => 'Total Score'
+        ];
+    }    
+
+
+    /**
+     * Generate ranks based on the selected aggregate columns
+     */
+    public function generateRanks()
+    {
+        $data = $this->validate(['col' => ['nullable', 'string', Rule::in(array_keys($this->getRankColumns()))]]);
+
+        $col = $data['col'] ?? 'total';
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            // Get order records from the databas with the admno number as the primary key
+
+            /** @var Collection */
+            $data = DB::table($tblName)
+                ->select(['admno', $col])
+                ->where('level_id', $this->level->id)
+                ->orderBy($col, 'desc')
+                ->get();
+
+            $prevRank = -1;
+            $currRank = -1;
+            $prevVal = 0;
+            $currVal = 0;
+
+            foreach ($data as $key => $record) {
+
+                if($key == 0) $currRank = 1;
+
+                $currVal = $record->$col;
+
+                if($key != 0){
+                    if($prevVal == $currVal){
+                        $currRank = $prevRank;
+                    }
+                }
+
+                DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
+                    'level_position' => $currRank
+                ]);
+
+                $prevVal = $currVal;
+
+                $prevRank = $currRank;
+
+                ++$currRank;
+            }
+
+            session()->flash('status', 'Student ranking operation completed successfully');
+
+            $this->emit('hide-rank-class-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to rank level students');
+
+            $this->emit('hide-rank-class-modal');
+        }   
+        
+    }    
 }

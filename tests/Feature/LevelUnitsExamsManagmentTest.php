@@ -450,8 +450,9 @@ class LevelUnitsExamsManagmentTest extends TestCase
         $tblName = Str::slug($exam->shortname);
 
         $firstRecordInRank = DB::table($tblName)
+            ->where('level_unit_id', $levelUnit->id)
             ->select(['admno', $col, 'level_unit_position'])
-            ->orderBy($col)
+            ->orderBy($col, 'desc')
             ->first();
 
         $this->assertEquals(1, $firstRecordInRank->level_unit_position);

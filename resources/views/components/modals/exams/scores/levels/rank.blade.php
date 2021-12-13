@@ -10,7 +10,8 @@
             </div>
             <div class="modal-body">
                 <p>This will rank students based on the selected criteria, defaulting to stdents totak score. Only rank
-                    if student eggregates have been generate, rnking depends on the aggregates.</p>
+                    if student eggregates have been generate, renking depends on the aggregates.</p>
+
                 <div class="mt-3">
                     <label for="column" class="form-label">Rank By</label>
                     <select wire:model="col" id="column" class="form-select">

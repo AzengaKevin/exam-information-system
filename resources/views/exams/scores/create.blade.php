@@ -72,6 +72,13 @@
                     <span>Publish Subject Performance.</span>
                 </a>
             </li>
+            <li>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#rank-class-modal" role="button"
+                    class="dropdown-item hstack gap-2">
+                    <i class="fa fa-sort-amount-down"></i>
+                    <span>Rank</span>
+                </a>
+            </li>
         </ul>
     </div>
     @endif
@@ -100,7 +107,7 @@
     livewire.on('hide-publish-level-grade-dist-modal', () => $('#publish-level-grade-dist-modal').modal('hide'));
 
     livewire.on('hide-publish-subjects-performance-modal', () => $('#publish-subjects-performance-modal').modal(
-    'hide'));
+        'hide'));
     livewire.on('hide-rank-class-modal', () => $('#rank-class-modal').modal('hide'))
 </script>
 @endpush
