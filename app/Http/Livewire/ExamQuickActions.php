@@ -29,13 +29,18 @@ class ExamQuickActions extends Component
         ]);
     }
 
-    public function createScoresTable()
+    /**
+     * Drop the curent exam scores table and recreate the table to accomodate any column changes
+     */
+    public function updateScoresTable()
     {
         try {
 
-            CreateScoresTable::invoke($this->exam);
+            CreateScoresTable::invoke($this->exam, true);
             
-            session()->flash('status', "{$this->exam->name} scores table has been created");
+            session()->flash('status', "{$this->exam->name} scores table has been refreshed");
+
+            $this->emit('hide-update-scores-table-modal');
 
         } catch (\Exception $exception) {
 
@@ -44,10 +49,15 @@ class ExamQuickActions extends Component
             ]);
             
             session()->flash('error', "Failed creating {$this->exam->name} scores table");
+
+            $this->emit('hide-update-scores-table-modal');
         }
         
     }
 
+    /**
+     * Change the status of the exam to any other available status
+     */
     public function changeExamStatus()
     {
         $data = $this->validate(['status' => ['bail', 'required', Rule::in(Exam::examStatusOptions())]]);

@@ -10,9 +10,24 @@ use Illuminate\Support\Facades\Schema;
 class CreateScoresTable
 {
 
-    public static function invoke(Exam $exam)
+    /**
+     * Create exam scores table on the fly
+     * 
+     * @param Exam $exam the one to create the table for
+     * 
+     * @param bool $refresh fresh the table if it already exixsts
+     */
+    public static function invoke(Exam $exam, bool $refresh = false)
     {
         $tableName = Str::slug($exam->shortname);
+
+        if(Schema::hasTable($tableName)){
+
+            if(!$refresh){
+                return;
+            }
+
+        }
 
         Schema::dropIfExists($tableName);
 

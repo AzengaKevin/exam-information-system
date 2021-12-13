@@ -4,7 +4,10 @@ namespace App\Policies;
 
 use App\Models\Exam;
 use App\Models\User;
+use Illuminate\Support\Str;
+use App\Models\Responsibility;
 use Illuminate\Auth\Access\Response;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class ExamPolicy
@@ -101,5 +104,31 @@ class ExamPolicy
     public function forceDelete(User $user, Exam $exam)
     {
         //
+    }
+
+    /**
+     * Determine whether the user can update the exam scores table, necssarily if the clumns have changed
+     * 
+     * @param User $user
+     * @param Exam $exam
+     * 
+     * @rerun Response|bool
+     */
+    public function updateScoresTable(User $user, Exam $exam)
+    {
+        $isTeacher = $user->authenticatable_type == 'teacher';
+
+        $isDos = false;
+
+        /** @var Teacher */
+        $teacher = $user->authenticatable;
+
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+
+        if($isTeacher) $isDos = $teacher->responsibilities->contains($responsibility);
+
+        return $isDos && Schema::hasTable(Str::slug($exam->shortname))
+            ? Response::allow()
+            : Response::deny('Only DOS can perform this action, after the table is already create');
     }
 }
