@@ -37,6 +37,7 @@ class Students extends Component
     public $gender;
     public $dob;
     public $admission_level_id;
+    public $level_id;
     public $stream_id;
     public $description;
 
@@ -55,7 +56,7 @@ class Students extends Component
 
     public function getPaginatedStudents()
     {
-        return Student::orderBy('adm_no')->paginate(24);
+        return Student::with(['levelUnit'])->orderBy('adm_no')->paginate(24);
     }
 
     public function getAllLevels()
@@ -76,7 +77,8 @@ class Students extends Component
             'upi' => ['bail', 'nullable'],
             'gender' => ['bail', Rule::in(User::genderOptions())],
             'dob' => ['bail', 'string'],
-            'admission_level_id' => ['bail', 'required', 'integer'],
+            'admission_level_id' => ['bail', 'nullable', 'integer'],
+            'level_id' => ['bail', 'nullable', 'integer'],
             'stream_id' => ['bail', 'required', 'integer'],
             'description' => ['bail', 'nullable'],
             'kcpe_grade' => ['bail', 'required', Rule::in(Student::kcpeGradeOptions())],
@@ -88,6 +90,8 @@ class Students extends Component
     {
         $data = $this->validate();
 
+        $data = array_filter($data, fn($value, $key) => !empty($value), ARRAY_FILTER_USE_BOTH);
+
         try {
 
             $access = Gate::inspect('create', Student::class);
@@ -95,13 +99,14 @@ class Students extends Component
             if($access->allowed()){
 
                 // Based on level and stream, get the level_unit_id and also persists
-                $data['level_unit_id'] = LevelUnit::firstOrCreate([
+                $data['level_unit_id'] = LevelUnit::where([
                     'level_id' => $data['admission_level_id'],
                     'stream_id' => $data['stream_id']
-                ])->id;
-    
+                ])->firstOrFail()->id;
+
+                
                 $student = Student::create($data);
-    
+
                 if($student){
     
                     $this->reset();
@@ -127,7 +132,7 @@ class Students extends Component
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred while trying to add student');
+            session()->flash('error', 'A fatal error occurred while trying to add student, perhaps you have not, generated classes form the levels and streams available');
 
             $this->emit('hide-upsert-student-modal');
         }
@@ -145,7 +150,7 @@ class Students extends Component
         $this->kcpe_marks = $student->kcpe_marks;
         $this->kcpe_grade = $student->kcpe_grade;
         $this->stream_id = $student->stream_id;
-        $this->admission_level_id = $student->admission_level_id;
+        $this->level_id = $student->level_id;
         $this->description = $student->description;
 
         $this->emit('show-upsert-student-modal');
@@ -155,10 +160,18 @@ class Students extends Component
     {
         $data = $this->validate();
 
+        $data = array_filter($data, fn($value, $key) => !empty($value), ARRAY_FILTER_USE_BOTH);
+
         try {
 
             /** @var Student */
             $student = Student::findOrFail($this->studentId);
+
+            // Based on level and stream, get the level_unit_id and also persists
+            $data['level_unit_id'] = LevelUnit::where([
+                'level_id' => $data['level_id'],
+                'stream_id' => $data['stream_id']
+            ])->firstOrFail()->id;
 
             $access = Gate::inspect('update', $student);
 
@@ -192,7 +205,7 @@ class Students extends Component
                 'student-id' => $this->studentId
             ]);
 
-            session()->flash('error', 'Fatal error occurred while udating student');
+            session()->flash('error', 'Fatal error occurred while udating student, perhaps the result class is missing');
 
             $this->emit('hide-upsert-student-modal');
         }
@@ -288,14 +301,7 @@ class Students extends Component
 
         try {
             
-            // $filename = $file->store("excel/students", 'public');
-    
-            // /** @var Storage */
-            // $publicDisk = Storage::disk('public');
-    
-            // $result = Excel::import(new StudentsImport, $publicDisk->path($filename));
-    
-            $result = Excel::import(new StudentsImport, $file);
+            Excel::import(new StudentsImport, $file);
     
             session()->flash('status', 'Students Successfully imported');
             

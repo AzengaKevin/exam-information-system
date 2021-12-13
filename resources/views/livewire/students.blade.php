@@ -23,7 +23,7 @@
                     <td>{{ $student->adm_no }}</td>
                     <TD>{{ $student->kcpe_marks }}</TD>
                     <td>{{ $student->name }}</td>
-                    <td>{{ optional($student->level)->numeric }}{{ optional($student->stream)->alias }}</td>
+                    <td>{{ optional($student->levelUnit)->alias ?? 'N/A' }}</td>
                     <td>{{ $student->dob->diffInYears(now()) }}</td>
                     <td>{{ $student->created_at->format('d/m/Y') }}</td>
                     <td>
