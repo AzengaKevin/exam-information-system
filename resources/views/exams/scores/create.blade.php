@@ -19,8 +19,8 @@
 
     @if (!is_null($levelUnit) && is_null($subject))
     <div class="dropdown">
-        <button type="button" class="btn text-nowrap btn-outline-primary dropdown-toggle" id="exam-class-action-button" data-bs-toggle="dropdown"
-            aria-expanded="false">Class Actions</button>
+        <button type="button" class="btn text-nowrap btn-outline-primary dropdown-toggle" id="exam-class-action-button"
+            data-bs-toggle="dropdown" aria-expanded="false">Class Actions</button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exam-class-action-button">
             <li>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#generate-scores-aggregates-modal" role="button"
@@ -36,13 +36,20 @@
                     <span>Publish</span>
                 </a>
             </li>
+            <li>
+                <a href="#" data-bs-toggle="modal" data-bs-target="#rank-class-modal" role="button"
+                    class="dropdown-item hstack gap-2">
+                    <i class="fa fa-sort-amount-down"></i>
+                    <span>Rank</span>
+                </a>
+            </li>
         </ul>
     </div>
     @elseif($level)
 
     <div class="dropdown">
-        <button type="button" class="btn btn-outline-primary text-nowrap dropdown-toggle" id="exam-class-action-button" data-bs-toggle="dropdown"
-            aria-expanded="false">Level Actions</button>
+        <button type="button" class="btn btn-outline-primary text-nowrap dropdown-toggle" id="exam-class-action-button"
+            data-bs-toggle="dropdown" aria-expanded="false">Level Actions</button>
         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="exam-class-action-button">
             <li>
                 <a href="#" data-bs-toggle="modal" data-bs-target="#publish-level-grade-dist-modal" role="button"
@@ -64,7 +71,7 @@
                     <i class="fa fa-upload"></i>
                     <span>Publish Subject Performance.</span>
                 </a>
-            </li>            
+            </li>
         </ul>
     </div>
     @endif
@@ -88,9 +95,12 @@
 <script>
     livewire.on('hide-generate-scores-aggregates-modal', () => $('#generate-scores-aggregates-modal').modal('hide'));
     livewire.on('show-generate-scores-aggregates-modal', () => $('#generate-scores-aggregates-modal').modal('show'));
-    
+
     livewire.on('hide-publish-class-scores-modal', () => $('#publish-class-scores-modal').modal('hide'));
     livewire.on('hide-publish-level-grade-dist-modal', () => $('#publish-level-grade-dist-modal').modal('hide'));
-    livewire.on('hide-publish-subjects-performance-modal', () => $('#publish-subjects-performance-modal').modal('hide'));
+
+    livewire.on('hide-publish-subjects-performance-modal', () => $('#publish-subjects-performance-modal').modal(
+    'hide'));
+    livewire.on('hide-rank-class-modal', () => $('#rank-class-modal').modal('hide'))
 </script>
 @endpush

@@ -39,7 +39,7 @@ class LevelExamScores extends Component
         $columns = $this->getSubjectColumns();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points");
+        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -63,7 +63,7 @@ class LevelExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points");
+        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
 
         /** @var array */
         $studentLevelCols = array("name", "alias");
