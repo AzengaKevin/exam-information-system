@@ -1,4 +1,7 @@
-@props(['responsibilityId' => null])
+@props([
+'responsibilityId' => null,
+'requirementOptions' => []
+])
 
 <div wire:ignore.self id="upsert-responsibility-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-responsibility-modal-title">
@@ -25,9 +28,25 @@
                 </div>
 
                 <div class="mt-3">
+                    <label for="requirements" class="form-label">Requirement(s)</label>
+                    <select wire:model.lazy="requirements" id="requirements" multiple
+                        class="form-select @error('requirements') is-invalid @enderror" size="3">
+                        <option value="">-- Select Requirements--</option>
+                        @foreach ($requirementOptions as $item)
+                        <option value="{{ $item  }}">{{ $item }}</option>
+                        @endforeach
+                    </select>
+                    @error('requirements')
+                    <span class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+
+                <div class="mt-3">
                     <label for="name" class="form-label">Description</label>
-                    <input type="text" wire:model.lazy="description" id="description"
-                        class="form-control @error('name') is-invalid @enderror">
+                    <textarea wire:model.lazy="description" id="description"
+                        class="form-control @error('description') is-invalid @enderror" cols="100" rows="3"></textarea>
                     @error('description')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>

@@ -6,8 +6,9 @@ use App\Models\Department;
 use App\Models\Level;
 use App\Models\LevelUnit;
 use App\Models\Responsibility;
-use App\Models\Subject;
+use App\Models\ResponsibilityTeacher;
 use App\Models\Teacher;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
@@ -15,24 +16,30 @@ class TeacherResponsibilities extends Component
 {
     public Teacher $teacher;
 
+    public Collection $allResponsibilities;
+
     public $responsibility_id;
     public $level_unit_id;
     public $level_id;
     public $department_id;
     public $subject_id;
 
+    public $fields = [];
+
     public $type = null;
 
     public function mount(Teacher $teacher)
     {
         $this->teacher = $teacher;
+
+        $this->allResponsibilities = $this->getResponsibilities();
     }
 
     public function render()
     {
         return view('livewire.teacher-responsibilities', [
             'responsibilities' => $this->getTeacherResponsibilities(),
-            'responsibilityOptions' => $this->getResponsibilities(),
+            'responsibilityOptions' => $this->allResponsibilities,
             'levels' => $this->getLevels(),
             'subjects' => $this->getSubjects(),
             'departments' => $this->getDepartments(),
@@ -40,9 +47,16 @@ class TeacherResponsibilities extends Component
         ]);
     }
 
+    public function updatedResponsibilityId($value)
+    {
+        $responsibility = $this->allResponsibilities->find($value);
+
+        $this->fields = $responsibility->requirements;
+    }
+
     public function getResponsibilities()
     {
-        return Responsibility::all(['id', 'name']);
+        return Responsibility::all();
     }
 
     public function getLevels()
@@ -72,32 +86,59 @@ class TeacherResponsibilities extends Component
 
     public function rules()
     {
-        return [
-            'responsibility_id' => ['bail', 'required', 'integer'],
-            'department_id' => ['nullable', 'integer'],
-            'level_id' => ['nullable', 'integer'],
-            'level_unit_id' => ['nullable', 'integer'],
-            'subject_id' => ['nullable', 'integer'],
-        ];
+        $dynamicRules = array();
+
+        if (in_array('level', $this->fields)) {
+            $dynamicRules['level_id'] = ['required', 'integer'];
+        }
+
+        if (in_array('department', $this->fields)) {
+            $dynamicRules['department_id'] = ['required', 'integer'];
+        }
+
+        if (in_array('class', $this->fields)) {
+            $dynamicRules['level_unit_id'] = ['required', 'integer'];
+        }
+
+        if (in_array('subject', $this->fields)) {
+            $dynamicRules['subject_id'] = ['required', 'integer'];
+        }
+
+        return array_merge($dynamicRules, [
+            'responsibility_id' => ['bail', 'required', 'integer']
+        ]);
     }
 
     public function assignResponsibility()
     {
         $data = $this->validate();
 
+        $data = array_filter($data, fn($value, $key) => !empty($value), ARRAY_FILTER_USE_BOTH);
+
         try {
-
-            $id = $data['responsibility_id'];
-
-            unset($data['responsibility_id']);
             
-            $this->teacher->responsibilities()->attach($id, $data);
+            if(ResponsibilityTeacher::where($data)->doesntExist()){
 
-            session()->flash('status', "{$this->teacher->auth->name} has been assigned a new responsibility");
+                $id = $data['responsibility_id'];
+    
+                unset($data['responsibility_id']);
+                
+                $this->teacher->responsibilities()->attach($id, $data);
+    
+                session()->flash('status', "{$this->teacher->auth->name} has been assigned a new responsibility");
+    
+                $this->reset(['responsibility_id', 'level_unit_id', 'level_id', 'department_id', 'subject_id']);
+    
+                $this->emit('hide-assign-teacher-responsibility-modal');
 
-            $this->reset(['responsibility_id', 'level_unit_id', 'level_id', 'department_id', 'subject_id']);
+            }else{
 
-            $this->emit('hide-assign-teacher-responsibility-modal');
+                session()->flash('error', 'The responsibility is already assigned to another teacher');
+    
+                $this->emit('hide-assign-teacher-responsibility-modal');
+
+            }
+
 
         } catch (\Exception $exception) {
             Log::error($exception->getMessage(), [
@@ -108,10 +149,26 @@ class TeacherResponsibilities extends Component
         
     }
 
-    public function removeResponsibility(Responsibility $responsibility)
+    public function removeResponsibility(ResponsibilityTeacher $responsibilityTeacher)
     {
-        $this->teacher->responsibilities()->detach($responsibility);
 
-        session()->flash('status', "{$this->teacher->auth->name} responsibility has been removed");
+        try {
+            
+            if($responsibilityTeacher->delete()){
+
+                session()->flash('status', "{$this->teacher->auth->name} responsibility has been removed");
+
+            }
+    
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'teacher' => $this->teacher->id,
+            ]);
+    
+            session()->flash('error', "No such responsibility for {$this->teacher->auth->name}");
+            
+        }
     }
 }

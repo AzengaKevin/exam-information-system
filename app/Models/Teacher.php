@@ -32,7 +32,7 @@ class Teacher extends Model
         return $this->belongsToMany(Responsibility::class)
             ->using(ResponsibilityTeacher::class)
             ->withTimestamps()
-            ->withPivot(['level_id', 'level_unit_id', 'subject_id', 'department_id']);
+            ->withPivot(['level_id', 'level_unit_id', 'subject_id', 'department_id', 'id']);
     }
 
     public function subjects()

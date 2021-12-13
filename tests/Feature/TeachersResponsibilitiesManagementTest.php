@@ -72,7 +72,9 @@ class TeachersResponsibilitiesManagementTest extends TestCase
             'password' => Hash::make('password')
         ]);
         
-        $responsibility = Responsibility::factory()->create();
+        $responsibility = Responsibility::factory()->create([
+            'requirements' => ['class']
+        ]);
 
         $levelUnit = LevelUnit::factory()->create();
 
@@ -106,8 +108,10 @@ class TeachersResponsibilitiesManagementTest extends TestCase
 
         $this->assertEquals(1, $teacher->fresh()->responsibilities()->count());
 
+        $id = $teacher->responsibilities()->first()->pivot->id;
+
         Livewire::test(TeacherResponsibilities::class, ['teacher' => $teacher])
-            ->call('removeResponsibility', $responsibility);
+            ->call('removeResponsibility', $id);
 
         $this->assertEquals(0, $teacher->fresh()->responsibilities()->count());
         

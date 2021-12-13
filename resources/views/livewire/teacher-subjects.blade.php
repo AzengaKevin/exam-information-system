@@ -13,7 +13,7 @@
                 @foreach ($teacherSubjects as $subject)
                 <tr>
                     <td>{{ $subject->name }}</td>
-                    <td class="text-center">{{ $subject->classes ?? 0 }}</td>
+                    <td class="text-center">{{ $subject->subject_classes_count }}</td>
                 </tr>
                 @endforeach
                 @else
