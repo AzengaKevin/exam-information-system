@@ -3,22 +3,48 @@
         <h5>Exam Quick Actions</h5>
         <hr>
         <x-feedback />
-
-        @can('change-exam-status')
-        <div>
-            <button wire:click="createScoresTable" class="btn btn-primary hstack gap-2">
-                <i class="fa fa-plus"></i>
+        <div class="d-flex gap-3 flex-wrap">
+            @can('updateScoresTable', $exam)
+            <button data-bs-toggle="modal" data-bs-target="#update-scores-table-modal"
+                class="btn btn-primary hstack gap-2">
+                <i class="fa fa-sync"></i>
                 <span>Scores Table</span>
             </button>
-        </div>
-        <div class="mt-3">
+            @endcan
+
+            @can('change-exam-status')
             <button data-bs-toggle="modal" data-bs-target="#change-status-exam-modal"
                 class="btn d-block btn-primary hstack gap-2">
                 <i class="fa fa-pencil-alt"></i>
                 <span>Change Status</span>
             </button>
+            @endcan
+
+            @can('access-upload-scores-page')
+            @if ($exam->fresh()->isInMarking())
+            <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
+                <span class="">Manage Scores</span>
+            </a>
+            @endif
+
+            @endcan
+            @if ($exam->fresh()->isPublished())
+            <a href="{{ route('exams.results.index', $exam) }}"
+                class="btn btn-outline-primary gap-2 align-items-center">
+                <i class="fa fa-table"></i>
+                <span class="">Results</span>
+            </a>
+            <a href="{{ route('exams.analysis.index', $exam) }}"
+                class="btn btn-outline-primary gap-2 align-items-center">
+                <i class="fa fa-poll"></i>
+                <span class="">Analysis</span>
+            </a>
+            @endif
+
         </div>
+
         <x-modals.exams.change-status :name="$exam->name" :statuses="$statuses" />
-        @endcan
+        <x-modals.exams.update-scores-table :name="$exam->name" />
+
     </div>
 </div>

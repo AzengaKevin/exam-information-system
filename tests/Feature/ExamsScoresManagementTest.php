@@ -369,7 +369,7 @@ class ExamsScoresManagementTest extends TestCase
     }    
 
     /** @group exams-scores */
-    public function testAuthorizedUserCanCreateAScoresTable()
+    public function testAuthorizedUserCanUpdateAnExamScoresTable()
     {
         $this->withoutExceptionHandling();
 
@@ -383,7 +383,7 @@ class ExamsScoresManagementTest extends TestCase
         $exam->subjects()->attach($subjects);
 
         Livewire::test(ExamQuickActions::class, ['exam' => $exam])
-            ->call('createScoresTable');
+            ->call('updateScoresTable');
 
         $this->assertTrue(Schema::hasTable(Str::slug($exam->shortname)));
         
