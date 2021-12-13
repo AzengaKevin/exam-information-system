@@ -3,7 +3,8 @@
 'levelUnits' => [],
 'subjects' => [],
 'departments' => [],
-'responsibilityOptions' => []
+'responsibilityOptions' => [],
+'fields' => []
 ])
 
 <div wire:ignore.self id="assign-teacher-responsibility-modal" class="modal fade" tabindex="-1"
@@ -31,6 +32,7 @@
                     @enderror
                 </div>
 
+                @if (in_array('department', $fields))
                 <div class="mt-3">
                     <label for="department" class="form-label">Department</label>
                     <select wire:model.lazy="department_id" id="department"
@@ -46,7 +48,9 @@
                     </span>
                     @enderror
                 </div>
+                @endif
 
+                @if (in_array('level', $fields))
                 <div class="mt-3">
                     <label for="level" class="form-label">Level</label>
                     <select wire:model.lazy="level_id" id="level"
@@ -62,7 +66,9 @@
                     </span>
                     @enderror
                 </div>
+                @endif
 
+                @if (in_array('subject', $fields))
                 <div class="mt-3">
                     <label for="subject" class="form-label">Subject</label>
                     <select wire:model.lazy="subject_id" id="subject"
@@ -78,7 +84,9 @@
                     </span>
                     @enderror
                 </div>
+                @endif
 
+                @if (in_array('class', $fields))
                 <div class="mt-3">
                     <label for="level-unit" class="form-label">Level Unit</label>
                     <select wire:model.lazy="level_unit_id" id="level-unit"
@@ -94,6 +102,7 @@
                     </span>
                     @enderror
                 </div>
+                @endif
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>

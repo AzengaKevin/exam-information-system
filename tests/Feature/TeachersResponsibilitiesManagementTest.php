@@ -72,7 +72,9 @@ class TeachersResponsibilitiesManagementTest extends TestCase
             'password' => Hash::make('password')
         ]);
         
-        $responsibility = Responsibility::factory()->create();
+        $responsibility = Responsibility::factory()->create([
+            'requirements' => ['class']
+        ]);
 
         $levelUnit = LevelUnit::factory()->create();
 

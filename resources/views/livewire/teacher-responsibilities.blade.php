@@ -54,6 +54,7 @@
         :departments="$departments"
         :levelUnits="$levelUnits"
         :responsibilityOptions="$responsibilityOptions"
-        :subjects="$subjects" />
+        :subjects="$subjects"
+        :fields="$fields" />
     
 </div>
