@@ -37,6 +37,10 @@ class AddStudentGuardians extends Component
     {
         $this->student = $student;
 
+        foreach ($student->guardians->pluck('id')->toArray() as $id) {
+            $this->selectedGuardians[$id] = 'true';
+        }
+
         $this->emit('show-add-student-guardians-modal');
         
     }
