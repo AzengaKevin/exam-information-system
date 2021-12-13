@@ -108,8 +108,10 @@ class TeachersResponsibilitiesManagementTest extends TestCase
 
         $this->assertEquals(1, $teacher->fresh()->responsibilities()->count());
 
+        $id = $teacher->responsibilities()->first()->pivot->id;
+
         Livewire::test(TeacherResponsibilities::class, ['teacher' => $teacher])
-            ->call('removeResponsibility', $responsibility);
+            ->call('removeResponsibility', $id);
 
         $this->assertEquals(0, $teacher->fresh()->responsibilities()->count());
         

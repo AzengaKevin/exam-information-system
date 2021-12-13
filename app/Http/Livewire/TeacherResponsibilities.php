@@ -149,10 +149,26 @@ class TeacherResponsibilities extends Component
         
     }
 
-    public function removeResponsibility(Responsibility $responsibility)
+    public function removeResponsibility(ResponsibilityTeacher $responsibilityTeacher)
     {
-        $this->teacher->responsibilities()->detach($responsibility);
 
-        session()->flash('status', "{$this->teacher->auth->name} responsibility has been removed");
+        try {
+            
+            if($responsibilityTeacher->delete()){
+
+                session()->flash('status', "{$this->teacher->auth->name} responsibility has been removed");
+
+            }
+    
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'teacher' => $this->teacher->id,
+            ]);
+    
+            session()->flash('error', "No such responsibility for {$this->teacher->auth->name}");
+            
+        }
     }
 }
