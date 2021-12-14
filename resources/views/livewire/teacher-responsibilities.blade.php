@@ -30,7 +30,8 @@
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
-                            <button wire:click="removeResponsibility({{ $responsibility->pivot->id }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
+                            <button wire:click="removeResponsibility({{ $responsibility->pivot->id }})"
+                                class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-times" aria-hidden="true"></i>
                                 <span>Remove</span>
                             </button>
@@ -52,4 +53,5 @@
     <x-modals.teachers.responsibilities.assign :levels="$levels" :departments="$departments" :levelUnits="$levelUnits"
         :responsibilityOptions="$responsibilityOptions" :subjects="$subjects" :fields="$fields" />
 
+    @include('partials.teachers.responsibilities.assign-bulk')
 </div>

@@ -9,6 +9,7 @@ use App\Models\Responsibility;
 use App\Models\ResponsibilityTeacher;
 use App\Models\Teacher;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 
@@ -28,11 +29,24 @@ class TeacherResponsibilities extends Component
 
     public $type = null;
 
+    public $selectAllClasses;
+    public $teacher_subject_id;
+
+    public $selectedClasses = [];
+
+    public Collection $allLevelUnitsMissingTeacherForThatSubject;
+
+    public Responsibility $teacherResponsibility;
+
     public function mount(Teacher $teacher)
     {
         $this->teacher = $teacher;
 
         $this->allResponsibilities = $this->getResponsibilities();
+
+        $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
+
+        $this->teacherResponsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
     }
 
     public function render()
@@ -52,6 +66,42 @@ class TeacherResponsibilities extends Component
         $responsibility = $this->allResponsibilities->find($value);
 
         $this->fields = $responsibility->requirements;
+    }
+
+    public function updatedSelectAllClasses($value)
+    {
+        $value = boolval($value);
+        
+        if($value){
+            
+            foreach ($this->allLevelUnitsMissingTeacherForThatSubject as $leveUnit) {
+
+                $this->selectedClasses[$leveUnit->id] = 'true';
+                
+            }
+
+        }else{
+            
+            foreach ($this->allLevelUnitsMissingTeacherForThatSubject as $leveUnit) {
+
+                $this->selectedClasses[$leveUnit->id] = null;
+                
+            }
+
+        }
+    }
+
+    public function updatedTeacherSubjectId($value)
+    {
+
+        $leveUnitIds = DB::table('responsibility_teacher')->select(['level_unit_id'])
+            ->where([
+                ['subject_id', $value],
+                ['responsibility_id', $this->teacherResponsibility->id]
+            ])->pluck('level_unit_id')->toArray();
+        
+        $this->allLevelUnitsMissingTeacherForThatSubject = LevelUnit::whereNotIn('id', $leveUnitIds)->get();
+        
     }
 
     public function getResponsibilities()
@@ -145,6 +195,52 @@ class TeacherResponsibilities extends Component
                 'action' => __METHOD__,
                 'teacher' => $this->teacher->id,
             ]);
+        }
+        
+    }
+
+    /**
+     * Assigning bulk subject teacher responsibilities to a teacher
+     */
+    public function assignBulkResponsibilities()
+    {
+
+        try {
+            
+            $data = $this->validate([
+                'teacher_subject_id' => ['bail', 'required', 'integer'],
+                'selectedClasses' => ['bail', 'array', 'required']
+            ]);
+    
+            $classes = array_filter($data['selectedClasses'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);
+
+            foreach ($classes as $key => $value) {
+                
+                DB::table('responsibility_teacher')
+                    ->insertOrIgnore([
+                        'teacher_id' => $this->teacher->id,
+                        'responsibility_id' => $this->teacherResponsibility->id,
+                        'level_unit_id' => $key,
+                        'subject_id' => $data['teacher_subject_id']
+                    ]);
+
+            }
+
+            session()->flash('status', 'Teacher successfully assigned bul subjects');
+
+            $this->emit('hide-assign-bulk-responsibilities-modal');
+    
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'teacher' => $this->teacher->id,
+            ]);
+    
+            session()->flash('error', "A fatal DB error occurred");
+
+            $this->emit('hide-assign-bulk-responsibilities-modal');
+            
         }
         
     }
