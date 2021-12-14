@@ -92,7 +92,7 @@ class Teachers extends Component
 
                     DB::commit();
 
-                    $this->reset(['name', 'email', 'employer', 'tsc_number']);
+                    $this->reset(['name', 'email', 'employer', 'tsc_number', 'selectedSubjects']);
 
                     $this->resetPage();
 
@@ -165,7 +165,7 @@ class Teachers extends Component
 
                     DB::commit();
 
-                    $this->reset(['teacherId', 'userId', 'name', 'email', 'employer', 'tsc_number']);
+                    $this->reset(['teacherId', 'userId', 'name', 'email', 'employer', 'tsc_number', 'selectedSubjects']);
 
                     $this->resetPage();
 

@@ -76,7 +76,7 @@ class SubjectsSeeder extends Seeder
                 'shortname' => 'mus'
             ],
             [
-                'name' => 'Art % Design',
+                'name' => 'Art & Design',
                 'shortname' => 'ad'
             ],
             [
@@ -88,7 +88,7 @@ class SubjectsSeeder extends Seeder
                 'shortname' => 'ger'
             ],
             [
-                'name' => 'Drawing & Desing',
+                'name' => 'Drawing & Design',
                 'shortname' => 'dd'
             ],
             [
