@@ -208,4 +208,24 @@ class StudentsManagementTest extends TestCase
         $this->assertEquals(count($payload), $student->guardians()->count());
         
     }
+
+    /** @group students */
+    public function testAuthorizedUserCanVisitStudentsShowPage()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Read']));
+
+        /** @var Student */
+        $student = Student::factory()->create();
+        
+        $response = $this->get(route('students.show', $student));
+
+        $response->assertOk();
+
+        $response->assertViewIs('students.show');
+
+        $response->assertViewHasAll(['student']);
+        
+    }
 }
