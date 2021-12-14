@@ -41,6 +41,8 @@ class ExamsScoresController extends Controller
         $classTeacherResponsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
         $levelSupervisorResponsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
 
+        $dosResponsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+
         $responsibilities = $teacher->responsibilities()
             ->whereIn('responsibilities.id', [
                 $responsibility->id, 
@@ -48,9 +50,22 @@ class ExamsScoresController extends Controller
                 $levelSupervisorResponsibility->id
             ])->get();
 
+        $levels = collect([]);
+
+        $levelUnits = collect([]);
+
+        if ($teacher->responsibilities()->where('responsibilities.id', $dosResponsibility->id)->exists()) {
+            $levels = $exam->levels;
+
+            $levelUnits = LevelUnit::whereIn('level_id', $exam->levels->pluck('id')->toArray())
+                ->get();
+        }
+
         return view('exams.scores.index', [
             'exam' => $exam,
-            'responsibilities' => $responsibilities
+            'responsibilities' => $responsibilities,
+            'levels' => $levels,
+            'levelUnits' => $levelUnits,
         ]);
         
     }
