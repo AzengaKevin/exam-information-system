@@ -131,4 +131,29 @@ class UsersManagementTest extends TestCase
         $this->assertNotEquals($activeStatus, $user->fresh()->active);
         
     }
+
+    /** @group users */
+    public function testAuthorizedUserCanPerformBulkUserRoleUpdate()
+    {
+        $this->withoutExceptionHandling();
+
+        $usersIds = User::factory(5)->create()->pluck('id')->toArray();
+
+        $selectedUsers = array();
+
+        foreach ($usersIds as $id) {
+            $selectedUsers[$id] = 'true';
+        }
+
+        /** @var Role */
+        $role = Role::factory()->create();
+
+        Livewire::test(Users::class)
+            ->set('role_id', $role->id)
+            ->set('selectedUsers', $selectedUsers)
+            ->call('bulkUsersRoleUpdate');
+
+        $this->assertEquals($usersIds, $role->users()->get()->pluck('id')->toArray());
+        
+    }
 }

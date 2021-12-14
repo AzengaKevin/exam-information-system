@@ -5,6 +5,7 @@
         <table class="table table-hover">
             <thead>
                 <tr>
+                    <th></th>
                     <th>#</th>
                     <th>Name</th>
                     <th>Email</th>
@@ -19,6 +20,7 @@
                 @if ($users->count())
                 @foreach ($users as $user)
                 <tr>
+                    <td><input type="checkbox" class="form-check" wire:model="selectedUsers.{{ $user->id }}"></td>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
@@ -73,4 +75,6 @@
     <x-modals.users.update :roles="$roles" />
     <x-modals.users.delete :name="$name" />
     
+    @include('partials.users.bulk-roles-update')
+
 </div>

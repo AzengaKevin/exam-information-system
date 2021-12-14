@@ -209,7 +209,7 @@ class TeacherResponsibilities extends Component
             
             $data = $this->validate([
                 'teacher_subject_id' => ['bail', 'required', 'integer'],
-                'selectedClasses' => ['bail', 'array', 'required']
+                'selectedClasses' => ['bail', 'array', 'required', 'min:1']
             ]);
     
             $classes = array_filter($data['selectedClasses'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);

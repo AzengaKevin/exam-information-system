@@ -84,6 +84,8 @@ class Roles extends Component
 
                 if($role){
 
+                    $this->reset(['name', 'description']);
+
                     session()->flash('status', 'A new role has been successfully added');
         
                     $this->emit('hide-upsert-role-modal');
@@ -125,6 +127,8 @@ class Roles extends Component
             if($access->allowed()){
 
                 if($role->update($data)){
+
+                    $this->reset(['roleId', 'name', 'description']);
     
                     session()->flash('status', 'role successfully updated');
     
