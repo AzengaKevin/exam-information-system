@@ -19,6 +19,21 @@
 </div>
 <hr>
 
-@livewire('level-unit-students', ['levelUnit' => $levelUnit])
+<div class="row g-3">
+    <div class="col-md-12">
+        @livewire('level-unit-students', ['levelUnit' => $levelUnit])
+    </div>
+
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="text-center">{{ $levelUnit->alias }} Responsibilities</h5>
+                <hr>
+                <livewire:level-unit-responsibilities :levelUnit="$levelUnit" />
+            </div>
+        </div>
+    </div>
+</div>
+
 
 @endsection

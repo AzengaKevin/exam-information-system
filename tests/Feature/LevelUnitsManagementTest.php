@@ -167,6 +167,8 @@ class LevelUnitsManagementTest extends TestCase
         $response->assertViewHasAll(['levelUnit']);
 
         $response->assertSeeLivewire('level-unit-students');
+
+        $response->assertSeeLivewire('level-unit-responsibilities');
         
     }
 }

@@ -37,4 +37,12 @@ class LevelUnit extends Model
             ->withTimestamps()
             ->withPivot(['points', 'grade', 'average']);
     }
+
+    public function responsibilities()
+    {
+        return $this->belongsToMany(Responsibility::class, 'responsibility_teacher')
+            ->using(ResponsibilityTeacher::class)
+            ->withTimestamps()
+            ->withPivot(['teacher_id', 'subject_id']);
+    }
 }
