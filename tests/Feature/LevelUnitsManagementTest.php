@@ -118,9 +118,10 @@ class LevelUnitsManagementTest extends TestCase
     /** @group level-units */
     public function testAuthorizedUserCanGenerateLevelUnits()
     {
-        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'LevelUnits Create']));
-
+        
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'LevelUnits Create']));
 
         $streamsPayload = [
             [
@@ -146,5 +147,26 @@ class LevelUnitsManagementTest extends TestCase
         $this->post(route('level-units.store'));
 
         $this->assertEquals((Level::count() * Stream::count()), LevelUnit::count());
+    }
+
+    /** @group level-units */
+    public function testAuthorizedUsersCanVisitLevelUnitsShowPage()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'LevelUnits Read']));
+
+        $levelUnit = LevelUnit::factory()->create();
+
+        $response = $this->get(route('level-units.show', $levelUnit));
+
+        $response->assertOk();
+
+        $response->assertViewIs('level-units.show');
+
+        $response->assertViewHasAll(['levelUnit']);
+
+        $response->assertSeeLivewire('level-unit-students');
+        
     }
 }

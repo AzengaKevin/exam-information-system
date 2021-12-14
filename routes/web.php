@@ -103,7 +103,7 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/level-units', [LevelUnitsController::class, 'index'])
         ->name('level-units.index');
 
-    Route::get('/level-units/{levelUnit}', [LevelUnitsController::class, 'show'])
+    Route::get('/level-units/{levelUnit:alias}', [LevelUnitsController::class, 'show'])
         ->name('level-units.show');
 
     Route::post('/level-units', [LevelUnitsController::class, 'store'])

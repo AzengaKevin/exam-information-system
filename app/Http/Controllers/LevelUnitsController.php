@@ -45,7 +45,7 @@ class LevelUnitsController extends Controller
                             ]);
                     });
                 
-                session()->flash('status', 'Successfully Created Classes');
+                session()->flash('status', 'Classes successfully updated');
                 
             } catch (\Exception $exception) {
 

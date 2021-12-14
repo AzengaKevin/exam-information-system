@@ -5,8 +5,11 @@
         <table class="table table-hover text-center">
             <thead>
                 <tr>
+                    <th colspan="5">Students</th>
+                </tr>
+                <tr>
                     <th>#</th>
-                    <th>Student</th>
+                    <th>Name</th>
                     <th>Admission Number</th>
                     <th>Guardian</th>
                     <th>Actions</th>
@@ -19,21 +22,20 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $student->name }}</td>
                     <td>{{ $student->adm_no }}</td>
-                    <td>  @foreach ($student->guardians as $guardian)
-                        {{$guardian->auth->name}}
-                         @endforeach</td>
+                    <td></td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
-                            <a href="{{route('students.show',['student'=>$student->adm_no])}}"  class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
-                                
+                            <a href="{{route('students.show',['student' => $student->adm_no])}}"
+                                class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                                <i class="fa fa-eye"></i>
                                 <span>Profile</span>
                             </a>
-                            <button wire:click="editstudent({{ $student }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
-                                <i class="fa fa-edit"></i>
-                                <span>Edit</span>
+                            <button class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                                <i class="far fa-chart-bar"></i>
+                                <span>Analysis</span>
                             </button>
-                            <button wire:click="showDeletestudentModal({{ $student }})"  class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
+                            <button class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
+                                <i class="fa fa-trash"></i>
                                 <span>Delete</span>
                             </button>
                         </div>
@@ -42,7 +44,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="6">
+                    <td colspan="5">
                         <div class="py-1 text-center">No student in this classroom yet</div>
                     </td>
                 </tr>
@@ -50,7 +52,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="5">
                         {{ $students->links() }}
                         @if ($students->count())
                         <div class="text-muted">{{ $students->firstItem() }} - {{ $students->lastItem() }} out of
@@ -61,9 +63,5 @@
             </tfoot>
         </table>
     </div>
-    
-    <x-modals.level-unit-students.upsert 
-        :levelUnitId="$levelUnitId"
-        :levels="$levels"
-        :streams="$streams" />
+
 </div>
