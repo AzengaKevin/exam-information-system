@@ -28,7 +28,7 @@
                     <td>{{ $student->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
-                            <a href="{{route('students.show',['student'=>$student->adm_no])}}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                            <a href="{{route('students.show', $student)}}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </a>
