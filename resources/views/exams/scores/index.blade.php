@@ -16,65 +16,158 @@
 </div>
 <hr>
 
-<section>
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th colspan="6">My Classes</th>
-                </tr>
-                <tr>
-                    <th>#</th>
-                    <th>Responsibility</th>
-                    <th>Subject</th>
-                    <th>Level Unit</th>
-                    <th>Level</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($responsibilities->count())
-                @foreach ($responsibilities as $responsibility)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $responsibility->name }}</td>
-                    <td>{{ $responsibility->pivot->subject->name }}</td>
-                    <td>{{ $responsibility->pivot->levelUnit->alias }}</td>
-                    <td>{{ $responsibility->pivot->level->name }}</td>
-                    <td>
-                        <div class="hstack gap-2 align-items-center">
-                            <a href="{{ route('exams.scores.create', [
-                                'exam' => $exam,
-                                'subject' => $responsibility->pivot->subject->id,
-                                'level-unit' => $responsibility->pivot->levelUnit->id,
-                                'level' => $responsibility->pivot->level->id,
-                            ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
-                                @if ($responsibility->pivot->subject->id)
-                                <i class="fa fa-upload"></i>
-                                <span>Subject Scores</span>
-                                @elseif($responsibility->pivot->levelUnit->id)
-                                <i class="fa fa-cog"></i>
-                                <span>Class Scores</span>
-                                @elseif($responsibility->pivot->level->id)
-                                <i class="fa fa-cog"></i>
-                                <span>Level Scores</span>
-                                @endif
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                @endforeach
-                @else
-                <tr>
-                    <td colspan="7">
-                        <div class="py-1 text-center">No Responsibility created yet</div>
-                    </td>
-                </tr>
-                @endif
-            </tbody>
-        </table>
+<div class="row g-4">
+    <div class="col-md-12">
+
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="6">My Classes</th>
+                            </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Responsibility</th>
+                                <th>Subject</th>
+                                <th>Level Unit</th>
+                                <th>Level</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($responsibilities->count())
+                            @foreach ($responsibilities as $responsibility)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $responsibility->name }}</td>
+                                <td>{{ $responsibility->pivot->subject->name }}</td>
+                                <td>{{ $responsibility->pivot->levelUnit->alias }}</td>
+                                <td>{{ $responsibility->pivot->level->name }}</td>
+                                <td>
+                                    <div class="hstack gap-2 align-items-center">
+                                        <a href="{{ route('exams.scores.create', [
+                                        'exam' => $exam,
+                                        'subject' => $responsibility->pivot->subject->id,
+                                        'level-unit' => $responsibility->pivot->levelUnit->id,
+                                        'level' => $responsibility->pivot->level->id,
+                                    ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                                            @if ($responsibility->pivot->subject->id)
+                                            <i class="fa fa-upload"></i>
+                                            <span>Subject Scores</span>
+                                            @elseif($responsibility->pivot->levelUnit->id)
+                                            <i class="fa fa-cog"></i>
+                                            <span>Class Scores</span>
+                                            @elseif($responsibility->pivot->level->id)
+                                            <i class="fa fa-cog"></i>
+                                            <span>Level Scores</span>
+                                            @endif
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            @endforeach
+                            @else
+                            <tr>
+                                <td colspan="7">
+                                    <div class="py-1 text-center">No Responsibility created yet</div>
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
-</section>
+
+    @can('change-exam-status')
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="3">All Classes</th>
+                            </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Class</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if ($levelUnits->count())
+                            @foreach ($levelUnits as $levelUnit)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $levelUnit->alias }}</td>
+                                <td>
+                                    <a href="{{ route('exams.scores.create', [
+                                    'exam' => $exam,
+                                    'level-unit' => $levelUnit->id
+                                ]) }}" class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                <i class="fa fa-cog"></i>
+                                <span>Manage Class</span>
+                                </a>
+                            </td>
+                            </tr>
+                            @endforeach
+                            @else
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="3">All Levels</th>
+                            </tr>
+                            <tr>
+                                <th>#</th>
+                                <th>Level</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @if ($levels->count())
+                            @foreach ($levels as $level)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ $level->name }}</td>
+                                <td>
+                                    <a href="{{ route('exams.scores.create', [
+                                    'exam' => $exam,
+                                    'level' => $level->id
+                                ]) }}" class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                <i class="fa fa-cog"></i>
+                                <span>Manage Level</span>
+                                </a>
+                            </td>
+                            </tr>
+                            @endforeach
+                            @else
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endcan
+</div>
 
 
 @endsection

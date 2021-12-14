@@ -26,9 +26,9 @@
                     <td>{{ $subject->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                            <button wire:click="showTeachers({{ $subject }})" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
-                                <span>Details</span>
+                                <span>Teachers</span>
                             </button>
                             <button wire:click="editSubject({{ $subject }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
@@ -66,5 +66,7 @@
 
     <x-modals.subjects.upsert :departmentId="$departmentId" :subjectId="$subjectId" :departments="$departments" />
     <x-modals.subjects.delete :name="$name" />
+
+    @include('partials.subjects.teachers')
     
 </div>

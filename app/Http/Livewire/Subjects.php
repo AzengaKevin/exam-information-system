@@ -25,6 +25,13 @@ class Subjects extends Component
     public $department_id;
     public $description;
 
+    public $teachers;
+
+    public function mount()
+    {
+        $this->teachers = collect([]);
+    }
+
     public function render()
     {
         return view('livewire.subjects', [
@@ -60,6 +67,16 @@ class Subjects extends Component
         $this->description = $subject->description;
 
         $this->emit('show-upsert-subject-modal');
+    }
+
+    public function showTeachers(Subject $subject)
+    {
+        $this->name = $subject->name;
+
+        $this->teachers = $subject->teachers;
+
+        $this->emit('show-subject-teachers-modal');
+        
     }
 
     public function rules()

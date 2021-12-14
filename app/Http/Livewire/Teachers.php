@@ -39,7 +39,7 @@ class Teachers extends Component
 
     public function getPaginatedTeachers()
     {
-        return Teacher::latest()->paginate(24);
+        return Teacher::with(['responsibilities'])->latest()->paginate(24);
     }
 
     public function getAllSubjects()
@@ -92,7 +92,7 @@ class Teachers extends Component
 
                     DB::commit();
 
-                    $this->reset(['name', 'email', 'employer', 'tsc_number']);
+                    $this->reset(['name', 'email', 'employer', 'tsc_number', 'selectedSubjects']);
 
                     $this->resetPage();
 
@@ -165,7 +165,7 @@ class Teachers extends Component
 
                     DB::commit();
 
-                    $this->reset(['teacherId', 'userId', 'name', 'email', 'employer', 'tsc_number']);
+                    $this->reset(['teacherId', 'userId', 'name', 'email', 'employer', 'tsc_number', 'selectedSubjects']);
 
                     $this->resetPage();
 

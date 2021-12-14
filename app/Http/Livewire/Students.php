@@ -55,7 +55,7 @@ class Students extends Component
 
     public function getPaginatedStudents()
     {
-        return Student::with(['levelUnit'])->orderBy('adm_no')->paginate(24);
+        return Student::with(['levelUnit'])->latest()->paginate(24);
     }
 
     public function getAllLevels()
@@ -283,7 +283,8 @@ class Students extends Component
 
     public function downloadUploadStudentsExcelFile()
     {
-        $cols = [["Adm. No.", "Name", "KCPE Marks", "KCPE Grade", "Gender (Male, Female, Other)", "DOB (YYYY-MM-DD)", "class (1B)"]];
+        // $cols = [["Adm. No.", "Name", "KCPE Marks", "KCPE Grade", "Gender (Male, Female, Other)", "DOB (YYYY-MM-DD)", "class (1B)"]];
+        $cols = [["ADMNO","NAME","KCPEMARKS","KCPEGRADE","GENDER (Male, Female, Other)","DOB (YYYY-MM-DD)","CLASS (1B)"]];
         
         $headers = collect($cols);
 

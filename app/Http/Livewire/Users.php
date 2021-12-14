@@ -25,6 +25,8 @@ class Users extends Component
     public $active;
     public $role_id;
 
+    public $selectedUsers = [];
+
     public function render()
     {
         return view('livewire.users', [
@@ -192,5 +194,43 @@ class Users extends Component
 
         }
 
+    }
+
+    public function bulkUsersRoleUpdate()
+    {
+        $data = $this->validate([
+            'role_id' => ['bail', 'required', 'integer'],
+            'selectedUsers' => ['bail', 'array', 'min:1']
+        ]);
+
+        $selectedUsers = array_filter($data['selectedUsers'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);
+
+        try {
+
+            DB::table('users')
+                ->whereIn('id', array_keys($selectedUsers))
+                ->update([
+                    'role_id' => $data['role_id']
+                ]);
+
+                $this->reset(['role_id', 'selectedUsers']);
+
+                session()->flash('status', 'Users roles updated');
+
+                $this->emit('hide-users-bulk-role-update-modal');
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A database error occurred');
+
+            $this->emit('hide-users-bulk-role-update-modal');
+            
+        }
+        
+        
     }
 }

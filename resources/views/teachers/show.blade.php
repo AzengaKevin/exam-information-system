@@ -50,16 +50,29 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="h5 my-0">Responsibilities</h2>
 
-                    <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
-                        class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
-                        <i class="fa fa-plus"></i>
-                    </button>
-
-                    <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
-                        class="d-none d-md-inline-flex btn btn-sm btn-outline-primary gap-2 align-items-center">
-                        <i class="fa fa-plus"></i>
-                        <span>Responsibility</span>
-                    </button>
+                    <div class="d-inline-flex gap-2">
+                        <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
+                            class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
+                            <i class="fa fa-plus"></i>
+                        </button>
+    
+                        <button data-bs-toggle="modal" data-bs-target="#assign-bulk-responsibilities-modal"
+                            class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
+                            <i class="fa fa-plus"></i>
+                        </button>
+    
+                        <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
+                            class="d-none d-md-inline-flex btn btn-sm btn-outline-primary gap-2 align-items-center">
+                            <i class="fa fa-plus"></i>
+                            <span>Responsibility</span>
+                        </button>
+    
+                        <button data-bs-toggle="modal" data-bs-target="#assign-bulk-responsibilities-modal"
+                            class="d-none d-md-inline-flex btn btn-sm btn-outline-primary gap-2 align-items-center">
+                            <i class="fa fa-plus"></i>
+                            <span>Bulk Responsibilities</span>
+                        </button>
+                    </div>
                 </div>
                 <hr>
                 <livewire:teacher-responsibilities :teacher="$teacher" type="table-sm table-bordered" />
@@ -94,7 +107,10 @@
     livewire.on('hide-assign-teacher-responsibility-modal', () =>
         $('#assign-teacher-responsibility-modal').modal('hide'));
 
-    livewire.on('hide-update-teacher-subjects-modal', () => 
+    livewire.on('hide-update-teacher-subjects-modal', () =>
         $('#update-teacher-subjects-modal').modal('hide'));
+
+    livewire.on('hide-assign-bulk-responsibilities-modal', () =>
+        $('#assign-bulk-responsibilities-modal').modal('hide'));
 </script>
 @endpush

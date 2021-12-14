@@ -11,7 +11,8 @@
             <li class="breadcrumb-item active" aria-current="page">Subjects</li>
         </ol>
     </nav>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-subject-modal" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+    <button data-bs-toggle="modal" data-bs-target="#upsert-subject-modal"
+        class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Subject</span>
     </button>
@@ -29,5 +30,6 @@
     livewire.on('show-delete-subject-modal', () => $('#delete-subject-modal').modal('show'))
     livewire.on('hide-delete-subject-modal', () => $('#delete-subject-modal').modal('hide'))
 
+    livewire.on('show-subject-teachers-modal', () => $('#subject-teachers-modal').modal('show'))
 </script>
 @endpush

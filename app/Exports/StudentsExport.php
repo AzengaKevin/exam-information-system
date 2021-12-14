@@ -2,11 +2,11 @@
 
 namespace App\Exports;
 
-use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 use Maatwebsite\Excel\Concerns\FromCollection;
+use Maatwebsite\Excel\Concerns\WithHeadings;
 
-class StudentsExport implements FromCollection
+class StudentsExport implements FromCollection, WithHeadings
 {
     public array $filters;
     
@@ -31,5 +31,18 @@ class StudentsExport implements FromCollection
 
             return $query->get(['adm_no', 'name', 'kcpe_marks', 'kcpe_grade', 'gender', 'dob', 'alias']);;
         }
+    }
+
+    public function headings(): array
+    {
+        return [
+            "ADMNO",
+            "NAME",
+            "KCPEMARKS",
+            "KCPEGRADE",
+            "GENDER",
+            "DOB",
+            "CLASS"
+        ];
     }
 }
