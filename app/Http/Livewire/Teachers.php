@@ -39,7 +39,7 @@ class Teachers extends Component
 
     public function getPaginatedTeachers()
     {
-        return Teacher::latest()->paginate(24);
+        return Teacher::with(['responsibilities'])->latest()->paginate(24);
     }
 
     public function getAllSubjects()

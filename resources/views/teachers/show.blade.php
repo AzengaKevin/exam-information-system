@@ -111,6 +111,6 @@
         $('#update-teacher-subjects-modal').modal('hide'));
 
     livewire.on('hide-assign-bulk-responsibilities-modal', () =>
-        $('#assign-bulk-responsibilities-modal').modal('hide'))
+        $('#assign-bulk-responsibilities-modal').modal('hide'));
 </script>
 @endpush

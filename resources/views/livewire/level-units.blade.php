@@ -10,6 +10,7 @@
                     <th>Stream</th>
                     <th>Alias</th>
                     <th>Students</th>
+                    <th>Teachers</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -22,6 +23,7 @@
                     <td>{{ optional($levelUnit->stream)->name }}</td>
                     <td>{{ $levelUnit->alias ?? 'Not Set' }}</td>
                     <td>{{ $levelUnit->students->count() }}</td>
+                    <td>{{ $levelUnit->responsibilities->count() }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
                             <a href="{{route('level-units.show',$levelUnit)}}"  class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">

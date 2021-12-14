@@ -44,7 +44,7 @@ class LevelUnits extends Component
 
     public function getPaginatedLevelUnits()
     {
-        return LevelUnit::with('students')->orderBy('alias')->paginate(24);
+        return LevelUnit::with(['students', 'responsibilities'])->orderBy('alias')->paginate(24);
     }
 
     public function rules()

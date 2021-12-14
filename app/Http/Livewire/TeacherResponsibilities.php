@@ -226,6 +226,10 @@ class TeacherResponsibilities extends Component
 
             }
 
+            $this->reset(['selectAllClasses', 'teacher_subject_id', 'selectedClasses']);
+
+            $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
+
             session()->flash('status', 'Teacher successfully assigned bul subjects');
 
             $this->emit('hide-assign-bulk-responsibilities-modal');
