@@ -14,6 +14,12 @@ class LevelExamResults extends Component
 {
     public Exam $exam;
     public Level $level;
+    
+    public $level_unit_id;
+    public $name;
+    public $admno;
+
+    public $orderBy = 'level_position';
 
     public function mount(Exam $exam, Level $level)
     {
@@ -40,16 +46,33 @@ class LevelExamResults extends Component
         /** @var array */
         $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
 
-        return Schema::hasTable($tblName)
-            ? DB::table($tblName)
+        if(Schema::hasTable($tblName)){
+
+            $query = DB::table($tblName)
                 ->select(array_merge(["admno"], $columns, $aggregateCols))
                 ->addSelect("students.name", "level_units.alias")
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
-                ->orderBy('level_position')
-                ->paginate(24, ['*'], Str::slug($this->level->name))
-            : new Paginator([], 24);
+                ->orderBy($this->orderBy ?? 'level_position');
+            
+            if (!empty($this->level_unit_id)) {
+                $query->where("{$tblName}.level_unit_id", $this->level_unit_id);
+            }
+
+            if (!empty($this->admno)) {
+                $query->where("{$tblName}.admno", $this->admno);
+            }
+
+            if(!empty($this->name)){
+                $query->where('students.name', 'LIKE', "%{$this->name}%");
+            }
+
+            return $query->paginate(24, ['*'], Str::slug($this->level->name));
+
+        }else{
+            return new Paginator([], 24);
+        }
     }
 
     public function getSubjectColumns()
@@ -66,7 +89,7 @@ class LevelExamResults extends Component
         $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
 
         /** @var array */
-        $studentLevelCols = array("name", "alias");
+        $studentLevelCols = array("admno", "name", "alias");
 
         return array_merge($studentLevelCols, $columns, $aggregateCols);;
     }
