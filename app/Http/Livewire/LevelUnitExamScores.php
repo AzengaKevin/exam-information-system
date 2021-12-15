@@ -43,8 +43,8 @@ class LevelUnitExamScores extends Component
     public function getRankColumns() : array
     {
         return [
-            'points' => 'Aggregate Points',
-            'total' => 'Total Score'
+            'tp' => 'Aggregate Points',
+            'tm' => 'Total Score'
         ];
     }
 
@@ -57,7 +57,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
+        $aggregateCols = $this->getAggregateColumns();
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -66,14 +66,19 @@ class LevelUnitExamScores extends Component
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_unit_id", $this->levelUnit->id)
-                ->orderBy("level_unit_position")
+                ->orderBy("sp")
                 ->paginate(24)
             : collect([]);
     }
 
-    public function getSubjectColumns()
+    public function getSubjectColumns(): array
     {
        return $this->exam->subjects->pluck("shortname")->toArray();
+    }
+
+    public function getAggregateColumns(): array
+    {
+        return array("mm", "tm", "mg", "mp", "tp", "sp", "op");
     }
 
     public function getColumns()
@@ -82,7 +87,7 @@ class LevelUnitExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
+        $aggregateCols = $this->getAggregateColumns();
 
         /** @var array */
         $studentLevelCols = array("name", "alias");
@@ -134,10 +139,11 @@ class LevelUnitExamScores extends Component
                 ->updateOrInsert([
                     "admno" => $stuData->admno
                 ], [
-                    "average" => $avgScore,
-                    "grade" => $avgGrade,
-                    'points' => $avgPoints,
-                    'total' => $totalScore
+                    "mm" => $avgScore,
+                    "mg" => $avgGrade,
+                    'mp' => $avgPoints,
+                    'tp' => $totalPoints,
+                    'tm' => $totalScore
                 ]);
             });
 
@@ -216,10 +222,11 @@ class LevelUnitExamScores extends Component
             ->updateOrInsert([
                 "admno" => $stuData->admno
             ], [
-                "average" => $avgScore,
-                "grade" => $avgGrade,
-                'points' => $avgPoints,
-                'total' => $totalScore
+                "mm" => $avgScore,
+                "mg" => $avgGrade,
+                'mp' => $avgPoints,
+                'tp' => $totalPoints,
+                'tm' => $totalScore
             ]);
 
             $this->reset('admno');
@@ -255,7 +262,7 @@ class LevelUnitExamScores extends Component
 
             $data = DB::table($tblName)
                 ->where("level_unit_id", $this->levelUnit->id)
-                ->selectRaw("AVG(total) AS avg_total, AVG(points) avg_points")
+                ->selectRaw("AVG(tm) AS avg_total, AVG(mp) avg_points")
                 ->first();
             
             $avgTotal = number_format($data->avg_total, 2);
@@ -291,13 +298,13 @@ class LevelUnitExamScores extends Component
     }
 
     /**
-     * Generate ranks based on the selected aggregate columns
+     * Generate stream ranks based on the selected aggregate columns
      */
     public function generateRanks()
     {
         $data = $this->validate(['col' => ['nullable', 'string', Rule::in(array_keys($this->getRankColumns()))]]);
 
-        $col = $data['col'] ?? 'total';
+        $col = $data['col'] ?? 'tm';
 
         try {
 
@@ -329,9 +336,7 @@ class LevelUnitExamScores extends Component
                     }
                 }
 
-                DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
-                    'level_unit_position' => $currRank
-                ]);
+                DB::table($tblName)->updateOrInsert(['admno' => $record->admno],['sp' => $currRank]);
 
                 $prevVal = $currVal;
 

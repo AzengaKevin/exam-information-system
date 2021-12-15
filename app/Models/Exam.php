@@ -101,4 +101,11 @@ class Exam extends Model
             ->withPivot(['points', 'grade', 'average']);
     }
 
+    public function students()
+    {
+        return $this->belongsToMany(Student::class)
+            ->withPivot(['mm','tm','mp','tp','mg','sp','op'])
+            ->withTimestamps();
+    }
+
 }

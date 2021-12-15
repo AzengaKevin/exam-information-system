@@ -19,7 +19,7 @@ class LevelExamResults extends Component
     public $name;
     public $admno;
 
-    public $orderBy = 'level_position';
+    public $orderBy = 'op';
 
     public function mount(Exam $exam, Level $level)
     {
@@ -44,7 +44,7 @@ class LevelExamResults extends Component
         $columns = $this->getSubjectColumns();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
+        $aggregateCols = $this->getAggregateColumns();
 
         if(Schema::hasTable($tblName)){
 
@@ -54,7 +54,7 @@ class LevelExamResults extends Component
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
-                ->orderBy($this->orderBy ?? 'level_position');
+                ->orderBy($this->orderBy ?? 'op');
             
             if (!empty($this->level_unit_id)) {
                 $query->where("{$tblName}.level_unit_id", $this->level_unit_id);
@@ -75,9 +75,14 @@ class LevelExamResults extends Component
         }
     }
 
-    public function getSubjectColumns()
+    public function getSubjectColumns() : array
     {
        return $this->exam->subjects->pluck("shortname")->toArray();
+    }
+
+    public function getAggregateColumns() : array
+    {
+        return array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
     }
 
     public function getColumns()
@@ -86,7 +91,7 @@ class LevelExamResults extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
+        $aggregateCols = $this->getAggregateColumns();
 
         /** @var array */
         $studentLevelCols = array("admno", "name", "alias");
