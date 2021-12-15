@@ -12,16 +12,20 @@
             <li class="breadcrumb-item active" aria-current="page">{{ $levelUnit->alias }}</li>
         </ol>
     </nav>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-student-modal" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+    <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-student-modal"
+        class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
         <i class="fa fa-plus"></i>
         <span>Promote Students</span>
     </button>
 </div>
-<hr>
 
-<div class="row g-3">
+<div class="row g-4 py-3">
     <div class="col-md-12">
-        @livewire('level-unit-students', ['levelUnit' => $levelUnit])
+        <div class="card">
+            <div class="card-body">
+                @livewire('level-unit-students', ['levelUnit' => $levelUnit])
+            </div>
+        </div>
     </div>
 
     <div class="col-md-6">

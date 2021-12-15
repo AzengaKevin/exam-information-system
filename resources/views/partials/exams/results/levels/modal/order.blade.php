@@ -15,7 +15,7 @@
                         <option value="">-- Select Level Unit --</option>
                         <option value="admno">Admission Number</option>
                         <option value="name">Name</option>
-                        <option value="level_position">Rank</option>
+                        <option value="op">Rank</option>
                     </select>
                     @error('orderBy')
                     <span class="invalid-feedback">
