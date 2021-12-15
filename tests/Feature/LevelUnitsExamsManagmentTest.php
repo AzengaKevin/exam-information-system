@@ -119,15 +119,16 @@ class LevelUnitsExamsManagmentTest extends TestCase
         $this->assertEquals(2, DB::table($tblName)->count());
 
         $data = DB::table($tblName)
-            ->select(["average", "total", "points", "grade"])
+            ->select(["mm", "tm", "mp", "tp", "mg"])
             ->where('level_unit_id', $levelUnit->id)
             ->get();
 
         foreach ($data as $item) {
-            $this->assertTrue(!is_null($item->total));
-            $this->assertTrue(!is_null($item->points));
-            $this->assertTrue(!is_null($item->grade));
-            $this->assertTrue(!is_null($item->average));
+            $this->assertTrue(!is_null($item->tm));
+            $this->assertTrue(!is_null($item->mp));
+            $this->assertTrue(!is_null($item->tp));
+            $this->assertTrue(!is_null($item->mg));
+            $this->assertTrue(!is_null($item->mm));
         }
     }
 
@@ -201,12 +202,13 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
         $tblName = Str::slug($exam->shortname);
 
-        $data = DB::table($tblName)->where('admno', $students->first()->adm_no)->select(["average", "total", "points", "grade"])->first();
+        $data = DB::table($tblName)->where('admno', $students->first()->adm_no)->select(["mm", "tm", "mp", "tp", "mg"])->first();
         
-        $this->assertTrue(!is_null($data->total));
-        $this->assertTrue(!is_null($data->points));
-        $this->assertTrue(!is_null($data->grade));
-        $this->assertTrue(!is_null($data->average));
+        $this->assertTrue(!is_null($data->tm));
+        $this->assertTrue(!is_null($data->mp));
+        $this->assertTrue(!is_null($data->tp));
+        $this->assertTrue(!is_null($data->mg));
+        $this->assertTrue(!is_null($data->mm));
     }    
 
 
@@ -308,10 +310,11 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
             DB::table($tblName)
                 ->updateOrInsert(["admno" => $stuData->admno], [
-                    "average" => $avgScore,
-                    "grade" => $avgGrade,
-                    'points' => $avgPoints,
-                    'total' => $totalScore
+                    "mm" => $avgScore,
+                    "mg" => $avgGrade,
+                    'mp' => $avgPoints,
+                    "tp" => $totalPoints,
+                    'tm' => $totalScore
                 ]);
         });
 
@@ -431,16 +434,17 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
             DB::table($tblName)
                 ->updateOrInsert(["admno" => $stuData->admno], [
-                    "average" => $avgScore,
-                    "grade" => $avgGrade,
-                    'points' => $avgPoints,
-                    'total' => $totalScore
+                    "mm" => $avgScore,
+                    "mg" => $avgGrade,
+                    'mp' => $avgPoints,
+                    "tp" => $totalPoints,
+                    'tm' => $totalScore
                 ]);
         });
 
         // Action => Call the student ranking method
 
-        $col = 'total';
+        $col = 'tm';
 
         Livewire::test(LevelUnitExamScores::class, ['exam' =>$exam, 'levelUnit' => $levelUnit])
             ->set('col', $col)
@@ -451,11 +455,11 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
         $firstRecordInRank = DB::table($tblName)
             ->where('level_unit_id', $levelUnit->id)
-            ->select(['admno', $col, 'level_unit_position'])
+            ->select(['admno', $col, 'sp'])
             ->orderBy($col, 'desc')
             ->first();
 
-        $this->assertEquals(1, $firstRecordInRank->level_unit_position);
+        $this->assertEquals(1, $firstRecordInRank->sp);
     }
 
 }
