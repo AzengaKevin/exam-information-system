@@ -8,6 +8,7 @@ use App\Models\Grading;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -43,7 +44,7 @@ class LevelExamScores extends Component
         $columns = $this->getSubjectColumns();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
+        $aggregateCols = $this->getAggreagateColumns();
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -52,14 +53,19 @@ class LevelExamScores extends Component
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
-                ->orderBy('level_position')
+                ->orderBy('op')
                 ->paginate(24)
             : collect([]);
     }
 
-    public function getSubjectColumns()
+    public function getSubjectColumns(): array
     {
        return $this->exam->subjects->pluck("shortname")->toArray();
+    }
+
+    public function getAggreagateColumns() : array
+    {
+        return array("mm", "tm", "mg", "mp", "tp", "sp", "op");
     }
 
     public function getColumns()
@@ -68,7 +74,7 @@ class LevelExamScores extends Component
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
 
         /** @var array */
-        $aggregateCols = array("average", "total", "grade", "points", "level_unit_position", "level_position");
+        $aggregateCols = $this->getAggreagateColumns();
 
         /** @var array */
         $studentLevelCols = array("name", "alias");
@@ -76,6 +82,9 @@ class LevelExamScores extends Component
         return array_merge($studentLevelCols, $columns, $aggregateCols);;
     }
 
+    /**
+     * Publishing general level average score and average points
+     */
     public function publishLevelScores()
     {
         try {
@@ -84,25 +93,28 @@ class LevelExamScores extends Component
 
             $data = DB::table($tblName)
                 ->where("level_id", $this->level->id)
-                ->selectRaw("AVG(total) AS avg_total, AVG(points) avg_points")
+                ->selectRaw("AVG(tm) AS avg_total, AVG(mp) avg_points")
                 ->first();
-            
-            $avgTotal = number_format($data->avg_total, 2);
-            $avgPoints = number_format($data->avg_points, 4);
+        
+            if (!is_null($data->avg_total) && !is_null($data->avg_points)) {
+                
+                $avgTotal = number_format($data->avg_total, 2);
+                $avgPoints = number_format($data->avg_points, 4);
+    
+                $pgm = Grading::pointsGradeMap();
+    
+                $avgGrade = $pgm[intval(round($avgPoints))];
+    
+                $this->exam->levels()->syncWithoutDetaching([
+                    $this->level->id => [
+                        "points" => $avgPoints,
+                        "grade" => $avgGrade,
+                        "average" => $avgTotal
+                    ]
+                ]);
 
-            $pgm = Grading::pointsGradeMap();
-
-            $avgGrade = $pgm[intval(round($avgPoints))];
-
-            $this->exam->levels()->syncWithoutDetaching([
-                $this->level->id => [
-                    "points" => $avgPoints,
-                    "grade" => $avgGrade,
-                    "average" => $avgTotal
-                ]
-            ]);
-
-            session()->flash('status', 'Your class scores have been successfully published, you can republish the scores incase of any changes');
+                session()->flash('status', 'Your class scores have been successfully published, you can republish the scores incase of any changes');
+            }
 
             $this->emit('hide-publish-class-scores-modal');
 
@@ -127,35 +139,34 @@ class LevelExamScores extends Component
     {
         try {
 
-            DB::beginTransaction();
-
             $tblName = Str::slug($this->exam->shortname);
 
+            /** @var Collection */
             $data = DB::table($tblName)
                 ->where('level_id', $this->level->id)
-                ->selectRaw("grade, COUNT(grade) AS grade_count")
-                ->groupBy('grade')
+                ->selectRaw("mg, COUNT(mg) AS grade_count")
+                ->groupBy('mg')
                 ->get()
-                ->pluck('grade_count', 'grade');
-            
-            DB::table('exam_level_grade_distribution')
-                ->where([
-                    'exam_id' => $this->exam->id,
-                    'level_id' => $this->level->id,
-                ])->delete();
+                ->pluck('grade_count', 'mg');
 
-            foreach (Grading::gradeOptions() as $grade) {
-                $this->exam->levelGradesDist()->attach([
-                    $this->level->id => [
-                        'grade' => $grade,
-                        'grade_count' => $data[$grade] ?? 0
-                    ]
-                ]);
+            if ($data->count()) {
+
+                DB::beginTransaction();
+    
+                foreach (Grading::gradeOptions() as $grade) {
+
+                    DB::table('exam_level_grade_distribution')
+                        ->updateOrInsert([
+                            'exam_id' => $this->exam->id,
+                            'level_id' => $this->level->id,
+                            'grade' => $grade,
+                        ],['grade_count' => $data[$grade] ?? 0]);
+                }
+    
+                DB::commit();
+    
+                session()->flash('status', 'Level grade distribution has been successfully published');
             }
-
-            DB::commit();
-
-            session()->flash('status', 'Level grade distribution has been successfully published');
 
             $this->emit('hide-publish-level-grade-dist-modal');
             
@@ -187,11 +198,7 @@ class LevelExamScores extends Component
 
             DB::beginTransaction();
 
-            DB::table('exam_level_subject_performance')
-            ->where([
-                'exam_id' => $this->exam->id,
-                'level_id' => $this->level->id,
-            ])->delete();
+            $atLeastASubjectPublished = false;
 
             foreach ($this->exam->subjects as $subject) {
 
@@ -203,27 +210,36 @@ class LevelExamScores extends Component
                     ->whereNotNull($col)
                     ->first();
 
-                $avgTotal = number_format($data->avg_score, 2);
-                $avgPoints = number_format($data->avg_points, 4);
+                if (!is_null($data->avg_points) && !is_null($data->avg_score)) {
 
-                $pgm = Grading::pointsGradeMap();
-
-                $avgGrade = $pgm[intval(round($avgPoints))];
-                
-                $this->exam->levelSubjectPerformance()
-                    ->attach([
-                        $this->level->id => [
-                            'subject_id' => $subject->id,
+                    $atLeastASubjectPublished = true;
+                    
+                    $avgTotal = number_format($data->avg_score, 2);
+                    $avgPoints = number_format($data->avg_points, 4);
+    
+                    $pgm = Grading::pointsGradeMap();
+    
+                    $avgGrade = $pgm[intval(round($avgPoints))];
+    
+                    DB::table('exam_level_subject_performance')
+                        ->updateOrInsert([
+                            'exam_id' => $this->exam->id,
+                            'level_id' => $this->level->id,
+                            'subject_id' => $subject->id
+                        ], [
                             'average' => $avgTotal,
                             'points' => $avgPoints,
                             'grade' => $avgGrade
-                        ]
-                    ]);
+                        ]);
+                }
+
             }
 
             DB::commit();
 
-            session()->flash('status', 'Level subject performance has been successfully published');
+            if ($atLeastASubjectPublished) {
+                session()->flash('status', 'Level subject performance has been successfully published');
+            }
 
             $this->emit('hide-publish-subjects-performance-modal');
             
@@ -248,8 +264,8 @@ class LevelExamScores extends Component
     public function getRankColumns() : array
     {
         return [
-            'points' => 'Aggregate Points',
-            'total' => 'Total Score'
+            'mp' => 'Aggregate Points',
+            'tm' => 'Total Score'
         ];
     }    
 
@@ -261,7 +277,7 @@ class LevelExamScores extends Component
     {
         $data = $this->validate(['col' => ['nullable', 'string', Rule::in(array_keys($this->getRankColumns()))]]);
 
-        $col = $data['col'] ?? 'total';
+        $col = $data['col'] ?? 'tm';
 
         try {
 
@@ -276,35 +292,39 @@ class LevelExamScores extends Component
                 ->orderBy($col, 'desc')
                 ->get();
 
-            $prevRank = -1;
-            $currRank = -1;
-            $prevVal = 0;
-            $currVal = 0;
+            if ($data->count()) {
 
-            foreach ($data as $key => $record) {
-
-                if($key == 0) $currRank = 1;
-
-                $currVal = $record->$col;
-
-                if($key != 0){
-                    if($prevVal == $currVal){
-                        $currRank = $prevRank;
+                $prevRank = -1;
+                $currRank = -1;
+                $prevVal = 0;
+                $currVal = 0;
+    
+                foreach ($data as $key => $record) {
+    
+                    if($key == 0) $currRank = 1;
+    
+                    $currVal = $record->$col;
+    
+                    if($key != 0){
+                        if($prevVal == $currVal){
+                            $currRank = $prevRank;
+                        }
                     }
+    
+                    DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
+                        'op' => $currRank
+                    ]);
+    
+                    $prevVal = $currVal;
+    
+                    $prevRank = $currRank;
+    
+                    ++$currRank;
                 }
+    
+                session()->flash('status', 'Student ranking operation completed successfully');
 
-                DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
-                    'level_position' => $currRank
-                ]);
-
-                $prevVal = $currVal;
-
-                $prevRank = $currRank;
-
-                ++$currRank;
             }
-
-            session()->flash('status', 'Student ranking operation completed successfully');
 
             $this->emit('hide-rank-class-modal');
 
@@ -319,5 +339,59 @@ class LevelExamScores extends Component
             $this->emit('hide-rank-class-modal');
         }   
         
-    }    
+    }
+
+    /**
+     * Publish Level Students Exam Results
+     */
+    public function publishStudentResults()
+    {
+
+        $tblName = Str::slug($this->exam->shortname);
+
+        try {
+
+            /** @var Collection */
+            $data = DB::table($tblName)->select(array_merge(["students.id"], $this->getAggreagateColumns()))
+                ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
+                ->where("{$tblName}.level_id", $this->level->id)
+                ->get();
+
+            if ($data->count()) {
+                
+                $data->each(function($item){
+    
+                    DB::table('exam_student')
+                        ->updateOrInsert([
+                            'exam_id' => $this->exam->id,
+                            'student_id' => $item->id
+                        ], [
+                            'mm' => $item->mm,
+                            'tm' => $item->tm,
+                            'mp' => $item->mp,
+                            'tp' => $item->tp,
+                            'mg' => $item->mg,
+                            'sp' => $item->sp,
+                            'op' => $item->op
+                        ]);
+    
+                });
+    
+                session()->flash('status', "{$this->level->name} - {$this->exam->name} results published");
+            }
+
+            $this->emit('hide-publish-students-results-modal');
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred while trying to publish students results');
+
+            $this->emit('hide-publish-students-results-modal');
+
+        }
+    }
 }

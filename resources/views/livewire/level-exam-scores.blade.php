@@ -35,6 +35,6 @@
     <x-modals.exams.scores.levels.rank :columns="$columns" />
     <x-modals.exams.scores.levels.publish-grade-distribution :level="$level" />
     <x-modals.exams.scores.levels.publish-subject-performance :level="$level" />
-    <x-modals.exams.scores.levels.publish-subject-performance :level="$level" />
+    <x-modals.exams.scores.levels.publish-students-results :level="$level" />
 
 </div>
