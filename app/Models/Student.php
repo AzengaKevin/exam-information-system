@@ -67,4 +67,10 @@ class Student extends Model
             ->withTimestamps();
     }
 
+    public function exams()
+    {
+        return $this->belongsToMany(Exam::class)
+            ->withPivot(['mm','tm','mp','tp','mg','sp','op'])
+            ->withTimestamps();
+    }
 }
