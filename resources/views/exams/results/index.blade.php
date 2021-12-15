@@ -13,17 +13,24 @@
             <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }} Results</li>
         </ol>
     </nav>
-
-    <button data-bs-toggle="modal" data-bs-target="#filter-exam-results"
-        class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
-        <i class="fa fa-filter"></i>
-        <span>Filter Results</span>
-    </button>
 </div>
 
 <hr>
 
-<livewire:exam-results :exam="$exam" />
+{{-- <livewire:exam-results :exam="$exam" /> --}}
+
+<div class="row g-4">
+    @foreach ($exam->levels as $level)
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <livewire:level-exam-results :exam="$exam" :level="$level" />
+            </div>
+        </div>
+    </div>
+    @endforeach
+</div>
+
 
 @endsection
 

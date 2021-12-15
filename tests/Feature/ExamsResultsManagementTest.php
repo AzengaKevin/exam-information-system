@@ -88,7 +88,7 @@ class ExamsResultsManagementTest extends TestCase
 
         $response->assertViewHasAll(['exam']);
 
-        $response->assertSeeLivewire('exam-results');
+        $response->assertSeeLivewire('level-exam-results');
         
     }
 }
