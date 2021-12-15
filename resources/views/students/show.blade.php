@@ -60,7 +60,7 @@
                     </dl>
                     <dl class="col-md-4">
                         <dt>Class</dt>
-                        <dd>{{ $student->levelUnit->alias }}</dd>
+                        <dd>{{ optional($student->levelUnit)->alias }}</dd>
                     </dl>
                     <dl class="col-md-6">
                         <dt>Join Level</dt>
