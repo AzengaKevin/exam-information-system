@@ -7,7 +7,7 @@
             <i class="fa fa-filter"></i>
             <span>Filter Results</span>
         </button>
-        <button data-bs-toggle="modal" data-bs-target="#order-exam-results"
+        <button data-bs-toggle="modal" data-bs-target="#order-level-{{ $level->id }}-exam-results-modal"
             class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
             <i class="fa fa-sort"></i>
             <span>Order Results</span>
@@ -61,5 +61,7 @@
     </div>
 
     @include('partials.exams.results.levels.modal.filter')
+
+    @include('partials.exams.results.levels.modal.order')
 
 </div>
