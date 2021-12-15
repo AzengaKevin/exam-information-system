@@ -46,6 +46,17 @@
                 </tr>
                 @endif
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="{{ count($cols) }}">
+                        {{ $data->links() }}
+                        @if ($data->count())
+                        <div class="text-muted">{{ $data->firstItem() }} - {{ $data->lastItem() }} out of
+                            {{ $data->total() }}</div>
+                        @endif
+                    </td>
+                </tr>
+            </tfoot>
         </table>
     </div>
 

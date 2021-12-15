@@ -48,8 +48,8 @@ class LevelExamResults extends Component
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy('level_position')
-                ->paginate(24)
-            : new Paginator([], 16);
+                ->paginate(24, ['*'], Str::slug($this->level->name))
+            : new Paginator([], 24);
     }
 
     public function getSubjectColumns()
