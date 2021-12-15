@@ -44,6 +44,11 @@ class Student extends Model
         return $this->belongsTo(Level::class);
     }
 
+    public function admissionLevel()
+    {
+        return $this->belongsTo(Level::class, 'admission_level_id');
+    }
+
     public function levelUnit()
     {
         return $this->belongsTo(LevelUnit::class);
@@ -58,7 +63,8 @@ class Student extends Model
 
     public function guardians()
     {
-        return $this->belongsToMany(Guardian::class,'student_guardians')->withTimestamps();
+        return $this->belongsToMany(Guardian::class,'student_guardians')
+            ->withTimestamps();
     }
 
 }
