@@ -38,12 +38,13 @@ class CreateScoresTable
             foreach ($exam->subjects as $subject) {
                 $table->jsonb($subject->shortname)->nullable();
             }
-            $table->tinyInteger('points', false, true)->nullable();
-            $table->char('grade', 2)->nullable();
-            $table->double('average')->nullable();
-            $table->integer('total', false, true)->nullable();
-            $table->integer('level_unit_position')->nullable();
-            $table->integer('level_position')->nullable();
+            $table->tinyInteger('mp', false, true)->nullable();
+            $table->tinyInteger('tp', false, true)->nullable();
+            $table->char('mg', 2)->nullable();
+            $table->double('mm')->nullable();
+            $table->integer('tm', false, true)->nullable();
+            $table->integer('sp')->nullable();
+            $table->integer('op')->nullable();
         });
         
     }
