@@ -64,7 +64,7 @@
                     </dl>
                     <dl class="col-md-6">
                         <dt>Join Level</dt>
-                        <dd>{{ $student->admissionLevel->name }}</dd>
+                        <dd>{{ optional($student->admissionLevel)->name ?? 'N/A' }}</dd>
                     </dl>
                     <dl class="col-md-12">
                         <dt>Description</dt>
