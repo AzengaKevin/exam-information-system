@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Models\LevelUnit;
+use Illuminate\Pagination\Paginator;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
@@ -48,7 +49,7 @@ class ExamResults extends Component
         /** @var array */
         $aggregateCols = array("average", "total");
         
-        if(!Schema::hasTable($tblName)) return collect([]);
+        if(!Schema::hasTable($tblName)) return new Paginator([], 16);
         
         $query = DB::table($tblName)
             ->select(array_merge(["admno"], $columns, $aggregateCols))
