@@ -17,6 +17,7 @@ use App\Http\Controllers\ExamsAnalysisController;
 use App\Http\Controllers\ExamsResultsController;
 use App\Http\Controllers\HostelsController;
 use App\Http\Controllers\ExamsScoresController;
+use App\Http\Controllers\ExamsTranscriptsController;
 use App\Http\Controllers\GradesController;
 use App\Http\Controllers\GradingsController;
 use App\Http\Controllers\LevelUnitsController;
@@ -96,6 +97,9 @@ Route::group(['middleware' => ['auth']], function(){
         ->only(['index']);
 
     Route::resource('exams.results', ExamsResultsController::class)
+        ->only(['index']);
+
+    Route::resource('exams.transcripts', ExamsTranscriptsController::class)
         ->only(['index']);
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
