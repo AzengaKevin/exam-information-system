@@ -16,8 +16,6 @@ use App\Models\Responsibility;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use App\Http\Livewire\ExamQuickActions;
-use App\Http\Livewire\LevelUnitExamScores;
-use App\Models\Grading;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -109,7 +107,7 @@ class ExamsScoresManagementTest extends TestCase
         
     }
 
-    /** @group exams */
+    /** @group exams-scores */
     public function testAuthorizedTeacherCanVisitPageToGenerateAggregates()
     {
         $this->withoutExceptionHandling();
