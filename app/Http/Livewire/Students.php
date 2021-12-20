@@ -12,6 +12,7 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use App\Exports\StudentsExport;
 use App\Imports\StudentsImport;
+use App\Models\Hostel;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
@@ -37,6 +38,7 @@ class Students extends Component
     public $dob;
     public $admission_level_id;
     public $level_id;
+    public $hostel_id;
     public $stream_id;
     public $description;
 
@@ -49,7 +51,8 @@ class Students extends Component
             'levels' => $this->getAllLevels(),
             'streams' => $this->getAllStreams(),
             'genderOptions' => User::genderOptions(),
-            'kcpeGradeOptions' => Student::kcpeGradeOptions()
+            'kcpeGradeOptions' => Student::kcpeGradeOptions(),
+            'hostels' => $this->getAllHostels()
         ]);
     }
 
@@ -68,6 +71,11 @@ class Students extends Component
         return Stream::all(['id', 'name']);
     }
 
+    public function getAllHostels()
+    {
+        return Hostel::all(['id', 'name']);
+    }
+
     public function rules()
     {
         return [
@@ -78,6 +86,7 @@ class Students extends Component
             'dob' => ['bail', 'string'],
             'admission_level_id' => ['bail', 'nullable', 'integer'],
             'level_id' => ['bail', 'nullable', 'integer'],
+            'hostel_id' => ['bail', 'nullable', 'integer'],
             'stream_id' => ['bail', 'required', 'integer'],
             'description' => ['bail', 'nullable'],
             'kcpe_grade' => ['bail', 'required', Rule::in(Student::kcpeGradeOptions())],
@@ -150,6 +159,7 @@ class Students extends Component
         $this->kcpe_grade = $student->kcpe_grade;
         $this->stream_id = $student->stream_id;
         $this->level_id = $student->level_id;
+        $this->hostel_id = $student->hostel_id;
         $this->description = $student->description;
 
         $this->emit('show-upsert-student-modal');

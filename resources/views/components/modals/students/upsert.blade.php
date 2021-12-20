@@ -1,6 +1,7 @@
 @props([
 'studentId' => null,
 'levels' => [],
+'hostels' => [],
 'streams' => [],
 'genderOptions' => [],
 'kcpeGradeOptions' => []
@@ -143,6 +144,22 @@
                                 <option value="">-- Select Stream --</option>
                                 @foreach ($streams as $stream)
                                 <option value="{{ $stream->id }}">{{ $stream->name }}</option>
+                                @endforeach
+                            </select>
+                            @error('stream_id')
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-9">
+                            <label for="hostel" class="form-label">Hostel</label>
+                            <select wire:model="hostel_id" id="hostel"
+                                class="form-select @error('hostel_id') is-invalid @enderror">
+                                <option value="">-- Select Hostel --</option>
+                                @foreach ($hostels as $hostel)
+                                <option value="{{ $hostel->id }}">{{ $hostel->name }}</option>
                                 @endforeach
                             </select>
                             @error('stream_id')

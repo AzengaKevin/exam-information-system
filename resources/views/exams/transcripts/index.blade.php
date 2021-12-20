@@ -20,7 +20,6 @@
         <div class="card">
             <div class="card-header py-3">
                 <div class="d-flex align-items-center justify-content-between">
-                    <h5>Name Report Form</h5>
                     <div class="d-inline-flex">
                         <a href="{{ route('exams.transcripts.print', [
                             'exam' => $exam,

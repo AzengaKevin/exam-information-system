@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Hostel;
 use App\Models\Level;
 use App\Models\Stream;
 use App\Models\Student;
@@ -26,6 +27,7 @@ class StudentFactory extends Factory
             'gender' => $this->faker->randomElement(User::genderOptions()),
             'admission_level_id' => Level::factory(),
             'stream_id' => Stream::factory(),
+            'hostel_id' => Hostel::factory(),
             'description' => $this->faker->paragraph()
         ];
     }

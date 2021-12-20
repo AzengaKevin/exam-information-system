@@ -18,13 +18,13 @@ class Hostels extends Component
     public function render()
     {
         return view('livewire.hostels', [
-            'hostels' => $this->getPaginatedHostels()
+            'hostels' => $this->getAllHostels()
         ]);
     }
 
-    public function getPaginatedHostels()
+    public function getAllHostels()
     {
-        return Hostel::get();
+        return Hostel::with('students')->get();
     }
 
     /**
@@ -53,23 +53,25 @@ class Hostels extends Component
 
     function createHostel()
     {
-        $this->validate();
+        $data = $this->validate();
         
         try {
 
-            Hostel::create([
-                'name'=>$this->name,
-                'description'=>$this->description ,
-            ]);
+            $hostel = Hostel::create($data);
+
+            session()->flash('status', "{$hostel->name} has been succefully added");
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
                 'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
+            session()->flash('error', 'Hostel addition failed, check logs for more intel');
+
         }
+
         $this->emit('hide-upsert-hostel-modal');
     }
 

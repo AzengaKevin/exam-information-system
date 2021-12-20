@@ -7,7 +7,7 @@
                 <tr>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Description</th>
+                    <th>Students</th>
                     <th>Created</th>
                     <th>Actions</th>
                 </tr>
@@ -18,7 +18,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $hostel->name }}</td>
-                    <td>{{ $hostel->description }}</td>
+                    <td>{{ $hostel->students->count() }}</td>
                     <td>{{ $hostel->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">

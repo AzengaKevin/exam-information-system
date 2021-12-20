@@ -15,6 +15,7 @@ class Student extends Model
         'dob',
         'gender',
         'level_id',
+        'hostel_id',
         'kcpe_marks',
         'kcpe_grade',
         'admission_level_id',
@@ -72,5 +73,11 @@ class Student extends Model
         return $this->belongsToMany(Exam::class)
             ->withPivot(['mm','tm','mp','tp','mg','sp','op'])
             ->withTimestamps();
+    }
+
+    public function hostel()
+    {
+        return $this->belongsTo(Hostel::class)
+            ->withDefault(['name' => 'N/A']);
     }
 }
