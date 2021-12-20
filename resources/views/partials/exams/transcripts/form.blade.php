@@ -10,20 +10,20 @@
                 <hr style="height: .5px; background-color: black; margin-top: 1px;">
             </div>
         </div>
-        <h2 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.25rem;">Form 1 - term 2 consolidated exam results year 2021 - (2021 Term 2)</h2>
+        <h2 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.25rem;">{{ $exam->name }}</h2>
         <table class="w-100">
             <tbody>
                 <tr>
                     <th class="text-start">NAME:</th>
-                    <td class="text-left" colspan="5">Loyrd Onyango W.</td>
+                    <td class="text-left" colspan="5">{{ $studentScores->name }}</td>
                 </tr>
                 <tr>
                     <th class="text-start">ADMNO:</th>
-                    <td class="text-left">23419</td>
+                    <td class="text-left">{{ $studentScores->adm_no }}</td>
                     <th class="text-start">FORM:</th>
-                    <td class="text-left">1 Green</td>
+                    <td class="text-left">{{ $studentScores->alias }}</td>
                     <th class="text-start">HOSTEL:</th>
-                    <td class="text-left">Longonot A</td>
+                    <td class="text-left">{{ $studentScores->hostel ?? 'N/A' }}</td>
                 </tr>
             </tbody>
         </table>
@@ -42,12 +42,12 @@
             <tbody>
                 <tr>
                     <th>VALUE</th>
-                    <td>828</td>
-                    <td>75%</td>
-                    <td>115</td>
-                    <td>A-</td>
-                    <td>18</td>
-                    <td>1</td>
+                    <td>{{ $studentScores->tm ?? '-' }}</td>
+                    <td>{{ $studentScores->mm ?? '-' }}{{ ($studentScores->mm) ? "%" : "" }}</td>
+                    <td>{{ $studentScores->tp ?? '-' }}</td>
+                    <td>{{ $studentScores->mg ?? '-' }}</td>
+                    <td>{{ $studentScores->op ?? '-' }}</td>
+                    <td>{{ $studentScores->sp ?? '-' }}</td>
                 </tr>
                 <tr>
                     <th>OUT OF</th>
@@ -78,166 +78,23 @@
                 </tr>
             </thead>
             <tbody>
+
+                @foreach ($subjectColums as $col)
+                @if (!is_null($studentScores->$col))
                 <tr>
-                    <td>
-                        <div>English</div>
-                    </td>
-                    <td><span>63%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right">
-                            <i class="fa fa-long-arrow-right text-warning"></i>
-                        </span>
-                    </td>
-                    <td><span>B-</span></td>
-                    <td><span>10 / 69</span></td>
-                    <td>
-                        <span>Satisfactory, aim higher</span>
-                    </td>
-                    <td>
-                        <span>Ms. Emilly Messo</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Kiswahili</div>
-                    </td>
-                    <td><span>76%</span></td>
+                    @php
+                    $subjectScore = json_decode($studentScores->$col);
+                    @endphp
+                    <td class="text-uppercase">{{ $subjectsMap[$col] ?? $col }}</td>
+                    <td>{{ $subjectScore->score }}%</td>
                     <td>0</td>
-                    <td><span>A-</span></td>
-                    <td><span>11 / 69</span></td>
-                    <td><span>Vizuri</span></td>
-                    <td><span>Ms. Rhenis Awino</span></td>
+                    <td>{{ $subjectScore->grade }}</td>
+                    <td>10 / 69</td>
+                    <td>Satisfactory, aim higher</td>
+                    <td>Ms. Emilly Messo</td>
                 </tr>
-                <tr>
-                    <td>
-                        <div>Mathematics</div>
-                    </td>
-                    <td><span>74%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>B+</span></td>
-                    <td><span>6 / 69</span></td>
-                    <td><span>Goodwork but aim higher</span></td>
-                    <td><span>Zadock Odiembo</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Biology</div>
-                    </td>
-                    <td><span>80%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>A</span></td>
-                    <td><span>4 / 69</span></td>
-                    <td><span>Excellent work</span></td>
-                    <td><span>Achan Kevin</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Physics</div>
-                    </td>
-                    <td><span>72%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>B+</span></td>
-                    <td><span>3 / 69</span></td>
-                    <td><span>Good work but aim higher</span></td>
-                    <td><span>Mr. Isaac Oketch</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Chemistry</div>
-                    </td>
-                    <td><span>66%</span></td>
-                    <td>
-                        <span>0</span><span class="pull-right"><i
-                                class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>B</span></td>
-                    <td><span>10 / 69</span></td>
-                    <td><span>Good, can do better</span></td>
-                    <td><span>Austine Odhiambo</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>History and Government</div>
-                    </td>
-                    <td><span>79%</span></td>
-                    <td>
-                        <span>0</span><span class="pull-right"><i
-                                class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>A-</span></td>
-                    <td><span>2 / 68</span></td>
-                    <td><span>Very good work</span></td>
-                    <td><span>Ms. Damaris Otuoma</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Geography</div>
-                    </td>
-                    <td><span>86%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>A</span></td>
-                    <td><span>4 / 68</span></td>
-                    <td><span>Excellent work</span></td>
-                    <td><span>Mr. Benard Olang</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>C.R.E.</div>
-                    </td>
-                    <td><span>74%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>B-</span></td>
-                    <td><span>6 / 62</span></td>
-                    <td>
-                        <span>Satisfactory, aim higher</span>
-                    </td>
-                    <td>
-                        <span>Mrs. Brenda Owuor</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Computer Studies</div>
-                    </td>
-                    <td><span>77%</span></td>
-                    <td>
-                        <span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>A-</span></td>
-                    <td><span>9 / 37</span></td>
-                    <td><span>Very good work</span></td>
-                    <td><span>Abel Bulukhu</span></td>
-                </tr>
-                <tr>
-                    <td>
-                        <div>Business Studies</div>
-                    </td>
-                    <td><span>81%</span></td>
-                    <td><span>0</span>
-                        <span class="pull-right"><i class="fa fa-long-arrow-right text-warning"></i></span>
-                    </td>
-                    <td><span>A</span></td>
-                    <td><span>1 / 69</span></td>
-                    <td> <span>Excellent work</span></td>
-                    <td><span>Mr. George Osano</span></td>
-                </tr>
+                @endif
+                @endforeach
             </tbody>
         </table>
     </div>
@@ -245,7 +102,7 @@
     <div>
 
         <h2 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.25rem;">Remarks</h2>
-        
+
         <table style="width: 100%;">
             <thead></thead>
             <tbody>

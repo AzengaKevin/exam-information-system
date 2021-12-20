@@ -40,6 +40,8 @@ Route::get('/', function(){
     return view('welcome');
 })->name('welcome');
 
+Route::view('test/report-form', 'printouts.exams.report-form');
+
 Route::group(['middleware' => ['auth']], function(){
     
     Route::get('/home', HomeController::class)->name('home');
@@ -101,6 +103,9 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::resource('exams.transcripts', ExamsTranscriptsController::class)
         ->only(['index']);
+
+    Route::get('/exams/{exam}/transcripts/print', [ExamsTranscriptsController::class, 'print'])
+        ->name('exams.transcripts.print');
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');
