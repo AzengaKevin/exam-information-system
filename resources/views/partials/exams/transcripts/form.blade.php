@@ -2,9 +2,9 @@
     <div>
         <div class="text-center">
             <div class="fw-bold">
-                <h1 class="fw-bold">NYANG'ORI BOYS' HIGH SCHOOL</h1>
-                <div class="fw-bold">251 Kisumu</div>
-                <div class="fw-bold">0708815177</div>
+                <h1 class="fw-bold">KISUMU BOYS' HIGH SCHOOL</h1>
+                <div class="fw-bold">1973 Kisumu</div>
+                <div class="fw-bold">Tel: +254-57-2020164</div>
                 <div class="fw-bold">kisumuboys1973@gmail.com</div>
                 <hr style="height: 2px; background-color: black; margin-bottom: 0px;">
                 <hr style="height: .5px; background-color: black; margin-top: 1px;">

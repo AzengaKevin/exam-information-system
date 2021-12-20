@@ -61,11 +61,13 @@
             <tfoot>
                 <tr>
                     <td colspan="8">
-                        {{ $students->links() }}
-                        @if ($students->count())
-                        <div class="text-muted">{{ $students->firstItem() }} - {{ $students->lastItem() }} out of
-                            {{ $students->total() }}</div>
-                        @endif
+                        <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
+                            {{ $students->links() }}
+                            @if ($students->count())
+                            <div class="text-muted ms-md-3">{{ $students->firstItem() }} - {{ $students->lastItem() }} out of
+                                {{ $students->total() }}</div>
+                            @endif
+                        </div>
                     </td>
                 </tr>
             </tfoot>
@@ -76,6 +78,7 @@
         :studentId="$studentId"
         :streams="$streams"
         :levels="$levels"
+        :hostels="$hostels"
         :genderOptions="$genderOptions"
         :kcpeGradeOptions="$kcpeGradeOptions" />
 

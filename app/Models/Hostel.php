@@ -17,7 +17,12 @@ class Hostel extends Model
     {
         $this->attributes['name'] = $value;
         
-        $this->attributes['slug'] = Str::slug($value); 
+        $this->attributes['slug'] = Str::slug($value);
+    }
+
+    public function students()
+    {
+        return $this->hasMany(Student::class);
     }
 
 }

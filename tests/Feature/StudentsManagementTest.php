@@ -90,6 +90,7 @@ class StudentsManagementTest extends TestCase
             ->set('dob', $payload['dob'])
             ->set('admission_level_id', $payload['admission_level_id'])
             ->set('stream_id', $payload['stream_id'])
+            ->set('hostel_id', $payload['hostel_id'])
             ->set('description', $payload['description'])
             ->call('addStudent');
 
@@ -102,6 +103,7 @@ class StudentsManagementTest extends TestCase
         $this->assertEquals($payload['gender'], $student->gender);
         $this->assertEquals($payload['admission_level_id'], $student->admission_level_id);
         $this->assertEquals($payload['level_id'], $student->level_id);
+        $this->assertEquals($payload['hostel_id'], $student->hostel_id);
 
         $this->assertNotNull($student->level_unit_id);
         
@@ -142,6 +144,7 @@ class StudentsManagementTest extends TestCase
             ->set('kcpe_grade', $payload['kcpe_grade'])
             ->set('dob', $payload['dob'])
             ->set('level_id', $payload['level_id'])
+            ->set('hostel_id', $payload['hostel_id'])
             ->set('stream_id', $payload['stream_id'])
             ->set('description', $payload['description'])
             ->call('updateStudent');
@@ -150,6 +153,7 @@ class StudentsManagementTest extends TestCase
         $this->assertEquals($payload['name'], $student->fresh()->name);
         $this->assertEquals($payload['gender'], $student->fresh()->gender);
         $this->assertEquals($payload['level_id'], $student->fresh()->level_id);
+        $this->assertEquals($payload['hostel_id'], $student->fresh()->hostel_id);
 
         $this->assertEquals($LevelUnit->id, $student->fresh()->level_unit_id);
     }
