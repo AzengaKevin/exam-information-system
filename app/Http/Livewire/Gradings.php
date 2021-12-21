@@ -2,10 +2,12 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\Grade;
 use App\Models\Grading;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Log;
 
 class Gradings extends Component
 {
@@ -17,14 +19,17 @@ class Gradings extends Component
 
     public function mount()
     {
-        foreach (array_reverse(Grading::gradeOptions()) as $index => $value) {
+        /** @var Collection */
+        $grades = Grade::all(['grade', 'points']);
+
+        $grades->each(function($grade){
             array_push($this->values, [
-                "grade" => $value,
-                "points" => $index + 1,
+                "grade" => $grade->grade,
+                "points" => $grade->points,
                 "min" => null,
                 "max" => null,
             ]);
-        }
+        });
         
     }
 
@@ -56,7 +61,7 @@ class Gradings extends Component
     public function addGrading()
     {
         $data = $this->validate();
-        
+
         try {
             $grading = Grading::create($data);
 

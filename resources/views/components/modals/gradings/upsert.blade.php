@@ -33,7 +33,7 @@
                             <div class="col-12">
                                 <div class="input-group">
                                     <select wire:model.lazy="values.{{ $index }}.grade" id="values-grade-{{ $index }}"
-                                        class="form-select @error('values.{{ $index }}.grade') is-invalid @enderror">
+                                        class="form-select @error('values.{{ $index }}.grade') is-invalid @enderror" disabled>
                                         <option value="">-- Select --</option>
                                         @foreach ($grades as $item)
                                         <option value="{{ $item }}">{{ $item }}</option>
@@ -41,7 +41,7 @@
                                     </select>
                                     <input type="number" wire:model.lazy="values.{{ $index }}.points" min="0" max="12"
                                         id="values-points-{{ $index }}" placeholder="Points"
-                                        class="form-control @error('values.{{ $index }}.points') is-invalid @enderror">
+                                        class="form-control @error('values.{{ $index }}.points') is-invalid @enderror" disabled>
                                     <input type="number" wire:model.lazy="values.{{ $index }}.min" min="0" max="100"
                                         id="values-min-{{ $index }}" placeholder="Min"
                                         class="form-control @error('values.{{ $index }}.min') is-invalid @enderror">

@@ -181,7 +181,6 @@ class ExamsScoresController extends Controller
 
                 }
                 
-                
                 DB::table(Str::slug($exam->shortname))
                     ->updateOrInsert([
                         "admno" => $admno
@@ -208,7 +207,7 @@ class ExamsScoresController extends Controller
                 'exam-id' => $exam->id
             ]);
 
-            session()->flash('error', 'A fata error occurred check with the admin');
+            session()->flash('error', 'A fatal error occurred while uploading scores check with the admin incase of recurrence');
 
             return back();
             

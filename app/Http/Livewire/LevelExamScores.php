@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Exam;
+use App\Models\Grade;
 use App\Models\Level;
 use App\Models\Grading;
 use Livewire\Component;
@@ -71,7 +72,7 @@ class LevelExamScores extends Component
     public function getColumns()
     {
         /** @var array */
-        $columns = $this->exam->subjects->pluck("shortname")->toArray();
+        $columns = $this->getSubjectColumns();
 
         /** @var array */
         $aggregateCols = $this->getAggreagateColumns();
@@ -101,9 +102,9 @@ class LevelExamScores extends Component
                 $avgTotal = number_format($data->avg_total, 2);
                 $avgPoints = number_format($data->avg_points, 4);
     
-                $pgm = Grading::pointsGradeMap();
+                $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
     
-                $avgGrade = $pgm[intval(round($avgPoints))];
+                $avgGrade = $pgm[intval(round($avgPoints))] ?? 'P';
     
                 $this->exam->levels()->syncWithoutDetaching([
                     $this->level->id => [
@@ -217,7 +218,7 @@ class LevelExamScores extends Component
                     $avgTotal = number_format($data->avg_score, 2);
                     $avgPoints = number_format($data->avg_points, 4);
     
-                    $pgm = Grading::pointsGradeMap();
+                    $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
     
                     $avgGrade = $pgm[intval(round($avgPoints))];
     
