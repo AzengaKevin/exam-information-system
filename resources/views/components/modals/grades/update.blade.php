@@ -9,16 +9,6 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="">
-                    <label for="grade" class="form-label">Grade</label>
-                    <input type="text" wire:model.lazy="grade" id="grade"
-                        class="form-control @error('grade') is-invalid @enderror">
-                    @error('grade')
-                    <span class="invalid-feedback">
-                        <strong>{{ $message }}</strong>
-                    </span>
-                    @enderror
-                </div>
                 <div class="mt-3">
                     <label for="points" class="form-label">Points</label>
                     <input type="number" wire:model.lazy="points" id="points" min="0" max="12"
@@ -30,20 +20,20 @@
                     @enderror
                 </div>
                 <div class="mt-3">
-                    <label for="english-comments" class="form-label">English Comments</label>
-                    <textarea wire:model.lazy="english_comments" id="english-comments" cols="100" rows="3"
-                        class="form-control @error('english_comments') is-invalid @enderror"></textarea>
-                    @error('english_comments')
+                    <label for="english-comment" class="form-label">English Comment</label>
+                    <textarea wire:model.lazy="english_comment" id="english-comment" cols="100" rows="3"
+                        class="form-control @error('english_comment') is-invalid @enderror"></textarea>
+                    @error('english_comment')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>
                     </span>
                     @enderror
                 </div>
                 <div class="mt-3">
-                    <label for="swahili-comments" class="form-label">Swahili Comments</label>
-                    <textarea wire:model.lazy="swahili_comments" id="swahili-comments" cols="100" rows="3"
-                        class="form-control @error('swahili_comments') is-invalid @enderror"></textarea>
-                    @error('swahili_comments')
+                    <label for="swahili-comment" class="form-label">Swahili Comments</label>
+                    <textarea wire:model.lazy="swahili_comment" id="swahili-comment" cols="100" rows="3"
+                        class="form-control @error('swahili_comment') is-invalid @enderror"></textarea>
+                    @error('swahili_comment')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>
                     </span>

@@ -20,7 +20,7 @@
 
 @push('scripts')
 <script>
-    livewire.on('show-update-grading-modal', () => $('#update-grading-modal').modal('show'))
-    livewire.on('hide-update-grading-modal', () => $('#update-grading-modal').modal('hide'))
+    livewire.on('show-update-grade-modal', () => $('#update-grade-modal').modal('show'))
+    livewire.on('hide-update-grade-modal', () => $('#update-grade-modal').modal('hide'))
 </script>
 @endpush

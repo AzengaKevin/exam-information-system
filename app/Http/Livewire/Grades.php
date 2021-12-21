@@ -4,7 +4,6 @@ namespace App\Http\Livewire;
 
 use App\Models\Grade;
 use Livewire\Component;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
 class Grades extends Component
@@ -14,6 +13,8 @@ class Grades extends Component
     public $swahili_comment;
     public $grade;
     public $points;
+
+    public $gradeId;
 
     public function render()
     {
@@ -39,20 +40,24 @@ class Grades extends Component
         $this->grade = $grade->grade;
         $this->points = $grade->points;
 
-        $this->emit('show-upsert-grade-modal');
+        $this->gradeId = $grade->id;
+
+        $this->emit('show-update-grade-modal');
     }
 
     public function rules()
     {
         return [
-            'low' => ['bail', 'required'],
-            'high' => ['bail', 'required'],
-            'points' => ['bail', 'required'],
-            'grade' => ['bail', 'required'],
+            'english_comment' => ['bail', 'required'],
+            'swahili_comment' => ['bail', 'required'],
+            'points' => ['bail', 'required', 'integer', 'between:0,12']
         ];
     }
 
 
+    /** 
+     * Update a database grade record
+     */
     public function updateGrade()
     {
         $data = $this->validate();
@@ -64,17 +69,23 @@ class Grades extends Component
 
             if($grade->update($data)){
 
+                $this->reset();
+
                 session()->flash('status', 'grade been successfully updated');
 
-                $this->emit('hide-upsert-grade-modal');
+                $this->emit('hide-update-grade-modal');
             }
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->gradeId,
+                'grade-id' => $this->gradeId,
                 'action' => __METHOD__
             ]);
+
+            session()->flash('error', 'Updating Grade Failed');
+
+            $this->emit('hide-update-grade-modal');
 
         }
     }
