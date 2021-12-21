@@ -51,12 +51,12 @@
                 </tr>
                 <tr>
                     <th>OUT OF</th>
-                    <td>1100</td>
-                    <td>100%</td>
-                    <td>132</td>
-                    <td>A</td>
-                    <td>602</td>
-                    <td>69</td>
+                    <td>{{ $outOfs['tm'] ?? '-' }}</td>
+                    <td>{{ $outOfs['mm'] ?? '-' }}%</td>
+                    <td>{{ $outOfs['tp'] ?? '-' }}</td>
+                    <td>{{ $outOfs['mg'] ?? '-' }}</td>
+                    <td>{{ $outOfs['lsc'] ?? '-' }}</td>
+                    <td>{{ $outOfs['lusc'] ?? '-' }}</td>
                 </tr>
             </tbody>
         </table>
@@ -90,8 +90,13 @@
                     <td>0</td>
                     <td>{{ $subjectScore->grade }}</td>
                     <td>10 / 69</td>
-                    <td>Satisfactory, aim higher</td>
-                    <td>Ms. Emilly Messo</td>
+
+                    @if ($col == 'kis')
+                    <td>{{ $swahiliComments[$subjectScore->grade] ?? 'Hakuna maoni' }}</td>
+                    @else
+                    <td>{{ $englishComments[$subjectScore->grade] ?? 'No Comments' }}</td>
+                    @endif
+                    <td>{{ $teachers[$col] ?? '-' }}</td>
                 </tr>
                 @endif
                 @endforeach
