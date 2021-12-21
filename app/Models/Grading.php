@@ -21,25 +21,8 @@ class Grading extends Model
     public static function gradeOptions(): array
     {
         return [
-            'Y', 'X', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E'
+            'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'E', 'P', 'X', 'Y', 'Z' 
         ];
     }
-
-    public static function pointsGradeMap() : array
-    {
-        return [
-            12 => 'A',
-            11 => 'A-',
-            10 => 'B+',
-            9 => 'B',
-            8 => 'B-',
-            7 => 'C+',
-            6 => 'C',
-            5 => 'C-',
-            4 => 'D+',
-            3 => 'D',
-            2 => 'D-',
-            1 => 'E',
-        ];
-    }
+    
 }

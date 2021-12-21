@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use Tests\TestCase;
 use App\Models\Exam;
 use App\Models\Role;
+use App\Models\Grade;
 use Livewire\Livewire;
 use App\Models\Grading;
 use App\Models\Student;
@@ -15,8 +16,8 @@ use Illuminate\Support\Str;
 use App\Models\Responsibility;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Actions\Exam\CreateScoresTable;
 use App\Http\Livewire\LevelExamScores;
+use App\Actions\Exam\CreateScoresTable;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -96,6 +97,7 @@ class LevelsExamsManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
         $this->artisan('db:seed --class=SubjectsSeeder');
 
         // Create the Level Unit
@@ -180,7 +182,7 @@ class LevelsExamsManagementTest extends TestCase
             $avgPoints = round($totalPoints / $populatedCols);
             $avgScore = round($totalScore / $populatedCols);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[$avgPoints];
 
@@ -221,6 +223,7 @@ class LevelsExamsManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
         $this->artisan('db:seed --class=SubjectsSeeder');
 
         // Create the Level Unit
@@ -305,7 +308,7 @@ class LevelsExamsManagementTest extends TestCase
             $avgPoints = round($totalPoints / $populatedCols);
             $avgScore = round($totalScore / $populatedCols);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[$avgPoints];
 
@@ -335,6 +338,7 @@ class LevelsExamsManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
         $this->artisan('db:seed --class=SubjectsSeeder');
 
         // Create the Level Unit
@@ -419,7 +423,7 @@ class LevelsExamsManagementTest extends TestCase
             $avgPoints = round($totalPoints / $populatedCols);
             $avgScore = round($totalScore / $populatedCols);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[$avgPoints];
 
@@ -449,6 +453,7 @@ class LevelsExamsManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
         $this->artisan('db:seed --class=SubjectsSeeder');
 
         // Create the Level Unit
@@ -533,7 +538,7 @@ class LevelsExamsManagementTest extends TestCase
             $avgPoints = round($totalPoints / $populatedCols);
             $avgScore = round($totalScore / $populatedCols);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[$avgPoints];
 
@@ -575,6 +580,7 @@ class LevelsExamsManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
         $this->artisan('db:seed --class=SubjectsSeeder');
 
         // Create the Level Unit
@@ -661,7 +667,7 @@ class LevelsExamsManagementTest extends TestCase
             $avgPoints = round($totalPoints / $populatedCols);
             $avgScore = round($totalScore / $populatedCols);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[$avgPoints];
 

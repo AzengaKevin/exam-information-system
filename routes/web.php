@@ -122,11 +122,13 @@ Route::group(['middleware' => ['auth']], function(){
     Route::resource('hostels',HostelsController::class)
         ->only('index');
     
+    Route::resource('grades',GradesController::class)
+        ->only('index');
+
     Route::resource('gradings',GradingsController::class)
         ->only('index');
   
     Route::get('hostels/{hostel:slug}',[HostelsController::class,'show'])->name('hostels.show');
 
-    Route::get('/grades',[GradesController::class,'index'])->name('grades.index');
 
 });

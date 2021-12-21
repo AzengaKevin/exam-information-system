@@ -2,15 +2,13 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover text-center">
+        <table class="table table-hover">
             <thead>
                 <tr>
-                    {{-- <th>#</th> --}}
-                    <th>Low</th>
-                    <th>High</th>
                     <th>Grade</th>
                     <th>Points</th>
-                    <th>Created</th>
+                    <th>English Comment</th>
+                    <th>Swahili Comment</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -18,23 +16,15 @@
                 @if ($grades->count())
                 @foreach ($grades as $grade)
                 <tr>
-                    {{-- <td>{{ $loop->iteration }}</td> --}}
-                    <td>{{ $grade->low }}</td>
-                    <td>{{ $grade->high }}</td>
                     <td>{{ $grade->grade }}</td>
                     <td>{{ $grade->points }}</td>
-                    <td>{{ $grade->created_at->format('d/m/Y') }}</td>
+                    <td>{{ $grade->english_comment }}</td>
+                    <td>{{ $grade->swahili_comment }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center justify-content-center">
-                            <button wire:click="editGrade({{ $grade }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
-                                <i class="fa fa-edit"></i>
-                                <span>Edit</span>
-                            </button>
-                            <button wire:click="showDeleteGradeModal({{ $grade }})" class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
-                                <span>Delete</span>
-                            </button>
-                        </div>
+                        <button wire:click="editGrade({{ $grade }})" class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                            <i class="fa fa-edit"></i>
+                            <span>Edit</span>
+                        </button>
                     </td>
                 </tr>
                 @endforeach
@@ -49,7 +39,6 @@
         </table>
     </div>
 
-    <x-modals.grades.upsert :gradeId="$gradeId" />
-    <x-modals.grades.delete :points="$points" />
-    
+    <x-modals.grades.update :grade="$grade" />
+
 </div>

@@ -4,142 +4,89 @@ namespace App\Http\Livewire;
 
 use App\Models\Grade;
 use Livewire\Component;
-use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
 class Grades extends Component
 {
-    public $gradeId;
 
-    public $low;
-    public $high;
+    public $english_comment;
+    public $swahili_comment;
     public $grade;
     public $points;
+
+    public $gradeId;
 
     public function render()
     {
         return view('livewire.grades', [
-            'grades' => $this->getPaginatedGrades()
+            'grades' => $this->getAllGrades()
         ]);
     }
 
-    public function getPaginatedGrades()
+    public function getAllGrades()
     {
-        return Grade::where('exam_id',NULL)->get();
+        return Grade::all();
     }
 
     /**
-     * Show upsert user modal for editing and updating user
+     * Show upsert grade modal for editing and updating user
      * 
-     * @param User $user
+     * @param Grade $user
      */
     public function editGrade(Grade $grade)
     {
-        
-        $this->gradeId = $grade->id;
-
-        $this->low = $grade->low;
-        $this->high = $grade->high;
+        $this->english_comment = $grade->english_comment;
+        $this->swahili_comment = $grade->swahili_comment;
         $this->grade = $grade->grade;
         $this->points = $grade->points;
 
-        $this->emit('show-upsert-grade-modal');
+        $this->gradeId = $grade->id;
+
+        $this->emit('show-update-grade-modal');
     }
 
     public function rules()
     {
         return [
-            'low' => ['bail', 'required'],
-            'high' => ['bail', 'required'],
-            'points' => ['bail', 'required'],
-            'grade' => ['bail', 'required'],
+            'english_comment' => ['bail', 'required'],
+            'swahili_comment' => ['bail', 'required'],
+            'points' => ['bail', 'required', 'integer', 'between:0,12']
         ];
     }
 
-    function createGrade()
-    {
-        $this->validate();
-        try {
-            Grade::create([
-                'low'=>$this->low,
-                'high'=>$this->high,
-                'grade'=>$this->grade,
-                'points'=>$this->points,
-            ]);
-            
-        } catch (\Exception $exception) {
-            
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->gradeId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
 
-        }
-        $this->emit('hide-upsert-grade-modal');
-    }
-
-
+    /** 
+     * Update a database grade record
+     */
     public function updateGrade()
     {
         $data = $this->validate();
 
         try {
 
-            /** @var User */
+            /** @var Grade */
             $grade = Grade::findOrFail($this->gradeId);
 
             if($grade->update($data)){
 
-                session()->flash('status', 'grade successfully updated');
+                $this->reset();
 
-                $this->emit('hide-upsert-grade-modal');
+                session()->flash('status', 'grade been successfully updated');
+
+                $this->emit('hide-update-grade-modal');
             }
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->gradeId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'grade-id' => $this->gradeId,
+                'action' => __METHOD__
             ]);
 
-        }
-    }
+            session()->flash('error', 'Updating Grade Failed');
 
-    public function showDeleteGradeModal(Grade $grade)
-    {
-        $this->grade = $grade->id;
+            $this->emit('hide-update-grade-modal');
 
-        $this->points = $grade->points;
-
-        $this->emit('show-delete-grade-modal');
-        
-    }
-
-    public function deleteGrade(Grade $grade)
-    {
-        try {
-
-            $grade = Grade::findOrFail($this->departmtneId);
-
-            if($grade->delete()){
-
-                $this->reset(['gradeId', 'points']);
-
-                session()->flash('status', 'The grade has been successfully deleted');
-
-                $this->emit('hide-delete-grade-modal');
-            }
-
-        } catch (\Exception $exception) {
-            
-            Log::error($exception->getMessage(), [
-                'grade-id' => $this->departmtneId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
-
-            session()->flash('error', 'A fatal error has occurred');
-
-            $this->emit('hide-delete-grade-modal');
         }
     }
 }

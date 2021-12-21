@@ -3,15 +3,16 @@
 namespace App\Http\Livewire;
 
 use App\Models\Exam;
+use App\Models\Grade;
 use App\Models\Grading;
 use Livewire\Component;
 use App\Models\LevelUnit;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Validation\Rule;
 
 class LevelUnitExamScores extends Component
 {
@@ -131,7 +132,7 @@ class LevelUnitExamScores extends Component
                 $avgPoints = round($totalPoints / $populatedCols);
                 $avgScore = round($totalScore / $populatedCols);
 
-                $pgm = Grading::pointsGradeMap();
+                $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
                 $avgGrade = $pgm[$avgPoints];
 
@@ -214,7 +215,7 @@ class LevelUnitExamScores extends Component
             $avgPoints = intval($totalPoints / $populatedCols);
             $avgScore = intval($totalScore / $populatedCols);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[$avgPoints];
 
@@ -268,7 +269,7 @@ class LevelUnitExamScores extends Component
             $avgTotal = number_format($data->avg_total, 2);
             $avgPoints = number_format($data->avg_points, 4);
 
-            $pgm = Grading::pointsGradeMap();
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[intval(round($avgPoints))];
 
