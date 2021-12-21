@@ -38,7 +38,24 @@ class ExamsTranscriptsController extends Controller
             $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
 
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
+
             $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
+
+            // Get subject teachers
+            $student = Student::where('adm_no', $admno)->first();
+
+            if ($student) {
+
+                $teachers = DB::table('responsibility_teacher')
+                    ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
+                    ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
+                    ->join('users', function($join){
+                        $join->on('teachers.id', '=', 'users.authenticatable_id')
+                             ->where('users.authenticatable_type', 'teacher');
+                    })->select('users.name', 'subjects.shortname')
+                        ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
+                        ->get()->pluck('name', 'shortname')->toArray();
+            }
             
             $studentScores = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColums, $aggregateColumns))
@@ -77,7 +94,8 @@ class ExamsTranscriptsController extends Controller
             'subjectColums' => $subjectColums ?? [],
             'subjectsMap' => $subjectsMap ?? [],
             'swahiliComments' => $swahiliComments ?? [],
-            'englishComments' => $englishComments ?? []
+            'englishComments' => $englishComments ?? [],
+            'teachers' => $teachers ?? []
         ]);
     }
 
@@ -99,6 +117,22 @@ class ExamsTranscriptsController extends Controller
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
             $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
+
+            // Get subject teachers
+            $student = Student::where('adm_no', $admno)->first();
+
+            if ($student) {
+
+                $teachers = DB::table('responsibility_teacher')
+                    ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
+                    ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
+                    ->join('users', function($join){
+                        $join->on('teachers.id', '=', 'users.authenticatable_id')
+                                ->where('users.authenticatable_type', 'teacher');
+                    })->select('users.name', 'subjects.shortname')
+                        ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
+                        ->get()->pluck('name', 'shortname')->toArray();
+            }
             
             $studentScores = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColums, $aggregateColumns))
@@ -115,7 +149,8 @@ class ExamsTranscriptsController extends Controller
                 'subjectColums' => $subjectColums ?? [],
                 'subjectsMap' => $subjectsMap ?? [],
                 'swahiliComments' => $swahiliComments ?? [],
-                'englishComments' => $englishComments ?? []
+                'englishComments' => $englishComments ?? [],
+                'teachers' => $teachers ?? []
             ]);
     
             return $pdf->download("{$exam->shortname}-{$admno}.pdf");

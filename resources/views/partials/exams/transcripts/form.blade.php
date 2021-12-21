@@ -96,7 +96,7 @@
                     @else
                     <td>{{ $englishComments[$subjectScore->grade] ?? 'No Comments' }}</td>
                     @endif
-                    <td>Ms. Emilly Messo</td>
+                    <td>{{ $teachers[$col] ?? '-' }}</td>
                 </tr>
                 @endif
                 @endforeach
