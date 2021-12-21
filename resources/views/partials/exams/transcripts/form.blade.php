@@ -90,7 +90,12 @@
                     <td>0</td>
                     <td>{{ $subjectScore->grade }}</td>
                     <td>10 / 69</td>
-                    <td>Satisfactory, aim higher</td>
+
+                    @if ($col == 'kis')
+                    <td>{{ $swahiliComments[$subjectScore->grade] ?? 'Hakuna maoni' }}</td>
+                    @else
+                    <td>{{ $englishComments[$subjectScore->grade] ?? 'No Comments' }}</td>
+                    @endif
                     <td>Ms. Emilly Messo</td>
                 </tr>
                 @endif

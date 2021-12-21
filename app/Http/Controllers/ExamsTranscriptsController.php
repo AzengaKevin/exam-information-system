@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Exam;
+use App\Models\Grade;
 use App\Models\Level;
 use App\Models\Student;
 use App\Models\LevelUnit;
@@ -35,6 +36,9 @@ class ExamsTranscriptsController extends Controller
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
 
             $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
+
+            $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
+            $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
             
             $studentScores = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColums, $aggregateColumns))
@@ -71,7 +75,9 @@ class ExamsTranscriptsController extends Controller
             'level' => $level ?? null,
             'studentScores' => $studentScores ?? null,
             'subjectColums' => $subjectColums ?? [],
-            'subjectsMap' => $subjectsMap ?? []
+            'subjectsMap' => $subjectsMap ?? [],
+            'swahiliComments' => $swahiliComments ?? [],
+            'englishComments' => $englishComments ?? []
         ]);
     }
 
@@ -80,31 +86,43 @@ class ExamsTranscriptsController extends Controller
 
         $admno = $request->get('admno');
 
-        $examScoresTblName = Str::slug($exam->shortname);
+        if ($admno) {
+            
+            $examScoresTblName = Str::slug($exam->shortname);
+    
+            $subjectColums = $exam->subjects->pluck("shortname")->toArray();
+    
+            $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
+    
+            $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
 
-        $subjectColums = $exam->subjects->pluck("shortname")->toArray();
+            $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
-        $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
+            $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
+            
+            $studentScores = DB::table($examScoresTblName)
+                ->select(array_merge($subjectColums, $aggregateColumns))
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
+                ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
+                ->where("{$examScoresTblName}.admno", $admno)
+                ->first();
+    
+            $pdf = \PDF::loadView("printouts.exams.report-form",  [
+                'exam' => $exam,
+                'studentScores' => $studentScores ?? null,
+                'subjectColums' => $subjectColums ?? [],
+                'subjectsMap' => $subjectsMap ?? [],
+                'swahiliComments' => $swahiliComments ?? [],
+                'englishComments' => $englishComments ?? []
+            ]);
+    
+            return $pdf->download("{$exam->shortname}-{$admno}.pdf");
+        }else{
+            return back();
+        }
 
-        $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
-        
-        $studentScores = DB::table($examScoresTblName)
-            ->select(array_merge($subjectColums, $aggregateColumns))
-            ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
-            ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-            ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-            ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
-            ->where("{$examScoresTblName}.admno", $admno)
-            ->first();
-
-        $pdf = \PDF::loadView("printouts.exams.report-form",  [
-            'exam' => $exam,
-            'studentScores' => $studentScores ?? null,
-            'subjectColums' => $subjectColums ?? [],
-            'subjectsMap' => $subjectsMap ?? []
-        ]);
-
-        return $pdf->download("{$exam->shortname}-{$admno}.pdf");
     }
     
 }
