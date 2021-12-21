@@ -17,7 +17,6 @@ class ExamsTranscriptsController extends Controller
 
     public function index(Request $request, Exam $exam)
     {
-
         $admno = $request->get('admno');
 
         /** @var LevelUnit */
@@ -25,6 +24,8 @@ class ExamsTranscriptsController extends Controller
 
         /** @var Level */
         $level = Level::find(intval($request->get('level')));
+
+        $outOfs = array();
 
         if($admno){
 
@@ -55,6 +56,19 @@ class ExamsTranscriptsController extends Controller
                     })->select('users.name', 'subjects.shortname')
                         ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
                         ->get()->pluck('name', 'shortname')->toArray();
+
+                $outOfs["lsc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_id', $student->level_id)
+                    ->count();
+
+                $outOfs["lusc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_unit_id', $student->level_unit_id)
+                    ->count();
+
             }
             
             $studentScores = DB::table($examScoresTblName)
@@ -65,6 +79,19 @@ class ExamsTranscriptsController extends Controller
                 ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
+
+            $subjectsCount = 0;
+            
+            foreach ($subjectColums as $col) {
+                if(!empty($studentScores->$col)){
+                    $subjectsCount++;
+                }
+            }
+
+            $outOfs["tm"] = $subjectsCount * 100;
+            $outOfs["tp"] = $subjectsCount * 12;
+            $outOfs["mm"] = 100;
+            $outOfs["mg"] = 'A';
 
         }else{
             
@@ -95,7 +122,8 @@ class ExamsTranscriptsController extends Controller
             'subjectsMap' => $subjectsMap ?? [],
             'swahiliComments' => $swahiliComments ?? [],
             'englishComments' => $englishComments ?? [],
-            'teachers' => $teachers ?? []
+            'teachers' => $teachers ?? [],
+            'outOfs' => $outOfs
         ]);
     }
 
@@ -105,6 +133,8 @@ class ExamsTranscriptsController extends Controller
         $admno = $request->get('admno');
 
         if ($admno) {
+
+            $outOfs = array();
             
             $examScoresTblName = Str::slug($exam->shortname);
     
@@ -132,6 +162,18 @@ class ExamsTranscriptsController extends Controller
                     })->select('users.name', 'subjects.shortname')
                         ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
                         ->get()->pluck('name', 'shortname')->toArray();
+
+                $outOfs["lsc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_id', $student->level_id)
+                    ->count();
+
+                $outOfs["lusc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_unit_id', $student->level_unit_id)
+                    ->count();
             }
             
             $studentScores = DB::table($examScoresTblName)
@@ -142,6 +184,19 @@ class ExamsTranscriptsController extends Controller
                 ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
+
+            $subjectsCount = 0;
+            
+            foreach ($subjectColums as $col) {
+                if(!empty($studentScores->$col)){
+                    $subjectsCount++;
+                }
+            }
+
+            $outOfs["tm"] = $subjectsCount * 100;
+            $outOfs["tp"] = $subjectsCount * 12;
+            $outOfs["mm"] = 100;
+            $outOfs["mg"] = 'A';
     
             $pdf = \PDF::loadView("printouts.exams.report-form",  [
                 'exam' => $exam,
@@ -150,7 +205,8 @@ class ExamsTranscriptsController extends Controller
                 'subjectsMap' => $subjectsMap ?? [],
                 'swahiliComments' => $swahiliComments ?? [],
                 'englishComments' => $englishComments ?? [],
-                'teachers' => $teachers ?? []
+                'teachers' => $teachers ?? [],
+                'outOfs' => $outOfs
             ]);
     
             return $pdf->download("{$exam->shortname}-{$admno}.pdf");

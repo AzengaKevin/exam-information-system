@@ -51,12 +51,12 @@
                 </tr>
                 <tr>
                     <th>OUT OF</th>
-                    <td>1100</td>
-                    <td>100%</td>
-                    <td>132</td>
-                    <td>A</td>
-                    <td>602</td>
-                    <td>69</td>
+                    <td>{{ $outOfs['tm'] ?? '-' }}</td>
+                    <td>{{ $outOfs['mm'] ?? '-' }}%</td>
+                    <td>{{ $outOfs['tp'] ?? '-' }}</td>
+                    <td>{{ $outOfs['mg'] ?? '-' }}</td>
+                    <td>{{ $outOfs['lsc'] ?? '-' }}</td>
+                    <td>{{ $outOfs['lusc'] ?? '-' }}</td>
                 </tr>
             </tbody>
         </table>
