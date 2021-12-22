@@ -107,8 +107,11 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/exams/{exam}/transcripts/show', [ExamsTranscriptsController::class, 'show'])
         ->name('exams.transcripts.show');
 
-    Route::get('/exams/{exam}/transcripts/print', [ExamsTranscriptsController::class, 'print'])
-        ->name('exams.transcripts.print');
+    Route::get('/exams/{exam}/transcripts/print-one', [ExamsTranscriptsController::class, 'printOne'])
+        ->name('exams.transcripts.print-one');
+
+    Route::get('/exams/{exam}/transcripts/print-bulk', [ExamsTranscriptsController::class, 'printBulk'])
+        ->name('exams.transcripts.print-bulk');
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');

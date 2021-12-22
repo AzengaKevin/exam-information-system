@@ -6,7 +6,7 @@
 
 <div>
     <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-md-0">
+        <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.index') }}">Exams</a></li>
             <li class="breadcrumb-item"><a href="{{ route('exams.show', $exam) }}">{{ $exam->name }}</a></li>
@@ -17,6 +17,13 @@
             </li>
         </ol>
     </nav>
+    <a href="{{ route('exams.transcripts.print-bulk', [
+        'exam' => $exam,
+        'level-unit' => $levelUnit->id
+    ]) }}" class="btn btn-primary f-inline-flex gap-2 align-items-center" download>
+        <i class="fa fa-download"></i>
+        <span>Download All</span>
+    </a>
 </div>
 
 <div class="row g-4 py-3">
@@ -27,7 +34,7 @@
             <div class="card-header bg-primary bg-gradient text-white">
                 <div class="d-flex align-items-center justify-content-between">
                     <h5>{{ $studentScores->name }}</h5>
-                    <a href="{{ route('exams.transcripts.print', [
+                    <a href="{{ route('exams.transcripts.print-one', [
                         'exam' => $exam,
                         'admno' => $studentScores->adm_no
                     ]) }}" class="btn btn-light d-inline-flex gap-2 align-items-center">
