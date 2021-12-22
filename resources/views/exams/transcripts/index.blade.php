@@ -18,26 +18,49 @@
 <div class="row g-4 py-3">
     <div class="col-md-12">
         <div class="card">
-            <div class="card-header py-3">
-                <div class="d-flex align-items-center justify-content-between">
-                    <div class="d-inline-flex">
-                        <a href="{{ route('exams.transcripts.print', [
-                            'exam' => $exam,
-                            'admno' => request()->admno
-                        ]) }}" class="btn btn-primary">Download</a>
-                    </div>
-                </div>
-            </div>
             <div class="card-body">
-                @if ($students)
-                @include('partials.exams.transcripts.students')
-                @else
-                @if ($studentScores)
-                @include('partials.exams.transcripts.form')
-                @else
-                <p>Can't find student score for current exam</p>
-                @endif
-                @endif
+
+
+                <div class="table-responsive">
+                    <table class="table table-hover text-center">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Level</th>
+                                <th>Stream</th>
+                                <th>Alias</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if ($levelUnits->count())
+                            @foreach ($levelUnits as $levelUnit)
+                            <tr>
+                                <td>{{ $loop->iteration }}</td>
+                                <td>{{ optional($levelUnit->level)->name }}</td>
+                                <td>{{ optional($levelUnit->stream)->name }}</td>
+                                <td>{{ $levelUnit->alias ?? 'Not Set' }}</td>
+                                <td>
+                                    <a href="{{ route('exams.transcripts.show', [
+                                        'exam' => $exam,
+                                        'level-unit' => $levelUnit->id
+                                    ]) }}" class="btn btn-sm btn-outline-primary d-inline-flex gap-2 align-items-center">
+                                        <i class="fa fa-eye"></i>
+                                        <span>Transcripts</span>
+                                    </a>
+                                </td>
+                            </tr>
+                            @endforeach
+                            @else
+                            <tr>
+                                <td colspan="6">
+                                    <div class="py-1 text-center">No levels registered to the exam</div>
+                                </td>
+                            </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

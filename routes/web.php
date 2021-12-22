@@ -104,6 +104,9 @@ Route::group(['middleware' => ['auth']], function(){
     Route::resource('exams.transcripts', ExamsTranscriptsController::class)
         ->only(['index']);
 
+    Route::get('/exams/{exam}/transcripts/show', [ExamsTranscriptsController::class, 'show'])
+        ->name('exams.transcripts.show');
+
     Route::get('/exams/{exam}/transcripts/print', [ExamsTranscriptsController::class, 'print'])
         ->name('exams.transcripts.print');
     
