@@ -128,7 +128,7 @@
                     <td class="text-start">
                         <span class="fw-bold">
                             <span>Class Teacher's Remarks</span>
-                            <span  class="text-secondary"> - Ms. Rhenis Awino</span>
+                            <span  class="text-secondary"> - {{ $teacher['ct'] ?? 'N/A' }}</span>
                         </span>
                     </td>
                 </tr>
@@ -148,7 +148,7 @@
                     <td class="text-start">
                         <span class="fw-bold">
                             <span>Principal's Remarks</span>
-                            <span  class="text-secondary"> - Mr. Peter Obwogo</span>
+                            <span  class="text-secondary"> - {{ $teachers['p'] ?? 'N/A' }}</span>
                         </span>
                     </td>
                 </tr>

@@ -8,6 +8,7 @@ use App\Models\Level;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\LevelUnit;
+use App\Models\Responsibility;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -77,7 +78,13 @@ class ExamsTranscriptsController extends Controller
                     ->where('responsibility_teacher.level_unit_id', $levelUnit->id)
                     ->get()->pluck('name', 'shortname')->toArray();
 
+            /** @var Responsibility */
+            $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
+            $teachers['p'] = optional(optional($pRes->teachers()->latest()->first())->auth)->name;
 
+            /** @var Responsibility */
+            $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+            $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;
 
             $outOfs["lsc"] = DB::table($examScoresTblName)
                 ->select("admno")
@@ -305,6 +312,15 @@ class ExamsTranscriptsController extends Controller
                         ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
                         ->get()->pluck('name', 'shortname')->toArray();
 
+
+                /** @var Responsibility */
+                $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
+                $teachers['p'] = optional(optional($pRes->teachers()->latest()->first())->auth)->name;
+
+                /** @var Responsibility */
+                $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+                $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;                        
+
                 $outOfs["lsc"] = DB::table($examScoresTblName)
                     ->select("admno")
                     ->distinct("admno")
@@ -414,7 +430,13 @@ class ExamsTranscriptsController extends Controller
                     ->where('responsibility_teacher.level_unit_id', $levelUnit->id)
                     ->get()->pluck('name', 'shortname')->toArray();
 
+            /** @var Responsibility */
+            $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
+            $teachers['p'] = optional(optional($pRes->teachers()->latest()->first())->auth)->name;
 
+            /** @var Responsibility */
+            $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+            $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;
             $outOfs["lsc"] = DB::table($examScoresTblName)
                 ->select("admno")
                 ->distinct("admno")
