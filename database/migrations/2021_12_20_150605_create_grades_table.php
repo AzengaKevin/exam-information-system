@@ -20,6 +20,8 @@ class CreateGradesTable extends Migration
             $table->tinyInteger('points', false, true);
             $table->mediumText('swahili_comment');
             $table->mediumText('english_comment');
+            $table->mediumText('ct_comment');
+            $table->mediumText('p_comment');
             $table->timestamps();
         });
     }

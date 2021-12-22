@@ -19,6 +19,8 @@ class GradeFactory extends Factory
             'points' => $this->faker->numberBetween(0, 12),
             'english_comment' => $this->faker->sentence(),
             'swahili_comment' => $this->faker->sentence(),
+            'ct_comment' => $this->faker->sentence(),
+            'p_comment' => $this->faker->sentence()
         ];
     }
 }
