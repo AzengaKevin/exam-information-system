@@ -29,6 +29,10 @@ class GradePersistentTest extends TestCase
         $this->assertEquals($paylod['english_comment'], $grade->english_comment);
 
         $this->assertEquals($paylod['swahili_comment'], $grade->swahili_comment);
+
+        $this->assertEquals($paylod['ct_comment'], $grade->ct_comment);
+        
+        $this->assertEquals($paylod['p_comment'], $grade->p_comment);
         
     }
 
