@@ -46,7 +46,8 @@
             <div class="card-body">
                 <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
                     :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
-                    :englishComments="$englishComments" :teachers="$teachers" />
+                    :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments"
+                    :teachers="$teachers" />
             </div>
         </div>
     </div>

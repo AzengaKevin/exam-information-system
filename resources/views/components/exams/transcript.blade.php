@@ -1,12 +1,14 @@
 @props([
-    'exam',
-    'studentScores',
-    'outOfs',
-    'subjectColumns',
-    'subjectsMap',
-    'swahiliComments',
-    'englishComments',
-    'teachers'
+'exam',
+'studentScores',
+'outOfs',
+'subjectColumns',
+'subjectsMap',
+'swahiliComments',
+'englishComments',
+'ctComments',
+'pComments',
+'teachers'
 ])
 
 <div>
@@ -124,23 +126,15 @@
             <tbody>
                 <tr>
                     <td class="text-start">
-                        <span style="padding-left: 0">
+                        <span class="fw-bold">
                             <span>Class Teacher's Remarks</span>
-                            <span> - Ms. Rhenis Awino</span>
+                            <span  class="text-secondary"> - Ms. Rhenis Awino</span>
                         </span>
-                    </td>
-                    <td class="text-end">
-                        <span ng-if="!user_roles.isStudent">Signature</span>
                     </td>
                 </tr>
                 <tr>
-                    <td class="text-start">
-                        <span ng-if="show_classteachers_comments">
-                            <span>Excellent work, keep it up so as to improve further.</span>
-                        </span>
-                    </td>
-                    <td class="text-end td-fit-nowrap">
-                        <div>Signature</div>
+                    <td class="text-start" style="padding: 1rem 0 1.5rem 0;">
+                        <span>{{ $ctComments[$studentScores->mg] ?? '-' }}</span>
                     </td>
                 </tr>
             </tbody>
@@ -152,22 +146,15 @@
             <tbody>
                 <tr>
                     <td class="text-start">
-                        <span>
+                        <span class="fw-bold">
                             <span>Principal's Remarks</span>
-                            <span> - Mr. Peter Obwogo</span>
+                            <span  class="text-secondary"> - Mr. Peter Obwogo</span>
                         </span>
-                    </td>
-                    <td class="text-end">
-                        <span>Signature</span>
                     </td>
                 </tr>
                 <tr>
-                    <td class="text-start">
-                        <span>Very
-                            good performance, pay closer attention to
-                            English in order to get a better grade.</span>
-                    </td>
-                    <td class="text-end">
+                    <td class="text-start" style="padding: 1rem 0 1.5rem 0;">
+                        <span>{{ $pComments[$studentScores->mg] ?? '-' }}</span>
                     </td>
                 </tr>
             </tbody>

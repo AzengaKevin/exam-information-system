@@ -62,6 +62,10 @@ class ExamsTranscriptsController extends Controller
 
             $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
 
+            $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
+            
+            $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
+
 
             $teachers = DB::table('responsibility_teacher')
                 ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
@@ -119,6 +123,8 @@ class ExamsTranscriptsController extends Controller
                 'subjectsMap' => $subjectsMap,
                 'swahiliComments' => $swahiliComments,
                 'englishComments' => $englishComments,
+                'ctComments' => $ctComments,
+                'pComments' => $pComments,
                 'teachers' => $teachers,
                 'outOfs' => $outOfs
             ]);
@@ -161,6 +167,10 @@ class ExamsTranscriptsController extends Controller
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
             $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
+
+            $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
+            
+            $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
 
             // Get subject teachers
             $student = Student::where('adm_no', $admno)->first();
@@ -242,6 +252,8 @@ class ExamsTranscriptsController extends Controller
             'subjectsMap' => $subjectsMap ?? [],
             'swahiliComments' => $swahiliComments ?? [],
             'englishComments' => $englishComments ?? [],
+            'ctComments' => $ctComments,
+            'pComments' => $pComments,
             'teachers' => $teachers ?? [],
             'outOfs' => $outOfs
         ]);
@@ -276,6 +288,10 @@ class ExamsTranscriptsController extends Controller
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
             $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
+
+            $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
+            
+            $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
 
             if ($student) {
 
@@ -331,6 +347,8 @@ class ExamsTranscriptsController extends Controller
                 'subjectsMap' => $subjectsMap,
                 'swahiliComments' => $swahiliComments,
                 'englishComments' => $englishComments,
+                'ctComments' => $ctComments,
+                'pComments' => $pComments,
                 'teachers' => $teachers,
                 'outOfs' => $outOfs
             ]);
@@ -380,6 +398,10 @@ class ExamsTranscriptsController extends Controller
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
             $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
+
+            $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
+            
+            $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
 
 
             $teachers = DB::table('responsibility_teacher')
@@ -437,6 +459,8 @@ class ExamsTranscriptsController extends Controller
                 'subjectsMap' => $subjectsMap,
                 'swahiliComments' => $swahiliComments,
                 'englishComments' => $englishComments,
+                'ctComments' => $ctComments,
+                'pComments' => $pComments,
                 'teachers' => $teachers,
                 'outOfs' => $outOfs
             ]);

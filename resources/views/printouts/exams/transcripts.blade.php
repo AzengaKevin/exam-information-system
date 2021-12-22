@@ -117,10 +117,13 @@
             font-size: 1.5rem;
         }
 
-        .page-break{
+        .page-break {
             page-break-after: always;
         }
 
+        .text-secondary {
+            color: gray;
+        }
     </style>
 </head>
 
@@ -129,7 +132,8 @@
         @foreach ($studentsScores as $studentScores)
         <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
             :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
-            :englishComments="$englishComments" :teachers="$teachers" />
+            :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments"
+            :teachers="$teachers" />
 
         @if (!$loop->last)
         <div class="page-break"></div>
