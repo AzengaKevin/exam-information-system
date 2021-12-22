@@ -2,7 +2,7 @@
 
 <div wire:ignore.self id="update-grade-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="update-grade-modal-title">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 id="update-grade-modal-title" class="modal-title">Update Grade</h5>
@@ -34,6 +34,27 @@
                     <textarea wire:model.lazy="swahili_comment" id="swahili-comment" cols="100" rows="3"
                         class="form-control @error('swahili_comment') is-invalid @enderror"></textarea>
                     @error('swahili_comment')
+                    <span class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+                <div class="mt-3">
+                    <label for="ct-comment" class="form-label">Class Teacher Comments on Transcripts</label>
+                    <textarea wire:model.lazy="ct_comment" id="ct-comment" cols="100" rows="3"
+                        class="form-control @error('ct_comment') is-invalid @enderror"></textarea>
+                    @error('ct_comment')
+                    <span class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+
+                <div class="mt-3">
+                    <label for="p-comment" class="form-label">Principal Comments on Transcripts</label>
+                    <textarea wire:model.lazy="p_comment" id="p-comment" cols="100" rows="3"
+                        class="form-control @error('p_comment') is-invalid @enderror"></textarea>
+                    @error('p_comment')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>
                     </span>

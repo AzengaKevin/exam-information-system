@@ -65,6 +65,8 @@ class GradesManagementTest extends TestCase
             ->set('points', $payload['points'])
             ->set('english_comment', $payload['english_comment'])
             ->set('swahili_comment', $payload['swahili_comment'])
+            ->set('ct_comment', $payload['ct_comment'])
+            ->set('p_comment', $payload['p_comment'])
             ->call('updateGrade');
 
         $this->assertEquals($payload['points'], $grade->fresh()->points);

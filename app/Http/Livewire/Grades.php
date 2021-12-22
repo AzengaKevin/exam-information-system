@@ -11,6 +11,8 @@ class Grades extends Component
 
     public $english_comment;
     public $swahili_comment;
+    public $ct_comment;
+    public $p_comment;
     public $grade;
     public $points;
 
@@ -37,6 +39,8 @@ class Grades extends Component
     {
         $this->english_comment = $grade->english_comment;
         $this->swahili_comment = $grade->swahili_comment;
+        $this->ct_comment = $grade->ct_comment;
+        $this->p_comment = $grade->p_comment;
         $this->grade = $grade->grade;
         $this->points = $grade->points;
 
@@ -50,6 +54,8 @@ class Grades extends Component
         return [
             'english_comment' => ['bail', 'required'],
             'swahili_comment' => ['bail', 'required'],
+            'ct_comment' => ['bail', 'required'],
+            'p_comment' => ['bail', 'required'],
             'points' => ['bail', 'required', 'integer', 'between:0,12']
         ];
     }

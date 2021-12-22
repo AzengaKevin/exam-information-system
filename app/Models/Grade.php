@@ -13,6 +13,8 @@ class Grade extends Model
         'grade',
         'points',
         'swahili_comment',
-        'english_comment'
+        'english_comment',
+        'ct_comment',
+        'p_comment'
     ];
 }
