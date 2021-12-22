@@ -89,7 +89,7 @@ class ExamsTranscriptsManagementTest extends TestCase
         
     }
 
-    /** @group exams-transacripts */
+    /** @group exams-transcripts */
     public function testAuthorizedUsersCanSeeTranscriptsForTheWholeClass()
     {
         $this->withoutExceptionHandling();

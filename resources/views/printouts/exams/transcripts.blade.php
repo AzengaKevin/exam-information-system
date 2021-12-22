@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{ $studentScores->name }} - {{ $exam->name }} Transacript</title>
+    <title>{{ $exam->name }} - {{ $levelUnit->alias }} - Transcripts</title>
     <style>
         table.table {
             border: 1px solid black;
@@ -116,12 +116,25 @@
         .h3 {
             font-size: 1.5rem;
         }
+
+        .page-break{
+            page-break-after: always;
+        }
+
     </style>
 </head>
 
 <body>
     <div class="container">
-        @include('partials.exams.transcripts.form')
+        @foreach ($studentsScores as $studentScores)
+        <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
+            :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
+            :englishComments="$englishComments" :teachers="$teachers" />
+
+        @if (!$loop->last)
+        <div class="page-break"></div>
+        @endif
+        @endforeach
     </div>
 </body>
 
