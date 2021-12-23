@@ -140,6 +140,8 @@
                     </div>
                 </a>
             </li>
+
+            @if ($systemSettings->school_has_streams)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('level-units.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('level-units.index') }}">
@@ -149,6 +151,17 @@
                     </div>
                 </a>
             </li>
+            @else
+            <li class="nav-item">
+                <a class="nav-link {{ request()->routeIs('levels.index') ? 'text-white' : 'text-white-50' }}"
+                    href="{{ route('levels.index') }}">
+                    <div class="hstack gap-3">
+                        <span><i class="fa fa-th" aria-hidden="true"></i></span>
+                        <span>Classes</span>
+                    </div>
+                </a>
+            </li>            
+            @endif
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('hostels.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('hostels.index') }}">

@@ -8,7 +8,9 @@
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb mb-0">
             <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            @if ($systemSettings->school_has_streams)
             <li class="breadcrumb-item"><a href="{{ route('level-units.index') }}">Classes</a></li>
+            @endif
             <li class="breadcrumb-item active" aria-current="page">Levels</li>
         </ol>
     </nav>

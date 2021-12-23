@@ -13,6 +13,7 @@ use Livewire\WithFileUploads;
 use App\Exports\StudentsExport;
 use App\Imports\StudentsImport;
 use App\Models\Hostel;
+use App\Settings\SystemSettings;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Log;
@@ -43,6 +44,12 @@ class Students extends Component
     public $description;
 
     public $studentsFile;
+
+    protected $systemSettings;
+
+    public function __construct() {
+        $this->systemSettings = app(SystemSettings::class);
+    }
 
     public function render()
     {
@@ -87,10 +94,10 @@ class Students extends Component
             'admission_level_id' => ['bail', 'nullable', 'integer'],
             'level_id' => ['bail', 'nullable', 'integer'],
             'hostel_id' => ['bail', 'nullable', 'integer'],
-            'stream_id' => ['bail', 'required', 'integer'],
+            'stream_id' => ['bail', 'nullable', 'integer'],
             'description' => ['bail', 'nullable'],
-            'kcpe_grade' => ['bail', 'required', Rule::in(Student::kcpeGradeOptions())],
-            'kcpe_marks' => ['bail', 'required', 'integer']
+            'kcpe_grade' => ['bail', 'nullable', Rule::in(Student::kcpeGradeOptions())],
+            'kcpe_marks' => ['bail', 'nullable', 'integer', 'between:1,500']
         ];
     }
 
@@ -106,12 +113,13 @@ class Students extends Component
 
             if($access->allowed()){
 
-                // Based on level and stream, get the level_unit_id and also persists
-                $data['level_unit_id'] = LevelUnit::where([
-                    'level_id' => $data['admission_level_id'],
-                    'stream_id' => $data['stream_id']
-                ])->firstOrFail()->id;
-
+                if ($this->systemSettings->school_has_streams) {
+                    // Based on level and stream, get the level_unit_id and also persists
+                    $data['level_unit_id'] = LevelUnit::where([
+                        'level_id' => $data['admission_level_id'],
+                        'stream_id' => $data['stream_id']
+                    ])->firstOrFail()->id;
+                }
                 
                 $student = Student::create($data);
 
@@ -140,7 +148,7 @@ class Students extends Component
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred while trying to add student, perhaps you have not, generated classes form the levels and streams available');
+            session()->flash('error', 'A db/error occurred');
 
             $this->emit('hide-upsert-student-modal');
         }
