@@ -1,5 +1,7 @@
 @extends('layouts.base')
 
+@section('title', $settings->school_name)
+
 @section('body')
 <header class="fixed-top">
     <x-navbar />
@@ -9,7 +11,7 @@
         <div class="container">
             <div class="min-vh-100 row align-items-center">
                 <div class="col-md-7 d-none d-md-block">
-                    <h1 class="display-3 fw-bold">Effectively Manage School Exams</h1>
+                    <h1 class="display-4 fw-bold">Exam Information System for <a href="">{{ $settings->school_name }}</a></h1>
                     <p>A scalable, highly effective and complete exam managment information system tool
                         for primary schools. Ranking, Grading, Pictorial Representaion and what have you.</p>
                     <a href="#" class="btn btn-lg btn-primary">Get Started</a>

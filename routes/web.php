@@ -23,7 +23,9 @@ use App\Http\Controllers\GradingsController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
+use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TeachersResponsibilitiesController;
+use App\Http\Controllers\WelcomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,9 +38,7 @@ use App\Http\Controllers\TeachersResponsibilitiesController;
 |
 */
 
-Route::get('/', function(){
-    return view('welcome');
-})->name('welcome');
+Route::get('/', WelcomeController::class)->name('welcome');
 
 Route::view('test/report-form', 'printouts.exams.report-form');
 
@@ -136,5 +136,10 @@ Route::group(['middleware' => ['auth']], function(){
   
     Route::get('hostels/{hostel:slug}',[HostelsController::class,'show'])->name('hostels.show');
 
+    Route::get('/settings', [SettingsController::class, 'index'])
+        ->name('settings.index');
+
+    Route::patch('/settings/update', [SettingsController::class, 'update'])
+        ->name('settings.update');
 
 });

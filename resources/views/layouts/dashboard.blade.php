@@ -12,7 +12,7 @@
                 <div><i class="fa fa-3x fa-user"></i></div>
                 <div class="ms-3">
                     <h5>{{ Auth()->user()->name }}</h5>
-                    <small class="text-white-50">Dashboard</small>
+                    <small class="text-white-50">{{ Auth()->user()->role->name }}</small>
                 </div>
             </div>
             <div>
@@ -155,6 +155,15 @@
                     <div class="hstack gap-3">
                         <span><i class="fa fa-bed" aria-hidden="true"></i></span>
                         <span>Hostels</span>
+                    </div>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {{request()->routeIs('settings.index') ? 'text-white':'text-white-50' }}"
+                    href="{{ route('settings.index') }}">
+                    <div class="hstack gap-3">
+                        <span><i class="fa fa-cog" aria-hidden="true"></i></span>
+                        <span>Settings</span>
                     </div>
                 </a>
             </li>
