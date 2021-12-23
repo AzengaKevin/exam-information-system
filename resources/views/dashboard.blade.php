@@ -296,6 +296,7 @@
     </div>
     @endcan
 
+    @if ($systemSettings->school_has_streams)
     @can('viewAny', \App\Models\LevelUnit::class)
     <a href="{{ route('level-units.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
         <div class="bg-white shadow-sm card h-100 border-light">
@@ -335,6 +336,47 @@
         </div>
     </div>
     @endcan
+    @else
+    @can('viewAny', \App\Models\Level::class)
+    <a href="{{ route('levels.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
+        <div class="bg-white shadow-sm card h-100 border-light">
+            <div class="card-body">
+                <div class="p-0 card-text">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Classes</h6>
+                            <span class="fw-bold number-count">{{ \App\Models\Level::count() }}</span>
+                        </div>
+                        <div
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            <i class="text-white fa fa-2x fa-th"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </a>
+    @else
+    <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
+        <div class="bg-white shadow-sm card h-100 border-light">
+            <div class="card-body">
+                <div class="p-0 card-text">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-uppercase">Classes</h6>
+                            <span class="fw-bold number-count">{{ \App\Models\LevelUnit::count() }}</span>
+                        </div>
+                        <div
+                            class="bg-primary bg-gradient w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
+                            <i class="text-white fa fa-2x fa-th"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endcan
+    @endif
 
     @can('viewAny', \App\Models\Subject::class)
     <a href="{{ route('subjects.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">

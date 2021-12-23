@@ -4,7 +4,8 @@
 'hostels' => [],
 'streams' => [],
 'genderOptions' => [],
-'kcpeGradeOptions' => []
+'kcpeGradeOptions' => [],
+'systemSettings'
 ])
 
 <div wire:ignore.self id="upsert-student-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
@@ -32,6 +33,8 @@
                             </span>
                             @enderror
                         </div>
+
+                        @if ($systemSettings->school_level == 'secondary')
                         <div class="col-md-3">
                             <label for="kcpe_marks" class="form-label">KCPE Marks</label>
                             <input type="number" step="1" min="0" max="500" wire:model.lazy="kcpe_marks" id="kcpe_marks"
@@ -57,6 +60,7 @@
                             </span>
                             @enderror
                         </div>
+                        @endif
                         <div class="col-md-6">
                             <label for="adm-no" class="form-label">Admission Number</label>
                             <input type="text" wire:model.lazy="adm_no" id="adm-no"
@@ -137,6 +141,7 @@
                         </div>
                         @endif
 
+                        @if ($systemSettings->school_has_streams)                            
                         <div class="col-md-6">
                             <label for="stream" class="form-label">Stream</label>
                             <select wire:model.lazy="stream_id" id="stream"
@@ -152,6 +157,7 @@
                             </span>
                             @enderror
                         </div>
+                        @endif
 
                         <div class="col-md-9">
                             <label for="hostel" class="form-label">Hostel</label>

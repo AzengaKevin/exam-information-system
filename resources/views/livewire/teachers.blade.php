@@ -52,7 +52,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         <div class="py-1 text-center">No Teachers Added Yet</div>
                     </td>
                 </tr>
@@ -60,7 +60,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="7">
+                    <td colspan="8">
                         {{ $teachers->links() }}
                         @if ($teachers->count())
                         <div class="text-muted">{{ $teachers->firstItem() }} - {{ $teachers->lastItem() }} out of

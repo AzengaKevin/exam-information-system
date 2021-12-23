@@ -1,7 +1,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary bg-gradient">
     <div class="container">
         <a class="navbar-brand fs-4" href="{{ route('welcome') }}">
-            <span class="d-none d-md-block">{{ config('app.name') }}</span>
+            <span class="d-none d-md-block">{{ $systemSettings->school_name }}</span>
             <span class="d-inline d-md-none">{{ config('app.short_name') }}</span>
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"

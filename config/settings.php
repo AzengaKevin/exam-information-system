@@ -1,5 +1,6 @@
 <?php
 
+use App\Settings\GeneralSettings;
 use App\Settings\SystemSettings;
 
 return [
@@ -10,6 +11,7 @@ return [
      */
     'settings' => [
         SystemSettings::class,
+        GeneralSettings::class
     ],
 
     /*

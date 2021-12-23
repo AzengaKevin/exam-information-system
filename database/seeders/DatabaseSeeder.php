@@ -21,7 +21,8 @@ class DatabaseSeeder extends Seeder
             ResponsibilitySeeder::class,
             DepartmentsSeeder::class,
             SubjectsSeeder::class,
-            GradingSeeder::class
+            GradingSeeder::class,
+            GradeSeeder::class,
         ]);
     }
 }
