@@ -24,6 +24,7 @@ use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
 use App\Http\Controllers\TeachersResponsibilitiesController;
+use App\Http\Controllers\WelcomeController;
 
 /*
 |--------------------------------------------------------------------------
@@ -36,9 +37,7 @@ use App\Http\Controllers\TeachersResponsibilitiesController;
 |
 */
 
-Route::get('/', function(){
-    return view('welcome');
-})->name('welcome');
+Route::get('/', WelcomeController::class)->name('welcome');
 
 Route::view('test/report-form', 'printouts.exams.report-form');
 

@@ -12,7 +12,7 @@
                 <div><i class="fa fa-3x fa-user"></i></div>
                 <div class="ms-3">
                     <h5>{{ Auth()->user()->name }}</h5>
-                    <small class="text-white-50">Dashboard</small>
+                    <small class="text-white-50">{{ Auth()->user()->role->name }}</small>
                 </div>
             </div>
             <div>
