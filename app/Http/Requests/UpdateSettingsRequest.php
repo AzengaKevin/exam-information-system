@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Exam;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -25,10 +26,17 @@ class UpdateSettingsRequest extends FormRequest
     public function rules()
     {
         return [
-            'school_name' => ['bail', 'required', 'string'],
-            'school_type' => ['bail', 'required', Rule::in(['boys', 'girls', 'mixed'])],
-            'school_level' => ['bail', 'required', Rule::in(['primary', 'secondary'])],
-            'school_has_streams' => ['bail', 'nullable']
+            'system.school_name' => ['bail', 'required', 'string'],
+            'system.school_type' => ['bail', 'required', Rule::in(['boys', 'girls', 'mixed'])],
+            'system.school_level' => ['bail', 'required', Rule::in(['primary', 'secondary'])],
+            'system.school_has_streams' => ['bail', 'nullable'],
+
+            'general.school_website' => ['bail', 'required', 'string'],
+            'general.school_address' => ['bail', 'required', 'string'],
+            'general.school_telephone_number' => ['bail', 'required', 'string'],
+            'general.school_email_address' => ['bail', 'required', 'string'],
+            'general.current_academic_year' => ['bail', 'required', 'int'],
+            'general.current_term' => ['bail', 'required', 'string', Rule::in(Exam::termOptions())],
         ];
     }
 }

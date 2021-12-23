@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Exam;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
@@ -38,7 +39,7 @@ class SettingsManagementTest extends TestCase
 
         $response->assertViewIs('settings.index');
 
-        $response->assertViewHasAll(['systemSettings']);
+        $response->assertViewHasAll(['systemSettings', 'generalSettings']);
         
     }
 
@@ -48,10 +49,20 @@ class SettingsManagementTest extends TestCase
         $this->withoutExceptionHandling();
 
         $response = $this->patch(route('settings.update'), [
-            'school_name' => $schoolName = $this->faker->sentence(),
-            'school_type' => $schoolType = 'girls',
-            'school_level' => $schoolLevel = 'primary',
-            'school_has_streams' => $schoolHasStreams = false
+            'system' => [
+                'school_name' => $schoolName = $this->faker->sentence(),
+                'school_type' => $schoolType = 'girls',
+                'school_level' => $schoolLevel = 'primary',
+                'school_has_streams' => $schoolHasStreams = false
+            ],
+            'general' => [
+                'school_website' => $schoolWebsite = $this->faker->url(),
+                'school_address' => $schoolAddress = $this->faker->address(),
+                'school_telephone_number' => $schoolTelephone = $this->faker->e164PhoneNumber(),
+                'school_email_address' => $schoolEmailAddress = $this->faker->safeEmail(),
+                'current_academic_year' => $currentAcademicYear = $this->faker->year(),
+                'current_term' => $currentTerm = $this->faker->randomElement(Exam::termOptions()),
+            ]
         ]);
 
         $response->assertRedirect();

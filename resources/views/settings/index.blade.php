@@ -26,11 +26,11 @@
                     <div class="row g-3">
                         <div class="col-md-4">
                             <div class="form-floating">
-                                <input type="text" class="form-control @error('school_name') is-invalid @enderror"
-                                    name="school_name" id="school-name" placeholder="School Name"
-                                    value="{{ $systemSettings->school_name }}">
+                                <input type="text" class="form-control @error('system.school_name') is-invalid @enderror"
+                                    name="system[school_name]" id="school-name" placeholder="School Name"
+                                    value="{{ old('system.school_name') ?? $systemSettings->school_name }}">
                                 <label for="school-name">School Name</label>
-                                @error('school_name')
+                                @error('system.school_name')
                                 <span class="invalid-feedback">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -39,11 +39,11 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating">
-                                <input type="text" class="form-control @error('school_type') is-invalid @enderror"
-                                    name="school_type" id="school-type" placeholder="School Type"
-                                    value="{{ $systemSettings->school_type }}">
+                                <input type="text" class="form-control @error('system.school_type') is-invalid @enderror"
+                                    name="system[school_type]" id="school-type" placeholder="School Type"
+                                    value="{{ old('system.school_type') ?? $systemSettings->school_type }}">
                                 <label for="school-type">School Type</label>
-                                @error('school_type')
+                                @error('system.school_type')
                                 <span class="invalid-feedback">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -52,11 +52,11 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-floating">
-                                <input type="text" class="form-control @error('school_level') is-invalid @enderror"
-                                    name="school_level" id="school-level" placeholder="School Level"
-                                    value="{{ $systemSettings->school_level }}">
+                                <input type="text" class="form-control @error('system.school_level') is-invalid @enderror"
+                                    name="system[school_level]" id="school-level" placeholder="School Level"
+                                    value="{{ old('system.school_level') ?? $systemSettings->school_level }}">
                                 <label for="school-level">School Level</label>
-                                @error('school_level')
+                                @error('system.school_level')
                                 <span class="invalid-feedback">
                                     <strong>{{ $message }}</strong>
                                 </span>
@@ -65,9 +65,99 @@
                         </div>
                         <div class="col-md-4">
                             <div class="form-check">
-                                <input type="checkbox" name="school_has_streams" id="school-has-streams"
-                                    class="form-check-input" {{ $systemSettings->school_has_streams ? 'checked' : '' }}>
+                                <input type="checkbox" name="system[school_has_streams]" id="school-has-streams"
+                                    class="form-check-input" {{ (old('system.school_has_streams') ?? $systemSettings->school_has_streams) ? 'checked' : '' }}>
                                 <label for="school-has-streams" class="form-check-label">School Has Streams</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                <h5>General Settings</h5>
+                <hr>
+                <div class="container-fluid">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control @error('general.school_website') is-invalid @enderror"
+                                    name="general[school_website]" id="school-website" placeholder="School Website"
+                                    value="{{ old('general.school_website') ?? $generalSettings->school_website }}">
+                                <label for="school-website">School Website</label>
+                                @error('general.school_website')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control @error('general.school_address') is-invalid @enderror"
+                                    name="general[school_address]" id="school-address" placeholder="School Address"
+                                    value="{{ $generalSettings->school_address }}">
+                                <label for="school-address">School Address</label>
+                                @error('general.school_address')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control @error('general.school_telephone_number') is-invalid @enderror"
+                                    name="general[school_telephone_number]" id="school-telephone-number" placeholder="School Telephone Number"
+                                    value="{{ $generalSettings->school_telephone_number }}">
+                                <label for="school-telephone-number">School Telephone Number</label>
+                                @error('general.school_telephone_number')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control @error('general.school_email_address') is-invalid @enderror"
+                                    name="general[school_email_address]" id="school-email-address" placeholder="School Email Address"
+                                    value="{{ $generalSettings->school_email_address }}">
+                                <label for="school-email-address">School Email Address</label>
+                                @error('general.school_email_address')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="number" class="form-control @error('general.current_academic_year') is-invalid @enderror"
+                                    name="general[current_academic_year]" id="current-academic-year" placeholder="Current Academic Year"
+                                    value="{{ old('general.current_academic_year') ?? $generalSettings->current_academic_year }}">
+                                <label for="current-academic-year">Current Academic Year</label>
+                                @error('general.current_academic_year')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" class="form-control @error('general.current_term') is-invalid @enderror"
+                                    name="general[current_term]" id="current-term" placeholder="Current Term"
+                                    value="{{ old('general.current_term') ?? $generalSettings->current_term }}">
+                                <label for="current-term">Current Term</label>
+                                @error('general.current_term')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
                             </div>
                         </div>
                     </div>
