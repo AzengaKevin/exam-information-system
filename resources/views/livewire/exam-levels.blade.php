@@ -1,7 +1,7 @@
 <div class="card h-100">
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-sm table-bordered table-hover">
+            <table class="table table-sm table-hover">
                 <thead>
                     <tr>
                         <th colspan="5">Enrolled Levels</th>

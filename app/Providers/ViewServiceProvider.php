@@ -31,7 +31,9 @@ class ViewServiceProvider extends ServiceProvider
             'dashboard',
             'levels.index',
             'livewire.students',
-            'students.index'
+            'students.index',
+            'teachers.responsibilities.index',
+            'teachers.show'
         ], SettingsComposer::class);
     }
 }

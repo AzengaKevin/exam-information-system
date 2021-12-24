@@ -9,7 +9,9 @@
                     <th>Responsibility</th>
                     <th>Subject</th>
                     <th>Class</th>
+                    @if ($systemSettings->school_has_streams)
                     <th>Level</th>
+                    @endif
                     <th>Department</th>
                     <th>Actions</th>
                 </tr>
@@ -21,15 +23,13 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $responsibility->name }}</td>
                     <td>{{ $responsibility->pivot->subject->name }}</td>
+                    @if ($systemSettings->school_has_streams)
                     <td>{{ $responsibility->pivot->levelUnit->alias }}</td>
+                    @endif
                     <td>{{ $responsibility->pivot->level->name }}</td>
                     <td>{{ $responsibility->pivot->department->name }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
-                                <i class="fa fa-eye"></i>
-                                <span>Details</span>
-                            </button>
                             <button wire:click="removeResponsibility({{ $responsibility->pivot->id }})"
                                 class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
                                 <i class="fa fa-times" aria-hidden="true"></i>

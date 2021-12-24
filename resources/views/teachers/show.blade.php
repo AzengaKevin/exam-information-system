@@ -56,15 +56,16 @@
                             <i class="fa fa-plus"></i>
                         </button>
     
-                        <button data-bs-toggle="modal" data-bs-target="#assign-bulk-responsibilities-modal"
-                            class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
-                            <i class="fa fa-plus"></i>
-                        </button>
-    
                         <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
                             class="d-none d-md-inline-flex btn btn-sm btn-outline-primary gap-2 align-items-center">
                             <i class="fa fa-plus"></i>
                             <span>Responsibility</span>
+                        </button>
+                        
+                        @if ($systemSettings->school_has_streams)              
+                        <button data-bs-toggle="modal" data-bs-target="#assign-bulk-responsibilities-modal"
+                            class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
+                            <i class="fa fa-plus"></i>
                         </button>
     
                         <button data-bs-toggle="modal" data-bs-target="#assign-bulk-responsibilities-modal"
@@ -72,10 +73,11 @@
                             <i class="fa fa-plus"></i>
                             <span>Bulk Responsibilities</span>
                         </button>
+                        @endif
                     </div>
                 </div>
                 <hr>
-                <livewire:teacher-responsibilities :teacher="$teacher" type="table-sm table-bordered" />
+                <livewire:teacher-responsibilities :teacher="$teacher" type="table-sm" />
             </div>
         </div>
     </div>
