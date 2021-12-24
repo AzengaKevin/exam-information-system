@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Models\Subject;
+use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
@@ -33,6 +34,20 @@ class Exams extends Component
 
     public $selectedLevels = [];
     public $selectedSubjects = [];
+
+    /** @var GeneralSettings */
+    protected $generalSettings;
+
+    public function __construct() {
+        $this->generalSettings = app(GeneralSettings::class);
+    }
+
+    public function mount()
+    {
+        $this->year = $this->generalSettings->current_academic_year;
+        $this->term = $this->generalSettings->current_term;
+
+    }
 
     public function render()
     {
