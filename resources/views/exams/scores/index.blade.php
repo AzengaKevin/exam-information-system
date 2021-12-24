@@ -64,6 +64,24 @@
                                             <span>Level Scores</span>
                                             @endif
                                         </a>
+
+                                        @if ($responsibility->pivot->subject_id)
+                                        <a href="{{ route('exams.scores.upload', [
+                                            'exam' => $exam,
+                                            'subject' => $responsibility->pivot->subject->id,
+                                            'level-unit' => $responsibility->pivot->levelUnit->id,
+                                            'level' => $responsibility->pivot->level->id,
+                                        ]) }}"
+                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                            <i class="fa fa-upload"></i>
+                                            <span>New Upload Scores</span>
+                                        </a>
+                                        <a href="#"
+                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                            <i class="fa fa-eye"></i>
+                                            <span>Uploaded Scores</span>
+                                        </a>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
@@ -110,10 +128,10 @@
                                     'exam' => $exam,
                                     'level-unit' => $levelUnit->id
                                 ]) }}" class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
-                                <i class="fa fa-cog"></i>
-                                <span>Manage Class</span>
-                                </a>
-                            </td>
+                                        <i class="fa fa-cog"></i>
+                                        <span>Manage Class</span>
+                                    </a>
+                                </td>
                             </tr>
                             @endforeach
                             @else
@@ -152,10 +170,10 @@
                                     'exam' => $exam,
                                     'level' => $level->id
                                 ]) }}" class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
-                                <i class="fa fa-cog"></i>
-                                <span>Manage Level</span>
-                                </a>
-                            </td>
+                                        <i class="fa fa-cog"></i>
+                                        <span>Manage Level</span>
+                                    </a>
+                                </td>
                             </tr>
                             @endforeach
                             @else

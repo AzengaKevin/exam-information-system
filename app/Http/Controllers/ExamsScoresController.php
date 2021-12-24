@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UploadScoresRequest;
 use App\Models\Exam;
 use App\Models\User;
 use App\Models\Subject;
@@ -143,6 +144,171 @@ class ExamsScoresController extends Controller
             ]);
 
             abort(500, 'A fatal server error occurred');
+            
+        }
+    }
+
+    /**
+     * Show the table / form for uploading scores for both school with streams and ones with no streams
+     * 
+     * @param Request $request
+     * @param Exam $exam
+     */
+    public function upload(Request $request, Exam $exam)
+    {
+
+        try {
+
+            /** @var Subject */
+            $subject = Subject::findOrFail(intval($request->get('subject')));
+
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
+
+            /** @var Level */
+            $level = Level::find(intval($request->get('level')));
+
+            $gradings = Grading::all(['id', 'name']);
+
+            $tblName = Str::slug($exam->shortname);
+
+            $col = $subject->shortname;
+
+            $query = DB::table('students')
+                ->leftJoin("{$tblName}", "students.adm_no", "=", "{$tblName}.admno")
+                ->select("students.adm_no", "students.name", "{$tblName}.{$col}");
+
+            if ($level) $query->where('students.level_id', $level->id);
+
+            if ($levelUnit) $query->where('students.level_unit_id', $levelUnit->id);
+                
+            $data = $query->get();
+
+            $title = "Upload " . (optional($level)->name ?? optional($levelUnit)->alias) . " - {$subject->name} Scores";
+
+            return view('exams.scores.upload', [
+                'exam' => $exam,
+                'level' => $level,
+                'levelUnit' => $levelUnit,
+                'subject' => $subject,
+                'gradings' => $gradings,
+                'data' => $data,
+                'title' => $title
+            ]);            
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'exam-id' => $exam->id,
+                'action' => __METHOD__
+            ]);
+
+            return back();
+            
+        }
+        
+    }
+
+    /**
+     * Persist student scores to the database
+     * @param UploadScoresRequest $request
+     * @param Exam $exam
+     */
+    public function uploadScores(UploadScoresRequest $request, Exam $exam)
+    {
+        /** @var array */
+        $data = $request->validated();
+
+        try {
+
+            /** @var Subject */
+            $subject = Subject::findOrFail(intval($request->get('subject')));
+
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
+
+            /** @var Level */
+            $level = Level::find(intval($request->get('level')));
+
+            $grading = Grading::find($data['grading_id'] ?? 1) ?? Grading::first();
+
+            $values = $grading->values;
+
+            // Process Uploading the scores
+
+            foreach ($data["scores"] as $admno => $scoreData) {
+
+                $score = $scoreData['score'] ?? null;
+                $grade = null;
+                $points = null;
+
+                $extra = $scoreData['extra'] ?? null;
+
+                if ($score) {
+
+                    foreach ($values as $value) {
+
+                        if($score >= $value['min'] && $score <= $value['max']){
+                            $grade = $value['grade'];
+                            $points = $value['points'];
+                            break;
+                        }
+    
+                    }
+                    
+                }else{
+
+                    if ($extra) {
+
+                        $score = 0;
+
+                        switch ($extra) {
+                            case 'missing':
+                                $points = 'X';
+                                break;
+                            case 'cheated':
+                                $points = 'Y';
+                                break;
+                            
+                            default:
+                                $points = 'P';
+                                break;
+                        }
+                        
+                    }
+
+                }
+
+                DB::table(Str::slug($exam->shortname))
+                    ->updateOrInsert([
+                        "admno" => $admno
+                    ], [
+                        $subject->shortname => json_encode([
+                                'score' => $score,
+                                'grade' => $grade,
+                                'points' => $points,
+                        ]),
+                        'level_id' => optional($level)->id,
+                        'level_unit_id' => optional($levelUnit)->id
+                    ]);
+            }            
+
+
+            return redirect(route('exams.scores.upload', [
+                'exam' => $exam,
+                'subject' => $subject->id,
+                'level' => optional($level)->id,
+                'level-unit' => optional($levelUnit)->id
+            ]));
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'exam-id' => $exam->id,
+                'action' => __METHOD__
+            ]);
+
+            return back()->withInput();
             
         }
     }

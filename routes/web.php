@@ -95,6 +95,12 @@ Route::group(['middleware' => ['auth']], function(){
         ->middleware('can:access-upload-scores-page')
         ->only(['index', 'create', 'store']);
 
+    Route::get('/exams/{exam:slug}/scores/upload', [ExamsScoresController::class, 'upload'])
+        ->name('exams.scores.upload');
+
+    Route::put('/exams/{exam:slug}/scores/upload', [ExamsScoresController::class, 'uploadScores'])
+        ->name('exams.scores.upload');
+
     Route::resource('exams.analysis', ExamsAnalysisController::class)
         ->only(['index']);
 
