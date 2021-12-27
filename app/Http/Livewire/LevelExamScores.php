@@ -49,10 +49,9 @@ class LevelExamScores extends Component
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
-                ->select(array_merge(["admno"], $columns, $aggregateCols))
-                ->addSelect("students.name", "level_units.alias")
+                ->select(array_merge(["admno", "levels.name AS level", "students.name"], $columns, $aggregateCols))
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
-                ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
+                ->join("levels", "{$tblName}.level_id", '=', 'levels.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy('op')
                 ->paginate(24)
@@ -66,7 +65,9 @@ class LevelExamScores extends Component
 
     public function getAggreagateColumns() : array
     {
-        return array("mm", "tm", "mg", "mp", "tp", "sp", "op");
+        $returnArray = array("mm", "tm", "mg", "mp", "tp", "op"); // "sp",
+
+        return $returnArray;
     }
 
     public function getColumns()
@@ -78,9 +79,80 @@ class LevelExamScores extends Component
         $aggregateCols = $this->getAggreagateColumns();
 
         /** @var array */
-        $studentLevelCols = array("name", "alias");
+        $studentLevelCols = array("name", "level");
 
         return array_merge($studentLevelCols, $columns, $aggregateCols);;
+    }
+
+    /**
+     * Generate aggregates (mm, tm, mg, tp, sp, op) for the whole level students
+     */
+    public function generateBulkLevelAggregates()
+    {
+        try {
+            
+            $cols = $this->exam->subjects->pluck("shortname")->toArray();
+    
+            $tblName = Str::slug($this->exam->shortname);
+    
+            /** @var Collection */
+            $data = DB::table($tblName)
+                ->where("level_id", $this->level->id)
+                ->select(array_merge(["admno"], $cols))->get();
+    
+            $data->each(function($stuData) use($tblName, $cols){
+    
+                $totalScore = 0;
+                $totalPoints = 0;
+                $populatedCols = 0;
+    
+                foreach ($cols as $col) {
+    
+                    if(!is_null($stuData->$col)){
+                        $populatedCols++;
+    
+                        $subData = json_decode($stuData->$col);
+    
+                        $totalScore += $subData->score ?? 0;
+                        $totalPoints += $subData->points ?? 0;
+                    }
+                }
+    
+                $avgPoints = round($totalPoints / $populatedCols);
+                $avgScore = round($totalScore / $populatedCols);
+    
+                $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+    
+                $avgGrade = $pgm[$avgPoints];
+    
+                DB::table($tblName)
+                ->updateOrInsert([
+                    "admno" => $stuData->admno
+                ], [
+                    "mm" => $avgScore,
+                    "mg" => $avgGrade,
+                    'mp' => $avgPoints,
+                    'tp' => $totalPoints,
+                    'tm' => $totalScore
+                ]);
+            });
+
+            session()->flash('status', 'Aggregates generated for all level students');
+    
+            $this->emit('hide-generate-aggregates-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-generate-aggregates-modal');
+            
+        }
+        
     }
 
     /**
