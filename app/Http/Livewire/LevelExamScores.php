@@ -444,7 +444,7 @@ class LevelExamScores extends Component
                             'mp' => $item->mp,
                             'tp' => $item->tp,
                             'mg' => $item->mg,
-                            'sp' => $item->sp,
+                            'sp' => $item->sp ?? null,
                             'op' => $item->op
                         ]);
     
