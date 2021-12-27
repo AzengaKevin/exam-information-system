@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', "{$exam->name} - {$levelUnit->alias} - Transcripts")
+@section('title', $title)
 
 @section('content')
 
@@ -13,13 +13,13 @@
             <li class="breadcrumb-item">
                 <a href="{{ route('exams.transcripts.index',$exam) }}">{{ $exam->name }} Transcripts</a>
             </li>
-            <li class="breadcrumb-item active" aria-current="page">{{ $exam->name }} - {{$levelUnit->alias}} Transcripts
-            </li>
+            <li class="breadcrumb-item active" aria-current="page">{{ $title }}</li>
         </ol>
     </nav>
     <a href="{{ route('exams.transcripts.print-bulk', [
         'exam' => $exam,
-        'level-unit' => $levelUnit->id
+        'level-unit' => optional($levelUnit)->id,
+        'level' => optional($level)->id,
     ]) }}" class="btn btn-primary f-inline-flex gap-2 align-items-center" download>
         <i class="fa fa-download"></i>
         <span>Download All</span>
