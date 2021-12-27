@@ -85,7 +85,7 @@ class ExamsTranscriptsManagementTest extends TestCase
 
         $response->assertViewIs('exams.transcripts.index');
 
-        $response->assertViewHasAll(['levelUnits', 'exam']);
+        $response->assertViewHasAll(['levelUnits', 'exam', 'systemSettings']);
         
     }
 
@@ -205,7 +205,80 @@ class ExamsTranscriptsManagementTest extends TestCase
 
         $response->assertViewIs('exams.transcripts.show');
 
-        $response->assertViewHasAll(['exam', 'levelUnit', 'studentsScores', 'subjectColumns', 'subjectsMap', 'swahiliComments', 'englishComments', 'teachers', 'outOfs']);
+        $response->assertViewHasAll(['exam', 'levelUnit', 'studentsScores', 'subjectColumns', 'subjectsMap', 'swahiliComments', 'englishComments', 'teachers', 'outOfs', 'title']);
+        
+    }
+
+    /** @group exams-scores */
+    public function testAuthorizedUsersCanSeeTranscriptsForTheWholeLevel()
+    {
+        
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        // Create the Level Unit
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        /** @var Collection */
+        $students = Student::factory(2)->create([
+            'admission_level_id' => $level->id,
+            'stream_id' => null,
+            'level_unit_id' => null
+        ]);
+
+        /** @var Collection */
+        $subjects = Subject::limit(2)->get();
+
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, ['level_id' => $level->id,]);
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($level);
+
+        $exam->subjects()->attach($subjects);
+
+        // Create Scores Table
+        CreateScoresTable::invoke($exam);
+
+        // Upload students scores
+        foreach ($students as $student) {
+
+            foreach ($subjects as $subject) {
+
+                DB::table(Str::slug($exam->shortname))
+                ->updateOrInsert([
+                    "admno" => $student->adm_no
+                ], [
+                    $subject->shortname => json_encode([
+                        'score' => $this->faker->numberBetween(0, 100),
+                        'grade' => $this->faker->randomElement(Grading::gradeOptions()),
+                        'points' => $this->faker->numberBetween(0, 12),
+                    ]),
+                    'level_id' => $level->id,
+                ]);
+    
+            }
+
+        }
+
+        $response = $this->get(route('exams.transcripts.show',[
+            'exam' =>  $exam,
+            'level' => $level->id
+        ]));
+
+        $response->assertOk();
+
+        $response->assertViewIs('exams.transcripts.show');
+
+        $response->assertViewHasAll(['exam', 'level', 'studentsScores', 'subjectColumns', 'subjectsMap', 'swahiliComments', 'englishComments', 'teachers', 'outOfs', 'title']);
         
     }
 
