@@ -222,15 +222,24 @@ class ExamsScoresController extends Controller
         try {
 
             /** @var Subject */
-            $subject = Subject::findOrFail(intval($request->get('subject')));
+            $subject = Subject::find(intval($request->get('subject')));
 
             /** @var LevelUnit */
             $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
 
             /** @var Level */
             $level = Level::find(intval($request->get('level')));
+            
+            $title = "Manage Scores";
 
-            $title = "Manage " . (optional($level)->name ?? optional($levelUnit)->alias) . " - {$subject->name} Scores";
+            if($subject){
+                if($level) $title = "Upload {$exam->name} - {$level->name} - {$subject->name} Scores";
+                if($levelUnit) $title = "Upload {$exam->name} - {$levelUnit->alias} - {$subject->name} Scores";
+            }elseif($levelUnit){
+                $title = "{$levelUnit->alias} Scores Management";
+            } elseif($level){
+                 $title = "{$level->name} Scores Management";
+            }
 
             return view('exams.scores.manage', [
                 'exam' => $exam,
