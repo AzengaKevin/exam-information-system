@@ -23,8 +23,8 @@ class CreateExamStudentTable extends Migration
             $table->integer('mp');
             $table->integer('tp');
             $table->enum('mg', Grading::gradeOptions());
-            $table->integer('sp');
-            $table->integer('op');
+            $table->integer('sp')->nullable(); // For the case of school without streams
+            $table->integer('op')->nullable(); // Just general
             $table->timestamps();
         });
     }
