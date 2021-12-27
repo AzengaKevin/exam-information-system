@@ -63,7 +63,7 @@ class ExamsScoresManagementTest extends TestCase
 
         $response->assertViewIs('exams.scores.index');
 
-        $response->assertViewHasAll(['exam', 'responsibilities']);
+        $response->assertViewHasAll(['exam', 'responsibilities', 'systemSettings']);
         
     }
 

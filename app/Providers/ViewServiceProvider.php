@@ -33,7 +33,8 @@ class ViewServiceProvider extends ServiceProvider
             'livewire.students',
             'students.index',
             'teachers.responsibilities.index',
-            'teachers.show'
+            'teachers.show',
+            'exams.scores.index'
         ], SettingsComposer::class);
     }
 }

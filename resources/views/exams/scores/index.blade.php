@@ -106,6 +106,8 @@
     </div>
 
     @can('change-exam-status')
+
+    @if ($systemSettings->school_has_streams)        
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
@@ -147,6 +149,7 @@
             </div>
         </div>
     </div>
+    @endif
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">

@@ -337,6 +337,7 @@ class ExamsScoresController extends Controller
                     ]);
             }
 
+            session()->flash('status', 'Scores successfully updated');
 
             return redirect(route('exams.scores.upload', [
                 'exam' => $exam,
@@ -351,6 +352,8 @@ class ExamsScoresController extends Controller
                 'exam-id' => $exam->id,
                 'action' => __METHOD__
             ]);
+
+            session()->flash('status', 'A db error occurred, check with admin');
 
             return back()->withInput();
             
