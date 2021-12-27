@@ -210,6 +210,50 @@ class ExamsScoresController extends Controller
     }
 
     /**
+     * Show class exam scores and options for extra tasks and operations
+     * 
+     * @param Request $request
+     * @param Exam $exam
+     * 
+     */
+    public function manage(Request $request, Exam $exam)
+    {
+
+        try {
+
+            /** @var Subject */
+            $subject = Subject::findOrFail(intval($request->get('subject')));
+
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
+
+            /** @var Level */
+            $level = Level::find(intval($request->get('level')));
+
+            $title = "Manage " . (optional($level)->name ?? optional($levelUnit)->alias) . " - {$subject->name} Scores";
+
+            return view('exams.scores.manage', [
+                'exam' => $exam,
+                'level' => $level,
+                'levelUnit' => $levelUnit,
+                'subject' => $subject,
+                'title' => $title
+            ]); 
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'exam-id' => $exam->id,
+                'action' => __METHOD__
+            ]);
+
+            return back();
+            
+        }
+        
+    }
+
+    /**
      * Persist student scores to the database
      * @param UploadScoresRequest $request
      * @param Exam $exam
@@ -291,7 +335,7 @@ class ExamsScoresController extends Controller
                         'level_id' => optional($level)->id,
                         'level_unit_id' => optional($levelUnit)->id
                     ]);
-            }            
+            }
 
 
             return redirect(route('exams.scores.upload', [

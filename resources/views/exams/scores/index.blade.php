@@ -76,10 +76,15 @@
                                             <i class="fa fa-upload"></i>
                                             <span>New Upload Scores</span>
                                         </a>
-                                        <a href="#"
+                                        <a href="{{ route('exams.scores.manage', [
+                                            'exam' => $exam,
+                                            'subject' => $responsibility->pivot->subject->id,
+                                            'level-unit' => $responsibility->pivot->levelUnit->id,
+                                            'level' => $responsibility->pivot->level->id,
+                                        ]) }}"
                                             class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
                                             <i class="fa fa-eye"></i>
-                                            <span>Uploaded Scores</span>
+                                            <span>Manage Scores</span>
                                         </a>
                                         @endif
                                     </div>
