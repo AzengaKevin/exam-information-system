@@ -102,7 +102,7 @@
                     <td>{{ $subjectScore->score }}%</td>
                     <td>0</td>
                     <td>{{ $subjectScore->grade }}</td>
-                    <td>10 / 69</td>
+                    <td>{{ $subjectScore->rank ?? '-' }} / {{ $subjectScore->total ?? '-' }}</td>
 
                     @if ($col == 'kis')
                     <td>{{ $swahiliComments[$subjectScore->grade] ?? 'Hakuna maoni' }}</td>
@@ -128,7 +128,7 @@
                     <td class="text-start">
                         <span class="fw-bold">
                             <span>Class Teacher's Remarks</span>
-                            <span  class="text-secondary"> - {{ $teacher['ct'] ?? 'N/A' }}</span>
+                            <span  class="text-secondary"> - {{ $teachers['ct'] ?? 'N/A' }}</span>
                         </span>
                     </td>
                 </tr>

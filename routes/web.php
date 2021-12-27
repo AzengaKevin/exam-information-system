@@ -113,10 +113,12 @@ Route::group(['middleware' => ['auth']], function(){
     Route::resource('exams.results', ExamsResultsController::class)
         ->only(['index']);
 
-    Route::resource('exams.transcripts', ExamsTranscriptsController::class)
-        ->only(['index']);
+    //Route::resource('exams.transcripts', ExamsTranscriptsController::class)->only(['index']);
 
-    Route::get('/exams/{exam}/transcripts/show', [ExamsTranscriptsController::class, 'show'])
+    Route::get('/exams/{exam:slug}/transcripts', [ExamsTranscriptsController::class, 'index'])
+        ->name('exams.transcripts.index');
+
+    Route::get('/exams/{exam:slug}/transcripts/show', [ExamsTranscriptsController::class, 'show'])
         ->name('exams.transcripts.show');
 
     Route::get('/exams/{exam}/transcripts/print-one', [ExamsTranscriptsController::class, 'printOne'])

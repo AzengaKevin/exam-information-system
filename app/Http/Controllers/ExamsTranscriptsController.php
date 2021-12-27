@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Models\LevelUnit;
 use App\Models\Responsibility;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,12 +44,17 @@ class ExamsTranscriptsController extends Controller
     public function show(Request $request, Exam $exam)
     {
         $levelUnitId = $request->get('level-unit');
+        $levelId = $request->get('level');
 
         try {
 
             $outOfs = array();
 
-            $levelUnit = LevelUnit::findOrFail($levelUnitId);
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::find($levelUnitId);
+
+            /** @var Level */
+            $level = Level::find($levelId);
 
             // Get the student results
             $examScoresTblName = Str::slug($exam->shortname);
@@ -68,15 +74,18 @@ class ExamsTranscriptsController extends Controller
             $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
 
 
-            $teachers = DB::table('responsibility_teacher')
+            $teachersQuery = DB::table('responsibility_teacher')
                 ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
                 ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
                 ->join('users', function($join){
                     $join->on('teachers.id', '=', 'users.authenticatable_id')
                         ->where('users.authenticatable_type', 'teacher');
-                })->select('users.name', 'subjects.shortname')
-                    ->where('responsibility_teacher.level_unit_id', $levelUnit->id)
-                    ->get()->pluck('name', 'shortname')->toArray();
+                })->select('users.name', 'subjects.shortname');
+
+            if ($levelUnit) $teachersQuery->where('responsibility_teacher.level_unit_id', $levelUnit->id);
+            if ($level) $teachersQuery->where('responsibility_teacher.level_id', $level->id);
+                    
+            $teachers = $teachersQuery->get()->pluck('name', 'shortname')->toArray();
 
             /** @var Responsibility */
             $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
@@ -84,30 +93,45 @@ class ExamsTranscriptsController extends Controller
 
             /** @var Responsibility */
             $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-            $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;
 
-            $outOfs["lsc"] = DB::table($examScoresTblName)
-                ->select("admno")
-                ->distinct("admno")
-                ->where('level_id', $levelUnit->level_id)
-                ->count();
+            if ($levelUnit) $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;
+            if ($level) $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_id', $level->id)->first())->auth)->name;
 
-            $outOfs["lusc"] = DB::table($examScoresTblName)
-                ->select("admno")
-                ->distinct("admno")
-                ->where('level_unit_id', $levelUnit->id)
-                ->count();
+            if ($levelUnit) {
+                
+                $outOfs["lsc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_id', $levelUnit->level_id)
+                    ->count();
+    
+                $outOfs["lusc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_unit_id', $levelUnit->id)
+                    ->count();
+            }
 
-
-            /** @var Collection */
-            $studentsScores = DB::table($examScoresTblName)
+            if($level){
+                
+                $outOfs["lsc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_id', $level->id)
+                    ->count();
+            }
+            
+            $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-                ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
-                ->where("{$examScoresTblName}.level_unit_id", $levelUnit->id)
-                ->get();                
+                ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left');
+            
+            if ($levelUnit) $studentsScoresQuery->where("{$examScoresTblName}.level_unit_id", $levelUnit->id);
+            if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
+
+            $studentsScores = $studentsScoresQuery->get();                
                 
             $subjectsCount = 0;
         
@@ -121,10 +145,16 @@ class ExamsTranscriptsController extends Controller
             $outOfs["tp"] = $subjectsCount * 12;
             $outOfs["mm"] = 100;
             $outOfs["mg"] = 'A';
+
+            $title = "Transcripts";
+
+            if ($levelUnit) $title = "{$exam->name} - {$levelUnit->alias} - Transcripts";
+            if ($level) $title = "{$exam->name} - {$level->name} - Transcripts";
             
             return view('exams.transcripts.show', [
                 'exam' => $exam,
                 'levelUnit' => $levelUnit,
+                'level' => $level,
                 'studentsScores' => $studentsScores,
                 'subjectColumns' => $subjectColumns,
                 'subjectsMap' => $subjectsMap,
@@ -133,7 +163,8 @@ class ExamsTranscriptsController extends Controller
                 'ctComments' => $ctComments,
                 'pComments' => $pComments,
                 'teachers' => $teachers,
-                'outOfs' => $outOfs
+                'outOfs' => $outOfs,
+                'title' => $title
             ]);
 
         } catch (\Exception $exception) {
@@ -272,7 +303,7 @@ class ExamsTranscriptsController extends Controller
      * @param Request $request
      * @param Exam $exam
      */
-    public function printOne(Request $request, Exam $exam)
+    public function printOne(Request $request, Exam $exam, SystemSettings $systemSettings)
     {
 
         $admno = $request->get('admno');
@@ -290,7 +321,7 @@ class ExamsTranscriptsController extends Controller
     
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
     
-            $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
+            $aggregateColumns = array("mm", "tm", "mg", "mp", "tp", "sp", "op");
 
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
@@ -302,16 +333,20 @@ class ExamsTranscriptsController extends Controller
 
             if ($student) {
 
-                $teachers = DB::table('responsibility_teacher')
+                $teachersQuery = DB::table('responsibility_teacher')
                     ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
                     ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
                     ->join('users', function($join){
                         $join->on('teachers.id', '=', 'users.authenticatable_id')
                                 ->where('users.authenticatable_type', 'teacher');
-                    })->select('users.name', 'subjects.shortname')
-                        ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
-                        ->get()->pluck('name', 'shortname')->toArray();
+                    })->select('users.name', 'subjects.shortname');
 
+                
+                if($systemSettings->school_has_streams) $teachersQuery->where('responsibility_teacher.level_unit_id', $student->level_unit_id);
+
+                else $teachersQuery->where('responsibility_teacher.level_id', $student->level_id);
+
+                $teachers = $teachersQuery->get()->pluck('name', 'shortname')->toArray();
 
                 /** @var Responsibility */
                 $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
@@ -319,27 +354,39 @@ class ExamsTranscriptsController extends Controller
 
                 /** @var Responsibility */
                 $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-                $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;                        
 
-                $outOfs["lsc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
-                    ->where('level_id', $student->level_id)
-                    ->count();
+                if($systemSettings->school_has_streams) $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $student->level_unit_id)->first())->auth)->name;                        
+                else $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_id', $student->level_id)->first())->auth)->name;                        
 
-                $outOfs["lusc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
-                    ->where('level_unit_id', $student->level_unit_id)
-                    ->count();
+                if ($systemSettings->school_has_streams) {
+                    
+                    $outOfs["lsc"] = DB::table($examScoresTblName)
+                        ->select("admno")
+                        ->distinct("admno")
+                        ->where('level_id', $student->level_id)
+                        ->count();
+    
+                    $outOfs["lusc"] = DB::table($examScoresTblName)
+                        ->select("admno")
+                        ->distinct("admno")
+                        ->where('level_unit_id', $student->level_unit_id)
+                        ->count();
+                }else{
+                    
+                    $outOfs["lsc"] = DB::table($examScoresTblName)
+                        ->select("admno")
+                        ->distinct("admno")
+                        ->where('level_id', $student->level_id)
+                        ->count();
+                }
             }
             
             $studentScores = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColums, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-                ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
+                ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
 
@@ -395,12 +442,15 @@ class ExamsTranscriptsController extends Controller
     public function printBulk(Request $request, Exam $exam)
     {
         $levelUnitId = $request->get('level-unit');
+        $levelId = $request->get('level');
 
         try {
 
             $outOfs = array();
 
-            $levelUnit = LevelUnit::findOrFail($levelUnitId);
+            $levelUnit = LevelUnit::find($levelUnitId);
+
+            $level = Level::find($levelId);
 
             // Get the student results
             $examScoresTblName = Str::slug($exam->shortname);
@@ -420,15 +470,19 @@ class ExamsTranscriptsController extends Controller
             $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
 
 
-            $teachers = DB::table('responsibility_teacher')
+            $teachersQuery = DB::table('responsibility_teacher')
                 ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
                 ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
                 ->join('users', function($join){
                     $join->on('teachers.id', '=', 'users.authenticatable_id')
                         ->where('users.authenticatable_type', 'teacher');
-                })->select('users.name', 'subjects.shortname')
-                    ->where('responsibility_teacher.level_unit_id', $levelUnit->id)
-                    ->get()->pluck('name', 'shortname')->toArray();
+                })->select('users.name', 'subjects.shortname');
+
+            if($level) $teachersQuery->where('responsibility_teacher.level_id', $level->id);
+
+            if($levelUnit) $teachersQuery->where('responsibility_teacher.level_unit_id', $levelUnit->id);
+
+            $teachers = $teachersQuery->get()->pluck('name', 'shortname')->toArray();
 
             /** @var Responsibility */
             $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
@@ -436,29 +490,47 @@ class ExamsTranscriptsController extends Controller
 
             /** @var Responsibility */
             $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-            $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;
-            $outOfs["lsc"] = DB::table($examScoresTblName)
-                ->select("admno")
-                ->distinct("admno")
-                ->where('level_id', $levelUnit->level_id)
-                ->count();
 
-            $outOfs["lusc"] = DB::table($examScoresTblName)
-                ->select("admno")
-                ->distinct("admno")
-                ->where('level_unit_id', $levelUnit->id)
-                ->count();
+            if($level) $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_id', $level->id)->first())->auth)->name;
+            
+            if($levelUnit) $teachers['ct'] = optional(optional($ctRes->teachers()->wherePivot('level_unit_id', $levelUnit->id)->first())->auth)->name;
 
+            if ($levelUnit) {
+                
+                $outOfs["lsc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_id', $levelUnit->level_id)
+                    ->count();
+    
+                $outOfs["lusc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_unit_id', $levelUnit->id)
+                    ->count();
+            }
 
-            /** @var Collection */
-            $studentsScores = DB::table($examScoresTblName)
+            if ($level) {
+
+                $outOfs["lsc"] = DB::table($examScoresTblName)
+                    ->select("admno")
+                    ->distinct("admno")
+                    ->where('level_id', $level->id)
+                    ->count();
+            }
+
+            $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-                ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
-                ->where("{$examScoresTblName}.level_unit_id", $levelUnit->id)
-                ->get();                
+                ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
+
+            if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
+
+            if ($levelUnit) $studentsScoresQuery->where("{$examScoresTblName}.level_unit_id", $levelUnit->id);
+            
+            $studentsScores = $studentsScoresQuery->get();             
                 
             $subjectsCount = 0;
         
@@ -473,9 +545,16 @@ class ExamsTranscriptsController extends Controller
             $outOfs["mm"] = 100;
             $outOfs["mg"] = 'A';
 
+            
+            $title = "Transcripts";
+            
+            if ($levelUnit) $title = "{$exam->name} - {$levelUnit->alias} - Transcripts";
+            if ($level) $title = "{$exam->name} - {$level->name} - Transcripts";
+
             $pdf = \PDF::loadView("printouts.exams.transcripts", [
                 'exam' => $exam,
                 'levelUnit' => $levelUnit,
+                'level' => $level,
                 'studentsScores' => $studentsScores,
                 'subjectColumns' => $subjectColumns,
                 'subjectsMap' => $subjectsMap,
@@ -484,10 +563,16 @@ class ExamsTranscriptsController extends Controller
                 'ctComments' => $ctComments,
                 'pComments' => $pComments,
                 'teachers' => $teachers,
-                'outOfs' => $outOfs
+                'outOfs' => $outOfs,
+                'title' => $title,
             ]);
+
+            $name = "transacripts";
+
+            if($level) $name = Str::slug($exam->shortname) . '-' . Str::slug($level->name);
+            if($levelUnit) $name = Str::slug($exam->shortname) . '-'. Str::slug($levelUnit->alias);
     
-            return $pdf->download("{$exam->shortname}-{$levelUnit->alias}.pdf");
+            return $pdf->download("{$name}.pdf");
 
         } catch (\Exception $exception) {
             

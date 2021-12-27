@@ -34,7 +34,8 @@ class ViewServiceProvider extends ServiceProvider
             'students.index',
             'teachers.responsibilities.index',
             'teachers.show',
-            'exams.scores.index'
+            'exams.scores.index',
+            'exams.transcripts.index'
         ], SettingsComposer::class);
     }
 }
