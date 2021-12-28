@@ -148,4 +148,34 @@ class Streams extends Component
             $this->emit('hide-delete-stream-modal');
         }
     }
+
+    /** 
+     * Deleting all current available streams from the database
+     */
+    public function truncateStreams()
+    {
+        try {
+
+            /** @var Collection */
+            $streams = Stream::all();
+
+            $streams->each(function(Stream $stream){
+                $stream->forceDelete();
+            });
+
+            session()->flash('status', 'All system streams have been deleted');
+
+            $this->emit('hide-truncate-streams-modal');
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+            
+            session()->flash('error', 'An error occurred while deleting systems streams');
+
+            $this->emit('hide-truncate-streams-modal');
+        }
+    }
 }

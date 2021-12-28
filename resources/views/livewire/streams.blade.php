@@ -64,5 +64,6 @@
 
     <x-modals.streams.upsert :streamId="$streamId" />
     <x-modals.streams.delete :name="$name" />
+    <x-modals.streams.truncate />
     
 </div>
