@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Subject;
 use Livewire\Component;
 use App\Models\Department;
+use App\Rules\LowerAlphaOnly;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -85,10 +86,9 @@ class Subjects extends Component
         return [
             'name' => ['bail', 'required','string', Rule::unique('subjects')->ignore($this->subjectId)],
             'description' => ['bail', 'nullable'],
-            'shortname' => ['bail', 'required', 'max:5'],
+            'shortname' => ['bail', 'required', 'max:5', new LowerAlphaOnly],
             'subject_code' => ['bail', 'nullable'],
             'department_id' => ['bail', 'nullable'],
-
         ];
     }
 
