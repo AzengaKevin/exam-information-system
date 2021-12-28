@@ -11,7 +11,12 @@ class Stream extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'slug',
+        'alias',
+        'description'
+    ];
 
     public function setNameAttribute($value)
     {

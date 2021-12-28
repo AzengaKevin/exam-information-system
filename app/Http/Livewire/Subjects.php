@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection;
 
 class Subjects extends Component
 {
@@ -182,5 +183,39 @@ class Subjects extends Component
 
             $this->emit('hide-delete-subject-modal');
         }
+    }
+
+    /**
+     * Truncates the subjects table | Deletes all the records from the subjects tabl
+     */
+    public function truncateSubjects()
+    {
+        try {
+            
+            //Subject::truncate();
+            
+            /** @var Collection */
+            $subjects = Subject::all();
+
+            $subjects->each(function(Subject $subject){
+                $subject->forceDelete();
+            });
+
+            session()->flash('status', 'You\'ve successfully deleted all the subjects in the application');
+
+            $this->emit('hide-truncate-subjects-modal');
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'An error occurred while deleting subjects');
+
+            $this->emit('hide-truncate-subjects-modal');
+            
+        }
+        
     }
 }

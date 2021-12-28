@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection;
 
 class Levels extends Component
 {
@@ -148,6 +149,38 @@ class Levels extends Component
             session()->flash('error', 'A fatal error has occurred');
 
             $this->emit('hide-delete-level-modal');
+        }
+    }
+
+    /**
+     * Delete all levels from the database
+     */
+    public function truncateLevels()
+    {
+        try {
+
+            // Level::truncate();
+
+            /** @var Collection */
+            $levels = Level::all();
+
+            $levels->each(function(Level $level){
+                $level->forceDelete();
+            });
+
+            session()->flash('status', 'All system levels have been deleted');
+
+            $this->emit('hide-truncate-levels-modal');
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+            
+            session()->flash('error', 'An error occurred while deleting systems levels');
+
+            $this->emit('hide-truncate-levels-modal');
         }
     }
 }
