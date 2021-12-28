@@ -127,10 +127,11 @@ class ExamsTranscriptsController extends Controller
             
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left');
+                ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
+                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
             
             if ($levelUnit) $studentsScoresQuery->where("{$examScoresTblName}.level_unit_id", $levelUnit->id);
             if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
@@ -399,9 +400,10 @@ class ExamsTranscriptsController extends Controller
             
             $studentScores = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
@@ -506,7 +508,7 @@ class ExamsTranscriptsController extends Controller
             /** @var Responsibility */
             $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
             $teachers['p'] = optional(optional($pRes->teachers()->latest()->first())->auth)->name;
-
+            
             /** @var Responsibility */
             $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
 
@@ -540,9 +542,10 @@ class ExamsTranscriptsController extends Controller
 
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
 
             if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
