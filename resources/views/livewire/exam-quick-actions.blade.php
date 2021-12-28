@@ -46,11 +46,14 @@
                 <span class="">Analysis</span>
             </a>
             @endif
+
+            @if (in_array($exam->status, ['Marking', 'Published']))                
             <a href="{{ route('exams.transcripts.index', $exam) }}"
                 class="btn btn-outline-primary gap-2 align-items-center">
                 <i class="fa fa-eye"></i>
                 <span class="">Transcripts</span>
             </a>
+            @endif
 
         </div>
 
