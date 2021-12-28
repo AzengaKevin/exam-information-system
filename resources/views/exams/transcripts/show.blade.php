@@ -47,7 +47,7 @@
                 <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
                     :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
                     :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments"
-                    :teachers="$teachers" />
+                    :teachers="$teachers" :systemSettings="$systemSettings" :generalSettings="$generalSettings" />
             </div>
         </div>
     </div>

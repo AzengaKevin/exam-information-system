@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Models\LevelUnit;
 use App\Models\Responsibility;
+use App\Settings\GeneralSettings;
 use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -41,9 +42,10 @@ class ExamsTranscriptsController extends Controller
      * @param Request $request
      * @param Exam $exam
      */
-    public function show(Request $request, Exam $exam)
+    public function show(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
         $levelUnitId = $request->get('level-unit');
+
         $levelId = $request->get('level');
 
         try {
@@ -131,6 +133,7 @@ class ExamsTranscriptsController extends Controller
             if ($levelUnit) $studentsScoresQuery->where("{$examScoresTblName}.level_unit_id", $levelUnit->id);
             if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
 
+            /** @var Collection */
             $studentsScores = $studentsScoresQuery->get();                
                 
             $subjectsCount = 0;
@@ -164,7 +167,9 @@ class ExamsTranscriptsController extends Controller
                 'pComments' => $pComments,
                 'teachers' => $teachers,
                 'outOfs' => $outOfs,
-                'title' => $title
+                'title' => $title,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
             ]);
 
         } catch (\Exception $exception) {
@@ -179,6 +184,13 @@ class ExamsTranscriptsController extends Controller
 
     }
 
+    /**
+     * Show a page with a asingle student transcript
+     * 
+     * @param Request $request
+     * 
+     * @param Exam $exam
+     */
     public function studentShow(Request $request, Exam $exam)
     {
         $admno = $request->get('admno');
@@ -243,8 +255,8 @@ class ExamsTranscriptsController extends Controller
                 ->select(array_merge($subjectColums, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-                ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
+                ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
 

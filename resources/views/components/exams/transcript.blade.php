@@ -8,17 +8,19 @@
 'englishComments',
 'ctComments',
 'pComments',
-'teachers'
+'teachers',
+'systemSettings',
+'generalSettings'
 ])
 
 <div>
     <div>
         <div class="text-center">
             <div class="fw-bold">
-                <h1 class="fw-bold">KISUMU BOYS' HIGH SCHOOL</h1>
-                <div class="fw-bold">1973 Kisumu</div>
-                <div class="fw-bold">Tel: +254-57-2020164</div>
-                <div class="fw-bold">kisumuboys1973@gmail.com</div>
+                <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
+                <div class="fw-bold">{{ $generalSettings->school_address }}</div>
+                <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
+                <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
                 <hr style="height: 2px; background-color: black; margin-bottom: 0px;">
                 <hr style="height: .5px; background-color: black; margin-top: 1px;">
             </div>
