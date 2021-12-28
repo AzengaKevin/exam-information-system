@@ -2,12 +2,14 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\Subjects;
 use App\Models\Subject;
 use Tests\TestCase;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class SubjectsManagementTest extends TestCase
 {
@@ -37,6 +39,20 @@ class SubjectsManagementTest extends TestCase
         $response->assertViewIs('subjects.index');
 
         $response->assertSeeLivewire('subjects');
+        
+    }
+
+    /** @group subjects */
+    public function testAuthorizedUserCanTruncateSubjects()
+    {
+        $this->withExceptionHandling();
+
+        Subject::factory(2)->create();
+
+        Livewire::test(Subjects::class)
+            ->call('truncateSubjects');
+
+        $this->assertEquals(0, Subject::count());
         
     }
 
