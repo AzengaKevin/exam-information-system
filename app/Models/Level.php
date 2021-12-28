@@ -12,7 +12,12 @@ class Level extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'slug',
+        'numeric',
+        'description'
+    ];
 
     public function setNameAttribute($value)
     {
