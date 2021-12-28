@@ -2,7 +2,7 @@
 
 <div wire:ignore.self id="upsert-subject-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-subject-modal-title">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 @if (is_null($departmentId))
@@ -13,7 +13,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="mt-3">
+                <div>
                     <label for="name" class="form-label">Name</label>
                     <input type="text" wire:model.lazy="name" id="name"
                         class="form-control @error('name') is-invalid @enderror">
@@ -34,7 +34,7 @@
                     </span>
                     @enderror
                 </div>
-              
+
                 <div class="mt-3">
                     <label for="name" class="form-label">Subject Code</label>
                     <input type="text" wire:model.lazy="subject_code" id="name"
@@ -46,18 +46,18 @@
                     @enderror
                 </div>
                 <div class="form-group mt-3">
-                    <label for="">Department</label>
-                    <select class="form-control" wire:model.lazy="department_id" name="" id="">
-                      <option value="">--select department--</option>
-                      @foreach($departments as $department)
-                      <option value="{{$department->id}}">{{$department->name}}</option>
-                      @endforeach
+                    <label for="department" class="form-label">Department</label>
+                    <select class="form-control" wire:model.lazy="department_id" id="department">
+                        <option value="">--select department--</option>
+                        @foreach($departments as $department)
+                        <option value="{{$department->id}}">{{$department->name}}</option>
+                        @endforeach
                     </select>
-                  </div>
+                </div>
                 <div class="mt-3">
                     <label for="name" class="form-label">Description</label>
-                    <input type="text" wire:model.lazy="description" id="description"
-                        class="form-control @error('name') is-invalid @enderror">
+                    <textarea wire:model.lazy="description" id="description" cols="100" rows="4"
+                        class="form-control @error('description') is-invalid @enderror"></textarea>
                     @error('description')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>

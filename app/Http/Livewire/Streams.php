@@ -72,16 +72,24 @@ class Streams extends Component
                 'description'=>$this->description ,
                 'slug'=>Str::slug($this->name)
             ]);
+
+            $this->reset(['name', 'slug', 'alias', 'description']);
+
+            session()->flash('status', 'A stream has been successfully created');
+
+            $this->emit('hide-upsert-stream-modal');
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
+            session()->flash('error', 'A db error occurred');
+
+            $this->emit('hide-upsert-stream-modal');
+
         }
-        $this->emit('hide-upsert-stream-modal');
     }
 
 
@@ -96,6 +104,8 @@ class Streams extends Component
 
             if($stream->update($data)){
 
+                $this->reset(['streamId', 'name', 'slug', 'alias', 'description']);
+
                 session()->flash('status', 'stream successfully updated');
 
                 $this->emit('hide-upsert-stream-modal');
@@ -104,8 +114,7 @@ class Streams extends Component
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
         }

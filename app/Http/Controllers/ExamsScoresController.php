@@ -341,7 +341,7 @@ class ExamsScoresController extends Controller
                                 'grade' => $grade,
                                 'points' => $points,
                         ]),
-                        'level_id' => optional($level)->id,
+                        'level_id' => optional($level)->id ?? optional($levelUnit)->level->id,
                         'level_unit_id' => optional($levelUnit)->id
                     ]);
             }
@@ -362,7 +362,7 @@ class ExamsScoresController extends Controller
                 'action' => __METHOD__
             ]);
 
-            session()->flash('status', 'A db error occurred, check with admin');
+            session()->flash('error', 'A db error occurred, check with admin');
 
             return back()->withInput();
             

@@ -47,24 +47,6 @@
                                 <td>{{ $responsibility->pivot->level->name }}</td>
                                 <td>
                                     <div class="hstack gap-2 align-items-center">
-                                        <a href="{{ route('exams.scores.create', [
-                                            'exam' => $exam,
-                                            'subject' => $responsibility->pivot->subject->id,
-                                            'level-unit' => $responsibility->pivot->levelUnit->id,
-                                            'level' => $responsibility->pivot->level->id,
-                                        ]) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
-                                            @if ($responsibility->pivot->subject->id)
-                                            <i class="fa fa-upload"></i>
-                                            <span>Subject Scores</span>
-                                            @elseif($responsibility->pivot->levelUnit->id)
-                                            <i class="fa fa-cog"></i>
-                                            <span>Class Scores</span>
-                                            @elseif($responsibility->pivot->level->id)
-                                            <i class="fa fa-cog"></i>
-                                            <span>Level Scores</span>
-                                            @endif
-                                        </a>
-
                                         @if ($responsibility->pivot->subject_id)
                                         <a href="{{ route('exams.scores.upload', [
                                             'exam' => $exam,
@@ -132,15 +114,6 @@
                                 <td>{{ $levelUnit->alias }}</td>
                                 <td>
                                     <div class="d-inline-flex gap-2 align-items-center">
-                                        <a href="{{ route('exams.scores.create', [
-                                            'exam' => $exam,
-                                            'level-unit' => $levelUnit->id
-                                        ]) }}"
-                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
-                                            <i class="fa fa-cog"></i>
-                                            <span>Manage Class</span>
-                                        </a>
-
                                         <a href="{{ route('exams.scores.manage', [
                                             'exam' => $exam,
                                             'level-unit' => $levelUnit->id
@@ -187,14 +160,6 @@
                                 <td>{{ $level->name }}</td>
                                 <td>
                                     <div class="d-inline-flex gap-2 align-items-center">
-                                        <a href="{{ route('exams.scores.create', [
-                                            'exam' => $exam,
-                                            'level' => $level->id
-                                        ]) }}"
-                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
-                                            <i class="fa fa-cog"></i>
-                                            <span>Manage Level</span>
-                                        </a>
 
                                         <a href="{{ route('exams.scores.manage', [
                                             'exam' => $exam,
