@@ -316,8 +316,10 @@ class ExamsTranscriptsController extends Controller
      * 
      * @param Request $request
      * @param Exam $exam
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
      */
-    public function printOne(Request $request, Exam $exam, SystemSettings $systemSettings)
+    public function printOne(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
 
         $admno = $request->get('admno');
@@ -331,7 +333,7 @@ class ExamsTranscriptsController extends Controller
             
             $examScoresTblName = Str::slug($exam->shortname);
     
-            $subjectColums = $exam->subjects->pluck("shortname")->toArray();
+            $subjectColumns = $exam->subjects->pluck("shortname")->toArray();
     
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
     
@@ -347,6 +349,7 @@ class ExamsTranscriptsController extends Controller
 
             if ($student) {
 
+                // Fetch the subject teachers appropriately
                 $teachersQuery = DB::table('responsibility_teacher')
                     ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
                     ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
@@ -355,7 +358,6 @@ class ExamsTranscriptsController extends Controller
                                 ->where('users.authenticatable_type', 'teacher');
                     })->select('users.name', 'subjects.shortname');
 
-                
                 if($systemSettings->school_has_streams) $teachersQuery->where('responsibility_teacher.level_unit_id', $student->level_unit_id);
 
                 else $teachersQuery->where('responsibility_teacher.level_id', $student->level_id);
@@ -396,7 +398,7 @@ class ExamsTranscriptsController extends Controller
             }
             
             $studentScores = DB::table($examScoresTblName)
-                ->select(array_merge($subjectColums, $aggregateColumns))
+                ->select(array_merge($subjectColumns, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
@@ -406,7 +408,7 @@ class ExamsTranscriptsController extends Controller
 
             $subjectsCount = 0;
             
-            foreach ($subjectColums as $col) {
+            foreach ($subjectColumns as $col) {
                 if(!empty($studentScores->$col)){
                     $subjectsCount++;
                 }
@@ -420,14 +422,16 @@ class ExamsTranscriptsController extends Controller
             $pdf = \PDF::loadView("printouts.exams.report-form",  [
                 'exam' => $exam,
                 'studentScores' => $studentScores,
-                'subjectColums' => $subjectColums,
+                'subjectColumns' => $subjectColumns,
                 'subjectsMap' => $subjectsMap,
                 'swahiliComments' => $swahiliComments,
                 'englishComments' => $englishComments,
                 'ctComments' => $ctComments,
                 'pComments' => $pComments,
                 'teachers' => $teachers,
-                'outOfs' => $outOfs
+                'outOfs' => $outOfs,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
             ]);
     
             return $pdf->download("{$exam->shortname}-{$admno}.pdf");
