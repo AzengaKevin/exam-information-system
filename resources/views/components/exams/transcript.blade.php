@@ -8,17 +8,19 @@
 'englishComments',
 'ctComments',
 'pComments',
-'teachers'
+'teachers',
+'systemSettings',
+'generalSettings'
 ])
 
 <div>
     <div>
         <div class="text-center">
             <div class="fw-bold">
-                <h1 class="fw-bold">KISUMU BOYS' HIGH SCHOOL</h1>
-                <div class="fw-bold">1973 Kisumu</div>
-                <div class="fw-bold">Tel: +254-57-2020164</div>
-                <div class="fw-bold">kisumuboys1973@gmail.com</div>
+                <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
+                <div class="fw-bold">{{ $generalSettings->school_address }}</div>
+                <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
+                <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
                 <hr style="height: 2px; background-color: black; margin-bottom: 0px;">
                 <hr style="height: .5px; background-color: black; margin-top: 1px;">
             </div>
@@ -28,13 +30,11 @@
             <tbody>
                 <tr>
                     <th class="text-start">NAME:</th>
-                    <td class="text-left" colspan="5">{{ $studentScores->name }}</td>
-                </tr>
-                <tr>
+                    <td class="text-left">{{ $studentScores->name }}</td>
                     <th class="text-start">ADMNO:</th>
                     <td class="text-left">{{ $studentScores->adm_no }}</td>
                     <th class="text-start">FORM:</th>
-                    <td class="text-left">{{ $studentScores->alias }}</td>
+                    <td class="text-left">{{ $studentScores->alias ?? $studentScores->level }}</td>
                     <th class="text-start">HOSTEL:</th>
                     <td class="text-left">{{ $studentScores->hostel ?? 'N/A' }}</td>
                 </tr>
@@ -49,7 +49,9 @@
                     <th>TOTAL POINTS</th>
                     <th>MEAN GRADE</th>
                     <th>OVERALL POSITION</th>
+                    @if ($systemSettings->school_has_streams)
                     <th>STREAM POSITION</th>
+                    @endif
                 </tr>
             </thead>
             <tbody>
@@ -60,7 +62,9 @@
                     <td>{{ $studentScores->tp ?? '-' }}</td>
                     <td>{{ $studentScores->mg ?? '-' }}</td>
                     <td>{{ $studentScores->op ?? '-' }}</td>
+                    @if ($systemSettings->school_has_streams)
                     <td>{{ $studentScores->sp ?? '-' }}</td>
+                    @endif
                 </tr>
                 <tr>
                     <th>OUT OF</th>
@@ -69,7 +73,9 @@
                     <td>{{ $outOfs['tp'] ?? '-' }}</td>
                     <td>{{ $outOfs['mg'] ?? '-' }}</td>
                     <td>{{ $outOfs['lsc'] ?? '-' }}</td>
+                    @if ($systemSettings->school_has_streams)
                     <td>{{ $outOfs['lusc'] ?? '-' }}</td>
+                    @endif
                 </tr>
             </tbody>
         </table>
@@ -128,7 +134,7 @@
                     <td class="text-start">
                         <span class="fw-bold">
                             <span>Class Teacher's Remarks</span>
-                            <span  class="text-secondary"> - {{ $teachers['ct'] ?? 'N/A' }}</span>
+                            <span class="text-secondary"> - {{ $teachers['ct'] ?? 'N/A' }}</span>
                         </span>
                     </td>
                 </tr>
@@ -148,7 +154,7 @@
                     <td class="text-start">
                         <span class="fw-bold">
                             <span>Principal's Remarks</span>
-                            <span  class="text-secondary"> - {{ $teachers['p'] ?? 'N/A' }}</span>
+                            <span class="text-secondary"> - {{ $teachers['p'] ?? 'N/A' }}</span>
                         </span>
                     </td>
                 </tr>

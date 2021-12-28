@@ -37,7 +37,7 @@
                     <a href="{{ route('exams.transcripts.print-one', [
                         'exam' => $exam,
                         'admno' => $studentScores->adm_no
-                    ]) }}" class="btn btn-light d-inline-flex gap-2 align-items-center">
+                    ]) }}" class="btn btn-light d-inline-flex gap-2 align-items-center" download>
                         <i class="fa fa-download"></i>
                         <span>Transcript</span>
                     </a>
@@ -47,7 +47,7 @@
                 <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
                     :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
                     :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments"
-                    :teachers="$teachers" />
+                    :teachers="$teachers" :systemSettings="$systemSettings" :generalSettings="$generalSettings" />
             </div>
         </div>
     </div>

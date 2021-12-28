@@ -90,7 +90,7 @@ class ExamsTranscriptsManagementTest extends TestCase
     }
 
     /** @group exams-transcripts */
-    public function testAuthorizedUsersCanSeeTranscriptsForTheWholeClass()
+    public function testAuthorizedUsersCanSeeTranscriptsForTheWholeLevelUnit()
     {
         $this->withoutExceptionHandling();
 
@@ -205,7 +205,20 @@ class ExamsTranscriptsManagementTest extends TestCase
 
         $response->assertViewIs('exams.transcripts.show');
 
-        $response->assertViewHasAll(['exam', 'levelUnit', 'studentsScores', 'subjectColumns', 'subjectsMap', 'swahiliComments', 'englishComments', 'teachers', 'outOfs', 'title']);
+        $response->assertViewHasAll([
+            'exam', 
+            'levelUnit', 
+            'studentsScores', 
+            'subjectColumns', 
+            'subjectsMap', 
+            'swahiliComments', 
+            'englishComments', 
+            'teachers', 
+            'outOfs', 
+            'title',
+            'systemSettings',
+            'generalSettings'
+        ]);
         
     }
 
@@ -278,7 +291,20 @@ class ExamsTranscriptsManagementTest extends TestCase
 
         $response->assertViewIs('exams.transcripts.show');
 
-        $response->assertViewHasAll(['exam', 'level', 'studentsScores', 'subjectColumns', 'subjectsMap', 'swahiliComments', 'englishComments', 'teachers', 'outOfs', 'title']);
+        $response->assertViewHasAll([
+            'exam', 
+            'level', 
+            'studentsScores', 
+            'subjectColumns', 
+            'subjectsMap', 
+            'swahiliComments', 
+            'englishComments', 
+            'teachers', 
+            'outOfs', 
+            'title',
+            'systemSettings',
+            'generalSettings'
+        ]);
         
     }
 

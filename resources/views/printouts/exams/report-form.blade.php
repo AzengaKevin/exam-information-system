@@ -116,12 +116,25 @@
         .h3 {
             font-size: 1.5rem;
         }
+
+        .page-break {
+            page-break-after: always;
+        }
+
+        .text-secondary {
+            color: gray;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        @include('partials.exams.transcripts.form')
+    <div class="container-fluid">
+        {{-- @include('partials.exams.transcripts.form') --}}
+
+        <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
+            :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
+            :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments" :teachers="$teachers"
+            :systemSettings="$systemSettings" :generalSettings="$generalSettings" />
     </div>
 </body>
 

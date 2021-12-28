@@ -128,12 +128,12 @@
 </head>
 
 <body>
-    <div class="container">
+    <div class="container-fluid">
         @foreach ($studentsScores as $studentScores)
         <x-exams.transcript :exam="$exam" :studentScores="$studentScores" :outOfs="$outOfs"
             :subjectColumns="$subjectColumns" :subjectsMap="$subjectsMap" :swahiliComments="$swahiliComments"
-            :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments"
-            :teachers="$teachers" />
+            :ctComments="$ctComments" :pComments="$pComments" :englishComments="$englishComments" :teachers="$teachers"
+            :systemSettings="$systemSettings" :generalSettings="$generalSettings" />
 
         @if (!$loop->last)
         <div class="page-break"></div>

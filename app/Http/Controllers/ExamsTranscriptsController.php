@@ -9,6 +9,7 @@ use App\Models\Student;
 use App\Models\Subject;
 use App\Models\LevelUnit;
 use App\Models\Responsibility;
+use App\Settings\GeneralSettings;
 use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -40,10 +41,13 @@ class ExamsTranscriptsController extends Controller
      *  
      * @param Request $request
      * @param Exam $exam
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
      */
-    public function show(Request $request, Exam $exam)
+    public function show(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
         $levelUnitId = $request->get('level-unit');
+
         $levelId = $request->get('level');
 
         try {
@@ -123,14 +127,16 @@ class ExamsTranscriptsController extends Controller
             
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left');
+                ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
+                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
             
             if ($levelUnit) $studentsScoresQuery->where("{$examScoresTblName}.level_unit_id", $levelUnit->id);
             if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
 
+            /** @var Collection */
             $studentsScores = $studentsScoresQuery->get();                
                 
             $subjectsCount = 0;
@@ -164,7 +170,9 @@ class ExamsTranscriptsController extends Controller
                 'pComments' => $pComments,
                 'teachers' => $teachers,
                 'outOfs' => $outOfs,
-                'title' => $title
+                'title' => $title,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
             ]);
 
         } catch (\Exception $exception) {
@@ -179,6 +187,13 @@ class ExamsTranscriptsController extends Controller
 
     }
 
+    /**
+     * Show a page with a asingle student transcript
+     * 
+     * @param Request $request
+     * 
+     * @param Exam $exam
+     */
     public function studentShow(Request $request, Exam $exam)
     {
         $admno = $request->get('admno');
@@ -243,8 +258,8 @@ class ExamsTranscriptsController extends Controller
                 ->select(array_merge($subjectColums, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-                ->join("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->join("hostels", "students.hostel_id", "=", "hostels.id", 'left')
+                ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
 
@@ -302,8 +317,10 @@ class ExamsTranscriptsController extends Controller
      * 
      * @param Request $request
      * @param Exam $exam
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
      */
-    public function printOne(Request $request, Exam $exam, SystemSettings $systemSettings)
+    public function printOne(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
 
         $admno = $request->get('admno');
@@ -317,7 +334,7 @@ class ExamsTranscriptsController extends Controller
             
             $examScoresTblName = Str::slug($exam->shortname);
     
-            $subjectColums = $exam->subjects->pluck("shortname")->toArray();
+            $subjectColumns = $exam->subjects->pluck("shortname")->toArray();
     
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
     
@@ -333,6 +350,7 @@ class ExamsTranscriptsController extends Controller
 
             if ($student) {
 
+                // Fetch the subject teachers appropriately
                 $teachersQuery = DB::table('responsibility_teacher')
                     ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
                     ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
@@ -341,7 +359,6 @@ class ExamsTranscriptsController extends Controller
                                 ->where('users.authenticatable_type', 'teacher');
                     })->select('users.name', 'subjects.shortname');
 
-                
                 if($systemSettings->school_has_streams) $teachersQuery->where('responsibility_teacher.level_unit_id', $student->level_unit_id);
 
                 else $teachersQuery->where('responsibility_teacher.level_id', $student->level_id);
@@ -382,17 +399,18 @@ class ExamsTranscriptsController extends Controller
             }
             
             $studentScores = DB::table($examScoresTblName)
-                ->select(array_merge($subjectColums, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->select(array_merge($subjectColumns, $aggregateColumns))
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
                 ->where("{$examScoresTblName}.admno", $admno)
                 ->first();
 
             $subjectsCount = 0;
             
-            foreach ($subjectColums as $col) {
+            foreach ($subjectColumns as $col) {
                 if(!empty($studentScores->$col)){
                     $subjectsCount++;
                 }
@@ -406,14 +424,16 @@ class ExamsTranscriptsController extends Controller
             $pdf = \PDF::loadView("printouts.exams.report-form",  [
                 'exam' => $exam,
                 'studentScores' => $studentScores,
-                'subjectColums' => $subjectColums,
+                'subjectColumns' => $subjectColumns,
                 'subjectsMap' => $subjectsMap,
                 'swahiliComments' => $swahiliComments,
                 'englishComments' => $englishComments,
                 'ctComments' => $ctComments,
                 'pComments' => $pComments,
                 'teachers' => $teachers,
-                'outOfs' => $outOfs
+                'outOfs' => $outOfs,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
             ]);
     
             return $pdf->download("{$exam->shortname}-{$admno}.pdf");
@@ -437,11 +457,14 @@ class ExamsTranscriptsController extends Controller
      * 
      * @param Request $request
      * @param Exam $exam
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
      * 
      */
-    public function printBulk(Request $request, Exam $exam)
+    public function printBulk(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
         $levelUnitId = $request->get('level-unit');
+
         $levelId = $request->get('level');
 
         try {
@@ -452,7 +475,6 @@ class ExamsTranscriptsController extends Controller
 
             $level = Level::find($levelId);
 
-            // Get the student results
             $examScoresTblName = Str::slug($exam->shortname);
 
             $subjectColumns = $exam->subjects->pluck("shortname")->toArray();
@@ -468,7 +490,6 @@ class ExamsTranscriptsController extends Controller
             $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
             
             $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
-
 
             $teachersQuery = DB::table('responsibility_teacher')
                 ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
@@ -487,7 +508,7 @@ class ExamsTranscriptsController extends Controller
             /** @var Responsibility */
             $pRes = Responsibility::firstOrCreate(['name' => 'Principal']);
             $teachers['p'] = optional(optional($pRes->teachers()->latest()->first())->auth)->name;
-
+            
             /** @var Responsibility */
             $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
 
@@ -521,9 +542,10 @@ class ExamsTranscriptsController extends Controller
 
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
+                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
+                ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
 
             if ($level) $studentsScoresQuery->where("{$examScoresTblName}.level_id", $level->id);
@@ -565,6 +587,8 @@ class ExamsTranscriptsController extends Controller
                 'teachers' => $teachers,
                 'outOfs' => $outOfs,
                 'title' => $title,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
             ]);
 
             $name = "transacripts";
