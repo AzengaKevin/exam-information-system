@@ -36,6 +36,9 @@ class LevelExamResults extends Component
         ]);
     }
 
+    /**
+     * Get all level results from the database
+     */
     public function getResults()
     {
         $tblName = Str::slug($this->exam->shortname);
@@ -52,7 +55,7 @@ class LevelExamResults extends Component
                 ->select(array_merge(["admno"], $columns, $aggregateCols))
                 ->addSelect("students.name", "level_units.alias")
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
-                ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
+                ->leftJoin("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy($this->orderBy ?? 'op');
             
