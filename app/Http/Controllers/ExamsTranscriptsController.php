@@ -41,6 +41,8 @@ class ExamsTranscriptsController extends Controller
      *  
      * @param Request $request
      * @param Exam $exam
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
      */
     public function show(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
@@ -449,11 +451,14 @@ class ExamsTranscriptsController extends Controller
      * 
      * @param Request $request
      * @param Exam $exam
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
      * 
      */
-    public function printBulk(Request $request, Exam $exam)
+    public function printBulk(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
         $levelUnitId = $request->get('level-unit');
+
         $levelId = $request->get('level');
 
         try {
@@ -464,7 +469,6 @@ class ExamsTranscriptsController extends Controller
 
             $level = Level::find($levelId);
 
-            // Get the student results
             $examScoresTblName = Str::slug($exam->shortname);
 
             $subjectColumns = $exam->subjects->pluck("shortname")->toArray();
@@ -480,7 +484,6 @@ class ExamsTranscriptsController extends Controller
             $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
             
             $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
-
 
             $teachersQuery = DB::table('responsibility_teacher')
                 ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
@@ -577,6 +580,8 @@ class ExamsTranscriptsController extends Controller
                 'teachers' => $teachers,
                 'outOfs' => $outOfs,
                 'title' => $title,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
             ]);
 
             $name = "transacripts";
