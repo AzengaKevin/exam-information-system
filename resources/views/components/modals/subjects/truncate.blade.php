@@ -7,7 +7,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p class="lead">Are you sure you want to delete all the subjects in the syste, the action is irreversable you might to save the data somewhere else first</p>
+                <p class="lead">Are you sure you want to delete all the subjects in the system, the action is irreversable you might to save the data somewhere else first</p>
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\Levels;
 use App\Models\Level;
 use App\Models\Permission;
 use Tests\TestCase;
@@ -10,6 +11,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class LevelsManagementTest extends TestCase
 {
@@ -29,7 +31,7 @@ class LevelsManagementTest extends TestCase
         $this->actingAs($user);
     }
 
-    /** @group students */
+    /** @group levels */
     public function testAuthorizedUserCanBrowseLevels()
     {
         $this->withoutExceptionHandling();
@@ -46,5 +48,18 @@ class LevelsManagementTest extends TestCase
 
         $response->assertSeeLivewire('levels');
         
-    }    
+    }
+
+    /** @group levels */
+    public function testAuthorizedUserCanTruncateLevels()
+    {
+        $this->withoutExceptionHandling();
+
+        Level::factory(2)->create();
+        
+        Livewire::test(Levels::class)
+            ->call('truncateLevels');
+
+        $this->assertEquals(0, Level::count());
+    }
 }
