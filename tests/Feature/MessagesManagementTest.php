@@ -2,6 +2,8 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\UserMessages;
+use App\Models\Message;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
@@ -9,10 +11,13 @@ use App\Models\Permission;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class MessagesManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
+
+    private User $user;
 
     public function setUp(): void
     {
@@ -34,11 +39,11 @@ class MessagesManagementTest extends TestCase
         $role->permissions()->attach(Permission::all());
 
         /** @var Authenticatable */
-        $user = User::factory()->create([
+        $this->user = User::factory()->create([
             'role_id' => $role->id
         ]);
 
-        $this->actingAs($user);
+        $this->actingAs($this->user);
     }
     
     /** @group messages */
@@ -54,5 +59,26 @@ class MessagesManagementTest extends TestCase
 
         $response->assertSeeLivewire('user-messages');
         
+    }
+
+    /** @group messages */
+    public function testAUserCanCreateAMessage()
+    {
+        $this->withoutExceptionHandling();
+        
+        /** @var array */
+        $payload = Message::factory()->make(['sender_id' => null])->toArray();
+
+        Livewire::test(UserMessages::class, ['user' => $this->user])
+            ->set('recipient_id', $payload['recipient_id'])
+            ->set('content', $payload['content'])
+            ->call('createMessage');
+        
+        $message = Message::first();
+
+        $this->assertNotNull($message);
+
+        $this->assertEquals(1, Message::for($this->user)->count());
+
     }
 }

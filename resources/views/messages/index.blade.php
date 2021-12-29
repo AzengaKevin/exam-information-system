@@ -12,7 +12,7 @@
         </ol>
     </nav>
     <div class="hstack gap-2">
-        <button class="btn btn-outline-primary hstack gap-2 align-items-center">
+        <button data-bs-toggle="modal" data-bs-target="#upsert-message-modal" class="btn btn-outline-primary hstack gap-2 align-items-center">
             <i class="fa fa-plus"></i>
             <span>Message</span>
         </button>
@@ -20,10 +20,12 @@
 </div>
 <hr>
 
-<livewire:user-messages />
+<livewire:user-messages :user="Auth::user()" />
 
 @endsection
 
 @push('scripts')
-<script></script>
+<script>
+    livewire.on('hide-upsert-message-modal', () => $('#upsert-message-modal').modal('hide'));
+</script>
 @endpush
