@@ -15,4 +15,13 @@ class Message extends Model
         'recipient_id',
         'content'
     ];
+
+    /**
+     * It is a scope method for gettings all the messages for a certain user, both sent and received
+     */
+    public function scopeFor($query, User $user)
+    {
+        $query->where('sender_id', $user->id)
+            ->orWhere('recipient_id', $user->id);
+    }
 }

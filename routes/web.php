@@ -21,6 +21,7 @@ use App\Http\Controllers\ExamsTranscriptsController;
 use App\Http\Controllers\GradesController;
 use App\Http\Controllers\GradingsController;
 use App\Http\Controllers\LevelUnitsController;
+use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ResponsibilitiesController;
 use App\Http\Controllers\SettingsController;
@@ -156,4 +157,6 @@ Route::group(['middleware' => ['auth']], function(){
     Route::patch('/settings/update', [SettingsController::class, 'update'])
         ->name('settings.update');
 
+    Route::resource('messages', MessagesController::class)
+        ->only(['index']);
 });
