@@ -2,10 +2,14 @@
 
 namespace App\Providers;
 
+use App\Channels\AdvantaChannel;
 use App\Models\Guardian;
+use App\Models\Message;
 use App\Models\Teacher;
+use App\Observers\MessageObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -34,5 +38,12 @@ class AppServiceProvider extends ServiceProvider
             'teacher' => Teacher::class,
             'guardian' => Guardian::class
         ]);
+
+        // Register new notification channel
+        Notification::extend('advanta', fn($app) => new AdvantaChannel());
+
+        // Register Observers
+        Message::observe(MessageObserver::class);
     }
+    
 }

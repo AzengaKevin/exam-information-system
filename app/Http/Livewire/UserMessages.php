@@ -43,7 +43,7 @@ class UserMessages extends Component
      */
     public function getAllUserMessages()
     {
-        return Message::with(['sender', 'recipient'])->for($this->user->fresh())->latest()->paginate(2)->withQueryString();
+        return Message::with(['sender', 'recipient'])->for($this->user->fresh())->latest()->paginate(24)->withQueryString();
     }
 
     /**
