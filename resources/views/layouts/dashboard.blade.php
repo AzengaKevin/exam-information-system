@@ -206,6 +206,12 @@
                             </a>
                         </li>
                         <li>
+                            <a class="dropdown-item text-muted" href="{{ route('messages.index') }}">
+                                <span><i class="fa fa-envelope"></i></span>
+                                <span class="ms-2">My Messages</span>
+                            </a>
+                        </li>
+                        <li>
                             <hr class="dropdown-divider">
                         </li>
                         <li>

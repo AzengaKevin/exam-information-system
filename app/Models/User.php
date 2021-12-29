@@ -61,4 +61,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Role::class)
             ->withDefault(['name' => 'None']);
     }
+
+    /**
+     * User messages relation
+     */
+    public function messages()
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
 }

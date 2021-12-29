@@ -30,4 +30,10 @@ return [
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
+    'advanta' => [
+        'apikey' => env('ADVANTA_API_KEY'),
+        'partnerID' => env('ADVANTA_PARTNER_ID'),
+        'shortcode' => env('ADVANTA_SHORT_CODE'),
+    ],
+
 ];
