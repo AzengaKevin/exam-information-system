@@ -24,4 +24,20 @@ class Message extends Model
         $query->where('sender_id', $user->id)
             ->orWhere('recipient_id', $user->id);
     }
+
+    /**
+     * Message sender (User) relations
+     */
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'sender_id');
+    }
+
+    /**
+     * Message recipient (User) relations
+     */
+    public function recipient()
+    {
+        return $this->belongsTo(User::class, 'recipient_id');
+    }
 }
