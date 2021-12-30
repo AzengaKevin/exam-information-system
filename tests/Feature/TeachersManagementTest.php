@@ -2,16 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Http\Livewire\Teachers;
-use App\Models\Subject;
 use Tests\TestCase;
 use App\Models\User;
+use Livewire\Livewire;
+use App\Models\Subject;
 use App\Models\Teacher;
+use Illuminate\Support\Str;
+use App\Http\Livewire\Teachers;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 class TeachersManagementTest extends TestCase
 {
@@ -40,6 +41,7 @@ class TeachersManagementTest extends TestCase
             $teacher->auth()->create([
                 'name' => $this->faker->name(),
                 'email' => $this->faker->safeEmail(),
+                'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
                 'password' => Hash::make('password')
             ]);
         }
@@ -62,6 +64,7 @@ class TeachersManagementTest extends TestCase
         $payload = [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'employer' => $this->faker->randomElement(Teacher::employerOptions()),
             'tsc_number' => $this->faker->numberBetween(123456, 999999),
         ];
@@ -69,6 +72,7 @@ class TeachersManagementTest extends TestCase
         Livewire::test(Teachers::class)
             ->set('name', $payload['name'])
             ->set('email', $payload['email'])
+            ->set('phone', $payload['phone'])
             ->set('employer', $payload['employer'])
             ->set('tsc_number', $payload['tsc_number'])
             ->call('addTeacher');
@@ -84,6 +88,7 @@ class TeachersManagementTest extends TestCase
 
         $this->assertEquals($payload['name'], $teacher->auth->name);
         $this->assertEquals($payload['email'], $teacher->auth->email);
+        $this->assertEquals(Str::start($payload['phone'], '254'), $teacher->auth->phone);
     }
 
     /** @group teachers */
@@ -102,6 +107,7 @@ class TeachersManagementTest extends TestCase
         $payload = [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'employer' => $this->faker->randomElement(Teacher::employerOptions()),
             'tsc_number' => $this->faker->numberBetween(123456, 999999),
             'selectedSubjects' => $selectedSubjects
@@ -110,6 +116,7 @@ class TeachersManagementTest extends TestCase
         Livewire::test(Teachers::class)
             ->set('name', $payload['name'])
             ->set('email', $payload['email'])
+            ->set('phone', $payload['phone'])
             ->set('employer', $payload['employer'])
             ->set('tsc_number', $payload['tsc_number'])
             ->set('selectedSubjects', $payload['selectedSubjects'])
@@ -127,6 +134,7 @@ class TeachersManagementTest extends TestCase
 
         $this->assertEquals($payload['name'], $teacher->auth->name);
         $this->assertEquals($payload['email'], $teacher->auth->email);
+        $this->assertEquals(Str::start($payload['phone'], '254'), $teacher->auth->phone);
 
         $this->assertEquals(count($selectedSubjects), $teacher->subjects()->count());
         
@@ -143,12 +151,14 @@ class TeachersManagementTest extends TestCase
         $teacher->auth()->create([
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('password')
         ]);
 
         $payload = [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'employer' => $this->faker->randomElement(Teacher::employerOptions()),
             'tsc_number' => $this->faker->numberBetween(123456, 999999),
         ];
@@ -157,6 +167,7 @@ class TeachersManagementTest extends TestCase
             ->call('editTeacher', $teacher)
             ->set('name', $payload['name'])
             ->set('email', $payload['email'])
+            ->set('phone', $payload['phone'])
             ->set('employer', $payload['employer'])
             ->set('tsc_number', $payload['tsc_number'])
             ->call('updateTeacher');
@@ -168,6 +179,7 @@ class TeachersManagementTest extends TestCase
 
         $this->assertEquals($payload['name'], $teacher->fresh()->auth->name);
         $this->assertEquals($payload['email'], $teacher->fresh()->auth->email);
+        $this->assertEquals(Str::start($payload['phone'], '254'), $teacher->fresh()->auth->phone);
         
     }
 
@@ -183,6 +195,7 @@ class TeachersManagementTest extends TestCase
         $teacher->auth()->create([
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('password')
         ]);
 
@@ -197,6 +210,7 @@ class TeachersManagementTest extends TestCase
         $payload = [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'employer' => $this->faker->randomElement(Teacher::employerOptions()),
             'tsc_number' => $this->faker->numberBetween(123456, 999999),
             'selectedSubjects' => $selectedSubjects
@@ -206,6 +220,7 @@ class TeachersManagementTest extends TestCase
             ->call('editTeacher', $teacher)
             ->set('name', $payload['name'])
             ->set('email', $payload['email'])
+            ->set('phone', $payload['phone'])
             ->set('employer', $payload['employer'])
             ->set('tsc_number', $payload['tsc_number'])
             ->set('selectedSubjects', $payload['selectedSubjects'])
@@ -218,6 +233,7 @@ class TeachersManagementTest extends TestCase
 
         $this->assertEquals($payload['name'], $teacher->fresh()->auth->name);
         $this->assertEquals($payload['email'], $teacher->fresh()->auth->email);
+        $this->assertEquals(Str::start($payload['phone'], '254'), $teacher->fresh()->auth->phone);
 
         $this->assertEquals(count($selectedSubjects), $teacher->fresh()->subjects()->count());
         
@@ -234,6 +250,7 @@ class TeachersManagementTest extends TestCase
         $teacher->auth()->create([
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('password')
         ]);
 
@@ -256,6 +273,7 @@ class TeachersManagementTest extends TestCase
         $teacher->auth()->create([
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('password')
         ]);
 

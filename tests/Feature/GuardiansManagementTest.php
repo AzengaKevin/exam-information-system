@@ -39,6 +39,7 @@ class GuardiansManagementTest extends TestCase
             $guardian->auth()->create([
                 'name' => $this->faker->name(),
                 'email' => $this->faker->safeEmail(),
+                'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
                 'password' => Hash::make('password')
             ]);
         }        
@@ -60,6 +61,7 @@ class GuardiansManagementTest extends TestCase
         $payload = [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'location' => $this->faker->streetAddress(),
             'profession' => $this->faker->company()
         ];
@@ -67,6 +69,7 @@ class GuardiansManagementTest extends TestCase
         Livewire::test(Guardians::class)
             ->set('name', $payload['name'])
             ->set('email', $payload['email'])
+            ->set('phone', $payload['phone'])
             ->set('profession', $payload['profession'])
             ->set('location', $payload['location'])
             ->call('addGuardian');
@@ -96,12 +99,14 @@ class GuardiansManagementTest extends TestCase
         $guardian->auth()->create([
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('password')
         ]);
 
         $payload = [
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'location' => $this->faker->streetAddress(),
             'profession' => $this->faker->company()
         ];
@@ -110,6 +115,7 @@ class GuardiansManagementTest extends TestCase
             ->call('editGuardian', $guardian)
             ->set('name', $payload['name'])
             ->set('email', $payload['email'])
+            ->set('phone', $payload['phone'])
             ->set('profession', $payload['profession'])
             ->set('location', $payload['location'])
             ->call('updateGuardian');
@@ -135,6 +141,7 @@ class GuardiansManagementTest extends TestCase
         $guardian->auth()->create([
             'name' => $this->faker->name(),
             'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('password')
         ]);
 

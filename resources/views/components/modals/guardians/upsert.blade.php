@@ -2,7 +2,7 @@
 
 <div wire:ignore.self id="upsert-guardian-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-guardian-modal-title">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
                 @if (is_null($guardianId))
@@ -29,6 +29,18 @@
                     <input type="email" wire:model.lazy="email" id="email"
                         class="form-control @error('email') is-invalid @enderror">
                     @error('email')
+                    <span class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
+
+                <div class="mt-3">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="tel" wire:model.lazy="phone" id="phone" aria-describedby="phone-help"
+                        class="form-control @error('phone') is-invalid @enderror" placeholder="254707427854">
+                    <div id="phone-help" class="form-text">Begin with the Kenyas country code(254) without the (+) symbol.</div>
+                    @error('phone')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>
                     </span>

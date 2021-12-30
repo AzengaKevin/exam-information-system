@@ -44,7 +44,7 @@ class RegistrationTest extends TestCase
     /** @group registration */
     public function testRegistrationRequiredFieds()
     {
-        $requiredFields = ['name', 'email', 'password'];
+        $requiredFields = ['name', 'email', 'phone', 'password'];
 
         foreach ($requiredFields as $field) {
 
@@ -63,6 +63,7 @@ class RegistrationTest extends TestCase
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->email(),
+            'phone' => "707427854",
             'password' => 'elephant69',
             'password_confirmation' => 'elephant69'
         ];

@@ -39,13 +39,6 @@ class TeacherResponsibilities extends Component
 
     public Responsibility $teacherResponsibility;
 
-    /** @var SystemSettings */
-    protected $systemSettings;
-
-    public function __construct() {
-        $this->systemSettings = app(SystemSettings::class);
-    }
-
     public function mount(Teacher $teacher)
     {
         $this->teacher = $teacher;
@@ -65,8 +58,7 @@ class TeacherResponsibilities extends Component
             'levels' => $this->getLevels(),
             'subjects' => $this->getSubjects(),
             'departments' => $this->getDepartments(),
-            'levelUnits' => $this->getLevelUnits(),
-            'systemSettings' => $this->systemSettings
+            'levelUnits' => $this->getLevelUnits()
         ]);
     }
 

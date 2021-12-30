@@ -12,8 +12,8 @@ class TeacherPersistenceTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /** @group teacher */
-    public function testATecherCanBePersistedToTheDatabase()
+    /** @group teachers */
+    public function testATeacherCanBePersistedToTheDatabase()
     {
         $this->withoutExceptionHandling();
 
@@ -25,6 +25,7 @@ class TeacherPersistenceTest extends TestCase
         $teacher->auth()->create([
             'name' => $name = $this->faker->name(),
             'email' => $email = $this->faker->safeEmail(),
+            'phone' => "707427854",
             'password' => Hash::make('password')
         ]);
 

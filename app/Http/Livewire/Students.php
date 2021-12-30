@@ -45,12 +45,6 @@ class Students extends Component
 
     public $studentsFile;
 
-    protected $systemSettings;
-
-    public function __construct() {
-        $this->systemSettings = app(SystemSettings::class);
-    }
-
     public function render()
     {
         return view('livewire.students',[
@@ -109,11 +103,13 @@ class Students extends Component
 
         try {
 
+            $systemSettings = app(SystemSettings::class);
+
             $access = Gate::inspect('create', Student::class);
 
             if($access->allowed()){
 
-                if ($this->systemSettings->school_has_streams) {
+                if ($systemSettings->school_has_streams) {
                     // Based on level and stream, get the level_unit_id and also persists
                     $data['level_unit_id'] = LevelUnit::where([
                         'level_id' => $data['admission_level_id'],
