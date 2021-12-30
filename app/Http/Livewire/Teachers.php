@@ -6,8 +6,10 @@ use App\Models\User;
 use App\Models\Subject;
 use App\Models\Teacher;
 use Livewire\Component;
+use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use App\Rules\MustBeKenyanPhone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
@@ -23,6 +25,7 @@ class Teachers extends Component
 
     public $name;
     public $email;
+    public $phone;
     public $employer;
     public $tsc_number;
 
@@ -35,6 +38,14 @@ class Teachers extends Component
             'employers' => Teacher::employerOptions(),
             'subjects' => $this->getAllSubjects()
         ]);
+    }
+
+    /**
+     * Ensures that the phone number is prefixed with 254 when entered
+     */
+    public function updatedPhone($value)
+    {
+        $this->phone = Str::start($value, "254");
     }
 
     public function getPaginatedTeachers()
@@ -52,6 +63,7 @@ class Teachers extends Component
         return [
             'name' => ['bail', 'required', 'string'],
             'email' => ['bail', 'required', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
+            'phone' => ['bail', 'required', Rule::unique('users')->ignore($this->userId), new MustBeKenyanPhone()],
             'employer' => ['bail', 'required', Rule::in(Teacher::employerOptions())],
             'tsc_number' => ['bail', 'nullable', Rule::unique('teachers')->ignore($this->teacherId)],
             'selectedSubjects' => ['bail', 'nullable', 'array']
@@ -77,6 +89,8 @@ class Teachers extends Component
                 ]));
 
                 //$user->sendEmailVerificationNotification();
+
+                // Send Phone Verification Notification
 
                 if($user){
 
@@ -118,6 +132,11 @@ class Teachers extends Component
         
     }
 
+    /**
+     * Show the modal for editing the specified teacher
+     * 
+     * @param Teacher $teacher
+     */
     public function editTeacher(Teacher $teacher)
     {
 
@@ -126,6 +145,7 @@ class Teachers extends Component
 
         $this->name = $teacher->auth->name;
         $this->email = $teacher->auth->email;
+        $this->phone = $teacher->auth->phone;
 
         $this->employer = $teacher->employer;
         $this->tsc_number = $teacher->tsc_number;
@@ -138,6 +158,9 @@ class Teachers extends Component
         
     }
 
+    /**
+     * Updates the changed details of the current teacher
+     */
     public function updateTeacher()
     {
         $data = $this->validate();

@@ -19,11 +19,23 @@
             <div class="modal-body">
                 <div class="container-fluid">
                     <div class="row g-3">
-                        <div class="col-md-6">
+                        <div class="col-md-8">
                             <label for="name" class="form-label">Name</label>
                             <input type="text" wire:model.lazy="name" id="name"
                                 class="form-control @error('name') is-invalid @enderror">
                             @error('name')
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label">Phone</label>
+                            <input type="tel" wire:model.lazy="phone" id="phone" aria-describedby="phone-help"
+                                class="form-control @error('phone') is-invalid @enderror" placeholder="254707427854">
+                            <div id="phone-help" class="form-text">Begin with the Kenyas country code(254) without the (+) symbol.</div>
+                            @error('phone')
                             <span class="invalid-feedback">
                                 <strong>{{ $message }}</strong>
                             </span>
@@ -68,11 +80,11 @@
                         </div>
 
                         <div class="col-md-12">
-                            <label for="subjects" class="form-label">Select Teacher Subjects</label>
+                            <label for="subjects" class="form-label fw-bold">Select Teacher Subject(s)</label>
                             <fieldset id="subjects" class="row g-3">
                                 @foreach ($subjects as $subject)
                                 <div class="col-md-4">
-                                    <div class="form-check">
+                                    <div class="form-check ps-0">
                                         <input type="checkbox" wire:model="selectedSubjects.{{ $subject->id }}"
                                             id="subject-{{ $loop->iteration }}" class="form-check-control" value="true">
                                         <label for="subject-{{ $loop->iteration }}"
