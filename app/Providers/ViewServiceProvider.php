@@ -31,11 +31,12 @@ class ViewServiceProvider extends ServiceProvider
             'dashboard',
             'levels.index',
             'livewire.students',
+            'livewire.teacher-responsibilities',
             'students.index',
             'teachers.responsibilities.index',
             'teachers.show',
             'exams.scores.index',
-            'exams.transcripts.index'
+            'exams.transcripts.index',
         ], SettingsComposer::class);
     }
 }
