@@ -6,6 +6,7 @@ use Tests\TestCase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 class RegistrationTest extends TestCase
 {
@@ -15,6 +16,8 @@ class RegistrationTest extends TestCase
     public function testAGuestCanVisitTheRegistrationPage()
     {
         $this->withoutExceptionHandling();
+
+        $this->expectException(RouteNotFoundException::class);
 
         $response = $this->get(route('register'));
 
@@ -28,6 +31,8 @@ class RegistrationTest extends TestCase
     public function testOneWithCorrectCredentialsCanSuccessfullyRegistered()
     {
         $this->withoutExceptionHandling();
+
+        $this->expectException(RouteNotFoundException::class);
 
         Mail::fake();
 
@@ -44,6 +49,9 @@ class RegistrationTest extends TestCase
     /** @group registration */
     public function testRegistrationRequiredFieds()
     {
+
+        $this->expectException(RouteNotFoundException::class);
+
         $requiredFields = ['name', 'email', 'phone', 'password'];
 
         foreach ($requiredFields as $field) {

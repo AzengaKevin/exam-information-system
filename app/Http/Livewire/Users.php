@@ -4,7 +4,6 @@ namespace App\Http\Livewire;
 
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -37,9 +36,10 @@ class Users extends Component
 
     public function getPaginatedUsers()
     {
-        $id = Auth::id();
+        /** @var Role */
+        $adminRole = Role::firstOrCreate(['name' => 'Administrator']);
 
-        return User::where('id', '<>', $id)->orderBy('name')->paginate(24);
+        return User::where('role_id', '!=', $adminRole->id)->orderBy('name')->paginate(24);
     }
 
     public function getAllRoles()

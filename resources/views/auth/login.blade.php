@@ -14,7 +14,10 @@
                                 <div class="text-center">
                                     <h1 class="text-center h3">Login</h1>
                                     <hr>
+
+                                    @if (Route::has('register'))
                                     <h4 class="h6">Not a member yet ? <a href="{{ route('register') }}">Register</a></h4>
+                                    @endif
                                 </div>
                                 <x-feedback />
                                 <form class="needs-validation" action="{{ route('login') }}" method="post">

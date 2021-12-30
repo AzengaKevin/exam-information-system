@@ -9,6 +9,7 @@
                     <th>#</th>
                     <th>Name</th>
                     <th>Email</th>
+                    <th>Phone</th>
                     <th>Type</th>
                     <th>Role</th>
                     <th>Active?</th>
@@ -24,6 +25,7 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
+                    <td>{{ $user->phone }}</td>
                     <td>{{ ucfirst($user->authenticatable_type ?? 'Anonymous') }}</td>
                     <td>{{ $user->role->name }}</td>
                     <td>{{ $user->active ? 'True' : 'False' }}</td>
@@ -52,7 +54,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="7">
+                    <td colspan="10">
                         <div class="py-1 text-center">No Other Users, Apart From You</div>
                     </td>
                 </tr>
@@ -60,7 +62,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="7">
+                    <td colspan="10">
                         {{ $users->links() }}
                         @if ($users->count())
                         <div class="text-muted">{{ $users->firstItem() }} - {{ $users->lastItem() }} out of
