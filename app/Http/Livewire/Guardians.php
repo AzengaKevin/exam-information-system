@@ -4,8 +4,10 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Guardian;
+use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use App\Rules\MustBeKenyanPhone;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
@@ -21,6 +23,7 @@ class Guardians extends Component
 
     public $name;
     public $email;
+    public $phone;
     public $profession;
     public $location;
 
@@ -36,11 +39,21 @@ class Guardians extends Component
         return Guardian::latest()->paginate(24);
     }
 
+    /**
+     * Hook method for updating the phone and making sure it starts with 254
+     */
+    public function updatedPhone($value)
+    {
+        $this->phone = Str::start($value, '254');
+        
+    }
+
     public function rules()
     {
         return [
             'name' => ['bail', 'required', 'string'],
             'email' => ['bail', 'required', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
+            'phone' => ['bail', 'required', Rule::unique('users')->ignore($this->userId), new MustBeKenyanPhone()],
             'profession' => ['bail', 'nullable'],
             'location' => ['bail', 'nullable']
         ];
@@ -101,6 +114,7 @@ class Guardians extends Component
 
         $this->name = $guardian->auth->name;
         $this->email = $guardian->auth->email;
+        $this->phone = $guardian->auth->phone;
 
         $this->profession = $guardian->profession;
         $this->location = $guardian->location;
