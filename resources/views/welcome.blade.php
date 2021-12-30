@@ -14,7 +14,7 @@
                     <h1 class="display-4 fw-bold">Exam Information System for <a href="">{{ $settings->school_name }}</a></h1>
                     <p>A scalable, highly effective and complete exam managment information system tool
                         for primary schools. Ranking, Grading, Pictorial Representaion and what have you.</p>
-                    <a href="#" class="btn btn-lg btn-primary">Get Started</a>
+                    <a href="{{ url(config('fortify.home')) }}" class="btn btn-lg btn-primary">Get Started</a>
                 </div>
 
                 @guest
