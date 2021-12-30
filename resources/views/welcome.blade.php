@@ -23,12 +23,12 @@
                     <div class="card shadow">
                         <div class="card-body p-3 p-md-5">
                             <div class="form-floating">
-                                <input type="email" name="email" id="email"
-                                    class="form-control @error('email') is-invalid @enderror"
-                                    placeholder="Email Address" value="{{ old('email') }}" autocomplete="email"
+                                <input type="tel" name="phone" id="phone"
+                                    class="form-control @error('phone') is-invalid @enderror"
+                                    placeholder="Phone Number" value="{{ old('phone') }}" autocomplete="phone"
                                     autofocus>
-                                <label for="email">Email Address</label>
-                                @error('email')
+                                <label for="phone">Phone Number</label>
+                                @error('phone')
                                 <div class="invalid-feedback"><strong>{{ $message }}</strong></div>
                                 @enderror
                             </div>

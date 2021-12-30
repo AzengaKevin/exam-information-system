@@ -20,11 +20,11 @@
                                 <form class="needs-validation" action="{{ route('login') }}" method="post">
                                     @csrf
                                     <div>
-                                        <label class="fw-bold form-label" for="email">Email Address <span class="text-danger">*</span></label>
-                                        <input class="form-control @error('email') is-invalid @enderror" type="email"
-                                            name="email" id="email" placeholder="Email Address..."
-                                            value="{{ old('email') }}" />
-                                        @error('email')
+                                        <label class="fw-bold form-label" for="phone">Phone Number <span class="text-danger">*</span></label>
+                                        <input class="form-control @error('phone') is-invalid @enderror" type="tel"
+                                            name="phone" id="phone" placeholder="254707427854"
+                                            value="{{ old('phone') }}" />
+                                        @error('phone')
                                         <span class="invalid-feedback">
                                             <strong>{{ $message }}</strong>
                                         </span>

@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -35,9 +36,12 @@ class AuthenticationTest extends TestCase
             'password' => Hash::make('elephant69')
         ];
 
-        User::create($payload);
+        $user = User::create($payload);
 
-        $response = $this->post(route('login'), $this->getData());
+        $response = $this->post(route('login'), [
+            'phone' => Str::start($payload['phone'], '254'),
+            'password' => 'elephant69'
+        ]);
         
         $this->assertAuthenticated();
 
@@ -49,7 +53,7 @@ class AuthenticationTest extends TestCase
     /** @group auth */
     public function testBothEmailAddPsswordAreRequiredForAUthentication()
     {
-        $requiredFields = ['email', 'password'];
+        $requiredFields = ['phone', 'password'];
 
         foreach ($requiredFields as $field) {
 
@@ -68,7 +72,7 @@ class AuthenticationTest extends TestCase
     {
         $response = $this->post(route('login'), $this->getData());
 
-        $response->assertSessionHasErrors(['email']);
+        $response->assertSessionHasErrors(['phone']);
     }
 
     private function getData() : array
