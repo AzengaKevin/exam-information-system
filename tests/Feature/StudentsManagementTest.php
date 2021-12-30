@@ -189,6 +189,7 @@ class StudentsManagementTest extends TestCase
             $guardian->auth()->create([
                 'name' => $this->faker->name(),
                 'email' => $this->faker->safeEmail(),
+                'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
                 'password' => Hash::make('password')
             ]);
         }

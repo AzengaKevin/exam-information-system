@@ -31,6 +31,7 @@ class AuthenticationTest extends TestCase
         $payload = [
             'name' => $this->faker->name,
             'email' => 'abc@test.xyz',
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
             'password' => Hash::make('elephant69')
         ];
 
