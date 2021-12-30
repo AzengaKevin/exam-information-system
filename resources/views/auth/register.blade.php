@@ -24,7 +24,8 @@
                                     <div class="row g-3">
 
                                         <div>
-                                            <label class="fw-bold form-label" for="name">Name <span class="text-danger">*</span></label>
+                                            <label class="fw-bold form-label" for="name">Name <span
+                                                    class="text-danger">*</span></label>
                                             <input class="form-control @error('name') is-invalid @enderror" type="text"
                                                 name="name" id="name" placeholder="Name..." value="{{ old('name') }}" />
                                             @error('name')
@@ -33,8 +34,9 @@
                                             </span>
                                             @enderror
                                         </div>
-                                        <div class="col-md-12">
-                                            <label class="fw-bold form-label" for="email">Email Address <span class="text-danger">*</span></label>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold form-label" for="email">Email Address <span
+                                                    class="text-danger">*</span></label>
                                             <input class="form-control @error('email') is-invalid @enderror"
                                                 type="email" name="email" id="email" placeholder="Email Address..."
                                                 value="{{ old('email') }}" />
@@ -44,9 +46,26 @@
                                             </span>
                                             @enderror
                                         </div>
+                                        <div class="col-md-6">
+                                            <label class="fw-bold form-label" for="phone">Phone Number<span
+                                                    class="text-danger">*</span></label>
+                                            <div class="input-group @error('phone') is-invalid @enderror">
+                                                <span class="input-group-text" id="phone-addon">+254</span>
+                                                <input type="tel" name="phone"
+                                                    class="form-control @error('phone') is-invalid @enderror"
+                                                    placeholder="707427854" value="{{ old('phone') }}"
+                                                    aria-label="Phone Number" aria-describedby="phone-addon">
+                                            </div>
+                                            @error('phone')
+                                            <span class="invalid-feedback">
+                                                <strong>{{ $message }}</strong>
+                                            </span>
+                                            @enderror
+                                        </div>
 
                                         <div class="col-md-6">
-                                            <label class="fw-bold form-label" for="password">Password <span class="text-danger">*</span></label>
+                                            <label class="fw-bold form-label" for="password">Password <span
+                                                    class="text-danger">*</span></label>
                                             <input class="form-control @error('password') is-invalid @enderror"
                                                 type="password" id="password" name="password"
                                                 placeholder="Password..." />
@@ -66,9 +85,12 @@
                                         </div>
                                         <div class="col-12">
                                             <div class="form-check">
-                                                <input type="checkbox" class="form-check-input" name="terms-and-condition" id="terms-and-condition">
-                                                
-                                                <label for="terms-and-condition" class="form-check-label">Agree to <a href="#"> Terms & Condition </a><span class="text-danger">*</span></label>
+                                                <input type="checkbox" class="form-check-input"
+                                                    name="terms-and-condition" id="terms-and-condition">
+
+                                                <label for="terms-and-condition" class="form-check-label">Agree to <a
+                                                        href="#"> Terms & Condition </a><span
+                                                        class="text-danger">*</span></label>
                                             </div>
                                         </div>
 
