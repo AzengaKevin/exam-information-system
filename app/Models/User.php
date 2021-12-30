@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -21,6 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $fillable = [
         'name',
         'email',
+        'phone',
         'password',
         'active',
         'role_id'
@@ -49,6 +51,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function authenticatable()
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Makes sure the phone number starts with 254
+     */
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = Str::start($value, "254");
     }
 
     public static function genderOptions() : array
