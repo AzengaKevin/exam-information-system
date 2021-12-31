@@ -121,7 +121,7 @@
                             <fieldset id="levels" class="row g-3">
                                 @foreach ($levels as $level)
                                 <div class="col-md-6">
-                                    <div class="form-check">
+                                    <div class="form-check ps-0">
                                         <input type="checkbox" wire:model="selectedLevels.{{ $level->id }}"
                                             id="level-{{ $loop->iteration }}" class="form-check-control" value="true">
                                         <label for="level-{{ $loop->iteration }}"
@@ -136,7 +136,7 @@
                             <fieldset id="subjects" class="row g-3">
                                 @foreach ($subjects as $subject)
                                 <div class="col-md-4">
-                                    <div class="form-check">
+                                    <div class="form-check ps-0">
                                         <input type="checkbox" wire:model="selectedSubjects.{{ $subject->id }}"
                                             id="subject-{{ $loop->iteration }}" class="form-check-control" value="true">
                                         <label for="subject-{{ $loop->iteration }}"

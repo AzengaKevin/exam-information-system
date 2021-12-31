@@ -92,35 +92,40 @@ class Subjects extends Component
         ];
     }
 
-    function createSubject()
+    /**
+     * Creates a subject entry in t he database based on the user input
+     */
+    public function createSubject()
     {
-        $this->validate();
+        $data = $this->validate();
         
         try {
 
-            Subject::create([
-                'name'=>$this->name,
-                'shortname'=>$this->shortname,
-                'subject_code'=>$this->subject_code,
-                'description'=>$this->description ,
-                'slug'=>Str::slug($this->name),
-                'department_id'=>$this->department_id
-            ]);
+            Subject::create($data);
 
             $this->reset(['name','shortname','subject_code','description','department_id']);
+
+            session()->flash('status', 'Subject successfully created');
+
+            $this->emit('hide-upsert-subject-modal');
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
 
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
+            session()->flash('error', 'Subject creation failed');
+
+            $this->emit('hide-upsert-subject-modal');
+
         }
-        $this->emit('hide-upsert-subject-modal');
     }
 
-
+    /**
+     * Update a database subject record based on user input
+     */
     public function updateSubject()
     {
         $data = $this->validate();
@@ -132,6 +137,8 @@ class Subjects extends Component
 
             if($subject->update($data)){
 
+                $this->reset(['subjectId', 'name','shortname','subject_code','description','department_id']);
+
                 session()->flash('status', 'subject successfully updated');
 
                 $this->emit('hide-upsert-subject-modal');
@@ -141,8 +148,12 @@ class Subjects extends Component
             
             Log::error($exception->getMessage(), [
                 'user-id' => $this->subjectId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
+
+            session()->flash('error', 'A fatal subject error occurred');
+
+            $this->emit('hide-upsert-subject-modal');
 
         }
     }
