@@ -348,7 +348,7 @@ class ExamsScoresController extends Controller
 
             session()->flash('status', 'Scores successfully updated');
 
-            return redirect(route('exams.scores.upload', [
+            return redirect(route('exams.scores.manage', [
                 'exam' => $exam,
                 'subject' => $subject->id,
                 'level' => optional($level)->id,
