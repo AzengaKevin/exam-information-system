@@ -108,13 +108,14 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/exams/{exam:slug}/scores/manage', [ExamsScoresController::class, 'manage'])
         ->name('exams.scores.manage');
 
-    Route::resource('exams.analysis', ExamsAnalysisController::class)
-        ->only(['index']);
+    Route::get('/exams/{exam:slug}/analysis', [ExamsAnalysisController::class, 'index'])
+        ->name('exams.analysis.index');
 
-    Route::resource('exams.results', ExamsResultsController::class)
-        ->only(['index']);
+    Route::get('/exams/{exam:slug}/results', [ExamsResultsController::class, 'index'])
+        ->name('exams.results.index');
 
-    //Route::resource('exams.transcripts', ExamsTranscriptsController::class)->only(['index']);
+    Route::post('/exams/{exam:slug}/results/send-message', [ExamsResultsController::class, 'sendMessage'])
+        ->name('exams.results.send-message');
 
     Route::get('/exams/{exam:slug}/transcripts', [ExamsTranscriptsController::class, 'index'])
         ->name('exams.transcripts.index');

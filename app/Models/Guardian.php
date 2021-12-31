@@ -19,6 +19,9 @@ class Guardian extends Model
         return $this->morphOne(User::class, 'authenticatable');
     }
 
+    /**
+     * Guardian students relation
+     */
     public function students()
     {
         return $this->belongsToMany(Student::class,'student_guardians')->withTimestamps();
