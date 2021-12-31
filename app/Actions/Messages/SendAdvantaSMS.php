@@ -22,7 +22,7 @@ class SendAdvantaSMS
                     "apikey" => config('services.advanta.apikey'),
                     "partnerID" => config('services.advanta.partnerID'),
                     "message" => $payload['content'],
-                    "shortcode" => config('services.advanta.partnerID'),
+                    "shortcode" => config('services.advanta.shortcode'),
                     "mobile" => $payload['phone']
                 ]);
 

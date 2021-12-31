@@ -69,6 +69,13 @@
                                             <i class="fa fa-cog"></i>
                                             <span>Manage Scores</span>
                                         </a>
+                                        @if ($responsibility->name == 'Class Teacher')
+                                        <a href="#"
+                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                            <i class="fa fa-send"></i>
+                                            <span>Send Results</span>
+                                        </a>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
