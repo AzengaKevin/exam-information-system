@@ -11,6 +11,7 @@ use App\Models\Permission;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
 class MessagesManagementTest extends TestCase
@@ -65,6 +66,8 @@ class MessagesManagementTest extends TestCase
     public function testAUserCanCreateAMessage()
     {
         $this->withoutExceptionHandling();
+
+        Notification::fake();
         
         /** @var array */
         $payload = Message::factory()->make(['sender_id' => null])->toArray();

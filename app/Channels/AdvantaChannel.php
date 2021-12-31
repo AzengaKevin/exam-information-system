@@ -34,11 +34,6 @@ class AdvantaChannel
             'phone' => $notifiable->phone,
             'content' => $data['content']
         ]);
-        
-        app('log')->info(json_encode([
-            'id'   => $id,
-            'data' => $data,
-        ]));
 
         return true;
     }
