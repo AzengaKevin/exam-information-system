@@ -27,7 +27,7 @@
                 <div class="mt-3">
                     <label for="name" class="form-label">Numeric</label>
                     <input type="integer" wire:model.lazy="numeric" id="numeric"
-                        class="form-control @error('name') is-invalid @enderror">
+                        class="form-control @error('numeric') is-invalid @enderror">
                     @error('numeric')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>
@@ -36,8 +36,8 @@
                 </div>
                 <div class="mt-3">
                     <label for="name" class="form-label">Description</label>
-                    <input type="text" wire:model.lazy="description" id="description"
-                        class="form-control @error('name') is-invalid @enderror">
+                    <textarea wire:model.lazy="description" id="description" cols="100" rows="3"
+                        class="form-control @error('description') is-invalid @enderror"></textarea>
                     @error('description')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>
