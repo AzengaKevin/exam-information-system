@@ -30,6 +30,9 @@ class Levels extends Component
         ]);
     }
 
+    /**
+     * Get all levels from the database
+     */
     public function getPaginatedLevels()
     {
         return Level::paginate(24);
@@ -63,31 +66,48 @@ class Levels extends Component
         ];
     }
 
-    function createLevel()
+    /**
+     * Creates a new level record in the database based on user input
+     */
+    public function createLevel()
     {
         $this->validate();
         
         try {
 
-            Level::create([
+            $level = Level::create([
                 'name'=>$this->name,
-               'numeric'=> $this->numeric,
-                'description'=>$this->description ,
+                'numeric'=> $this->numeric,
+                'description'=>$this->description,
                 'slug'=>Str::slug($this->name)
             ]);
+
+            if($level){
+
+                $this->reset(['name', 'numeric', 'description', 'slug']);
+
+                session()->flash('status', 'Level successfully added');
+        
+                $this->emit('hide-upsert-level-modal');
+
+            }
             
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
+            session()->flash('error', 'Level addition failed');
+        
+            $this->emit('hide-upsert-level-modal');
+
         }
-        $this->emit('hide-upsert-level-modal');
     }
 
-
+    /**
+     * Updating the current database level record
+     */
     public function updateLevel()
     {
         $data = $this->validate();
@@ -99,7 +119,9 @@ class Levels extends Component
 
             if($level->update($data)){
 
-                session()->flash('status', 'level successfully updated');
+                $this->reset(['levelId', 'name', 'numeric', 'slug', 'description']);
+
+                session()->flash('status', 'Level successfully updated');
 
                 $this->emit('hide-upsert-level-modal');
             }
@@ -114,6 +136,10 @@ class Levels extends Component
         }
     }
 
+    /**
+     * Shows the modal for deleting a specified level
+     * @param Level $level
+     */
     public function showDeleteLevelModal(Level $level)
     {
         $this->levelId = $level->id;
@@ -124,7 +150,10 @@ class Levels extends Component
         
     }
 
-    public function deleteLevel(Level $level)
+    /**
+     * Deletes a level record from the database
+     */
+    public function deleteLevel()
     {
         try {
 

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Message;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class MessagePersistenceTest extends TestCase
@@ -15,6 +16,8 @@ class MessagePersistenceTest extends TestCase
     public function testAMessageCanBePesistedToTheDatabase()
     {
         $this->withoutExceptionHandling();
+        
+        Notification::fake();
 
         $payload = Message::factory()->make()->toArray();
 

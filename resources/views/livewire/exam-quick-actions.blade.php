@@ -27,7 +27,7 @@
             @endcan
 
             @can('access-upload-scores-page')
-            @if ($exam->fresh()->isInMarking())
+            @if ($exam->fresh()->isInMarking() || $exam->fresh()->isPublished())
             <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
                 <span class="">Manage Scores</span>
             </a>

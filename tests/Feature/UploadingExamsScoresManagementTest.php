@@ -175,7 +175,7 @@ class UploadingExamsScoresManagementTest extends TestCase
             $this->assertNotNull($item->$subCol);
         });
 
-        $response->assertRedirect(route('exams.scores.upload', [
+        $response->assertRedirect(route('exams.scores.manage', [
             'exam' => $exam,
             'subject' => $subject->id,
             'level' => $level->id

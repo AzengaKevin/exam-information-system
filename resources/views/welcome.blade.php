@@ -13,7 +13,7 @@
                 <div class="col-md-7 d-none d-md-block">
                     <h1 class="display-4 fw-bold">Exam Information System for <a href="">{{ $settings->school_name }}</a></h1>
                     <p>A scalable, highly effective and complete exam managment information system tool
-                        for primary schools. Ranking, Grading, Pictorial Representaion and what have you.</p>
+                        for schools. Ranking, Grading, Pictorial Representaion and what have you.</p>
                     <a href="{{ url(config('fortify.home')) }}" class="btn btn-lg btn-primary">Get Started</a>
                 </div>
 
@@ -28,6 +28,7 @@
                                     placeholder="Phone Number" value="{{ old('phone') }}" autocomplete="phone"
                                     autofocus>
                                 <label for="phone">Phone Number</label>
+                                <div class="form-text">Begin with the Kenya's country code(254) without the (+) symbol.</div>
                                 @error('phone')
                                 <div class="invalid-feedback"><strong>{{ $message }}</strong></div>
                                 @enderror

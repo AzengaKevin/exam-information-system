@@ -44,7 +44,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         <div class="py-1 text-center">No Level Units created yet</div>
                     </td>
                 </tr>
@@ -52,7 +52,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="6">
+                    <td colspan="7">
                         {{ $levelUnits->links() }}
                         @if ($levelUnits->count())
                         <div class="text-muted">{{ $levelUnits->firstItem() }} - {{ $levelUnits->lastItem() }} out of

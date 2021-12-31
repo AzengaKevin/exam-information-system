@@ -69,6 +69,20 @@
                                             <i class="fa fa-cog"></i>
                                             <span>Manage Scores</span>
                                         </a>
+                                        @if ($responsibility->name == 'Class Teacher')
+                                        <form action="{{ route('exams.results.send-message', [
+                                            'exam' => $exam,
+                                            'level-unit' => $responsibility->pivot->levelUnit->id,
+                                            'level' => $responsibility->pivot->level->id,
+                                        ]) }}" method="post">
+                                            @csrf
+                                            <button type="submit"
+                                                class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                                <i class="fas fa-paper-plane"></i>
+                                                <span>Send Results</span>
+                                            </button>
+                                        </form>
+                                        @endif
                                     </div>
                                 </td>
                             </tr>
