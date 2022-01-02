@@ -32,10 +32,13 @@ class ViewServiceProvider extends ServiceProvider
             'levels.index',
             'livewire.students',
             'livewire.teacher-responsibilities',
+            'livewire.exam-levels',
+            'livewire.level-exam-results',
             'students.index',
             'teachers.responsibilities.index',
             'teachers.show',
             'exams.scores.index',
+            'exams.results.index',
             'exams.transcripts.index',
         ], SettingsComposer::class);
     }
