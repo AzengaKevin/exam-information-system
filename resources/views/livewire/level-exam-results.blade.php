@@ -1,7 +1,7 @@
 <div>
     <x-feedback />
 
-    <div class="d-inline-flex gap-2">
+    <div class="d-inline-flex flex-wrap gap-2">
         <button data-bs-toggle="modal" data-bs-target="#filter-level-{{ $level->id }}-exam-results-modal"
             class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
             <i class="fa fa-filter"></i>
@@ -12,6 +12,17 @@
             <i class="fa fa-sort"></i>
             <span>Order Results</span>
         </button>
+
+        @if ($systemSettings->school_has_streams)           
+        <a href="#" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+            <i class="fa fa-eye"></i>
+            <span>Details</span>
+        </a>
+        @endif
+        <a href="#" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+            <i class="fa fa-print"></i>
+            <span>Print List</span>
+        </a>
     </div>
 
     <div class="table-responsive">
@@ -32,7 +43,14 @@
                 <tr>
                     @foreach ($cols as $col)
                     @if (in_array($col, $subjectCols))
-                    <td>{{ optional(json_decode($item->$col))->score ?? null }}{{ optional(json_decode($item->$col))->grade ?? null }}
+                    @php
+                    $score = json_decode($item->$col);
+                    @endphp
+                    <td>
+                        <span>{{ optional($score)->score ?? null }}</span>
+                        @if ($systemSettings->school_level == 'secondary')
+                        <span>{{ optional($score)->grade ?? null }}</span>
+                        @endif
                     </td>
                     @else
                     <td>{{ $item->$col }}</td>

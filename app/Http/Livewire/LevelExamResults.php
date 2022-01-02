@@ -4,6 +4,7 @@ namespace App\Http\Livewire;
 
 use App\Models\Exam;
 use App\Models\Level;
+use App\Settings\SystemSettings;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -83,9 +84,27 @@ class LevelExamResults extends Component
        return $this->exam->subjects->pluck("shortname")->toArray();
     }
 
+    /**
+     * Get appropriate level columns
+     * 
+     * @return array
+     */
     public function getAggregateColumns() : array
     {
-        return array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        $cols = array("mm", "tm", "op");
+
+        if($systemSettings->school_level == 'secondary'){
+            array_push($cols, "mg", "mp", "tp");
+        }
+
+        if ($systemSettings->school_has_streams) {
+            array_push($cols, "sp");
+        }
+
+        return $cols;
     }
 
     public function getColumns()
