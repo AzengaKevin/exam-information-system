@@ -31,6 +31,12 @@
             <i class="fa fa-plus"></i>
             <span>Student</span>
         </button>
+
+        <button data-bs-toggle="modal" data-bs-target="#add-student-modal"
+            class="btn btn-outline-primary hstack gap-2 align-items-center">
+            <i class="fa fa-plus"></i>
+            <span>New Student</span>
+        </button>
     </div>
 </div>
 <hr>

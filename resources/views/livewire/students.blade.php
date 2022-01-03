@@ -88,6 +88,9 @@
     <x-modals.students.upsert :studentId="$studentId" :streams="$streams" :levels="$levels" :hostels="$hostels"
         :genderOptions="$genderOptions" :kcpeGradeOptions="$kcpeGradeOptions" :systemSettings="$systemSettings" />
 
+    <x-modals.students.add :studentId="$studentId" :streams="$streams" :levels="$levels" :hostels="$hostels"
+        :genderOptions="$genderOptions" :kcpeGradeOptions="$kcpeGradeOptions" :systemSettings="$systemSettings" />
+
     <x-modals.students.delete :name="$name" />
 
     <x-modals.students.export-spreadsheet />
