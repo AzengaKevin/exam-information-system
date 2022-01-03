@@ -14,6 +14,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
 use App\Http\Controllers\ExamsAnalysisController;
+use App\Http\Controllers\ExamsMeritListController;
 use App\Http\Controllers\ExamsResultsController;
 use App\Http\Controllers\HostelsController;
 use App\Http\Controllers\ExamsScoresController;
@@ -128,6 +129,9 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::get('/exams/{exam}/transcripts/print-bulk', [ExamsTranscriptsController::class, 'printBulk'])
         ->name('exams.transcripts.print-bulk');
+
+    Route::get('/exams/{exam:slug}/merit-list/download', [ExamsMeritListController::class, 'download'])
+        ->name('exams.merit-list.download');
     
     Route::resource('responsibilities', ResponsibilitiesController::class)
         ->only('index');
@@ -158,6 +162,5 @@ Route::group(['middleware' => ['auth']], function(){
     Route::patch('/settings/update', [SettingsController::class, 'update'])
         ->name('settings.update');
 
-    Route::resource('messages', MessagesController::class)
-        ->only(['index']);
+    Route::resource('messages', MessagesController::class)->only(['index']);
 });
