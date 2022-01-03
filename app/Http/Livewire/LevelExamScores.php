@@ -383,39 +383,13 @@ class LevelExamScores extends Component
                 ->orderBy($col, 'desc')
                 ->get();
 
-            if ($data->count()) {
+            $data->each(function($item, $key) use($tblName) {
 
-                $prevRank = -1;
-                $currRank = -1;
-                $prevVal = 0;
-                $currVal = 0;
+                $rank = $key + 1;
     
-                foreach ($data as $key => $record) {
-    
-                    if($key == 0) $currRank = 1;
-    
-                    $currVal = $record->$col;
-    
-                    if($key != 0){
-                        if($prevVal == $currVal){
-                            $currRank = $prevRank;
-                        }
-                    }
-    
-                    DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
-                        'op' => $currRank
-                    ]);
-    
-                    $prevVal = $currVal;
-    
-                    $prevRank = $currRank;
-    
-                    ++$currRank;
-                }
-    
-                session()->flash('status', 'Student ranking operation completed successfully');
+                DB::table($tblName)->updateOrInsert(['admno' => $item->admno],['op' => $rank]);
 
-            }
+            });
 
             $this->emit('hide-rank-class-modal');
 
@@ -437,7 +411,6 @@ class LevelExamScores extends Component
      */
     public function publishStudentResults()
     {
-
         $tblName = Str::slug($this->exam->shortname);
 
         try {

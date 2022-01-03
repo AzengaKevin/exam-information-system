@@ -32,6 +32,7 @@ class ViewServiceProvider extends ServiceProvider
             'levels.index',
             'livewire.students',
             'livewire.teacher-responsibilities',
+            'livewire.subject-exam-scores',
             'livewire.exam-levels',
             'livewire.level-exam-results',
             'livewire.level-exam-scores',
@@ -44,7 +45,8 @@ class ViewServiceProvider extends ServiceProvider
             'exams.transcripts.index',
             'components.exams.analysis.level-line-graph',
             'exams.analysis.index',
-            'exams.scores.upload'
+            'exams.scores.upload',
+            'exams.scores.manage'
         ], SettingsComposer::class);
     }
 }
