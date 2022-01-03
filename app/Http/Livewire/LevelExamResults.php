@@ -22,12 +22,23 @@ class LevelExamResults extends Component
 
     public $orderBy = 'op';
 
+    /**
+     * Component lifecycle method called once when the component Launches
+     * 
+     * @param Exam $exam
+     * @param Level $level
+     */
     public function mount(Exam $exam, Level $level)
     {
         $this->exam = $exam;
         $this->level = $level;
     }
 
+    /**
+     * Called everytime the component renders|re-renders
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.level-exam-results', [
@@ -39,9 +50,13 @@ class LevelExamResults extends Component
 
     /**
      * Get all level results from the database
+     * 
+     * @return Paginator
+     * 
      */
     public function getResults()
     {
+        // Get the table name
         $tblName = Str::slug($this->exam->shortname);
 
         /** @var array */
@@ -107,7 +122,12 @@ class LevelExamResults extends Component
         return $cols;
     }
 
-    public function getColumns()
+    /**
+     * Gets a combination of all cols to show on the merit list
+     * 
+     * @return array
+     */
+    public function getColumns() : array
     {
         /** @var array */
         $columns = $this->exam->subjects->pluck("shortname")->toArray();
@@ -118,7 +138,7 @@ class LevelExamResults extends Component
         /** @var array */
         $studentLevelCols = array("admno", "name", "alias");
 
-        return array_merge($studentLevelCols, $columns, $aggregateCols);;
+        return array_merge($studentLevelCols, $columns, $aggregateCols);
     }
     
 }

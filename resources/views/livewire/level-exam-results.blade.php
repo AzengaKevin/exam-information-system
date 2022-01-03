@@ -19,7 +19,10 @@
             <span>Details</span>
         </a>
         @endif
-        <a href="#" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+        <a href="{{ route('exams.merit-list.download', [
+            'exam' => $exam,
+            'level' => $level->id
+        ]) }}" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center" download>
             <i class="fa fa-print"></i>
             <span>Print List</span>
         </a>
