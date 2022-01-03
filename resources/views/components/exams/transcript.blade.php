@@ -46,8 +46,10 @@
                     <th>AGGREGATES</th>
                     <th>TOTAL MARKS</th>
                     <th>MEAN MARKS</th>
+                    @if ($systemSettings->school_level == 'secondary')
                     <th>TOTAL POINTS</th>
                     <th>MEAN GRADE</th>
+                    @endif
                     <th>OVERALL POSITION</th>
                     @if ($systemSettings->school_has_streams)
                     <th>STREAM POSITION</th>
@@ -59,8 +61,10 @@
                     <th>VALUE</th>
                     <td>{{ $studentScores->tm ?? '-' }}</td>
                     <td>{{ $studentScores->mm ?? '-' }}{{ ($studentScores->mm) ? "%" : "" }}</td>
+                    @if ($systemSettings->school_level == 'secondary')
                     <td>{{ $studentScores->tp ?? '-' }}</td>
                     <td>{{ $studentScores->mg ?? '-' }}</td>
+                    @endif
                     <td>{{ $studentScores->op ?? '-' }}</td>
                     @if ($systemSettings->school_has_streams)
                     <td>{{ $studentScores->sp ?? '-' }}</td>
@@ -70,8 +74,11 @@
                     <th>OUT OF</th>
                     <td>{{ $outOfs['tm'] ?? '-' }}</td>
                     <td>{{ $outOfs['mm'] ?? '-' }}%</td>
+
+                    @if ($systemSettings->school_level == 'secondary')                        
                     <td>{{ $outOfs['tp'] ?? '-' }}</td>
                     <td>{{ $outOfs['mg'] ?? '-' }}</td>
+                    @endif
                     <td>{{ $outOfs['lsc'] ?? '-' }}</td>
                     @if ($systemSettings->school_has_streams)
                     <td>{{ $outOfs['lusc'] ?? '-' }}</td>
@@ -90,7 +97,10 @@
                     <th><span>SUBJECT</span></th>
                     <th>MARKS</th>
                     <th><span>DEV.</span></th>
+
+                    @if ($systemSettings->school_level ==  'secondary')
                     <th><span>GR.</span></th>
+                    @endif
                     <th><span>RANK</span>
                     <th><span>COMMENT</span></th>
                     <th><span>TEACHER</span></th>
@@ -107,7 +117,9 @@
                     <td class="text-uppercase">{{ $subjectsMap[$col] ?? $col }}</td>
                     <td>{{ $subjectScore->score }}%</td>
                     <td>0</td>
+                    @if ($systemSettings->school_level == 'secondary')
                     <td>{{ $subjectScore->grade }}</td>
+                    @endif
                     <td>{{ $subjectScore->rank ?? '-' }} / {{ $subjectScore->total ?? '-' }}</td>
 
                     @if ($col == 'kis')
