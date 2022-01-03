@@ -9,7 +9,9 @@
                     <th>Adm. No.</th>
                     <th>Name</th>
                     <th>% Score</th>
+                    @if ($systemSettings->school_level == 'secondary')
                     <th>Points</th>
+                    @endif
                     <th>Rank</th>
                 </tr>
             </thead>
@@ -24,8 +26,15 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $item->adm_no }}</td>
                     <td>{{ $item->name }}</td>
-                    <td>{{ optional($score)->score }}{{ optional($score)->grade }}</td>
+                    <td>
+                        <span>{{ optional($score)->score }}</span>
+                        @if ($systemSettings->school_level == 'secondary')
+                        <span>{{ optional($score)->grade }}</span>
+                        @endif
+                    </td>
+                    @if ($systemSettings->school_level == 'secondary')
                     <td>{{ optional($score)->points }}</td>
+                    @endif
                     <td>{{ optional($score)->rank ?? '-' }} / {{ optional($score)->total ?? '-' }}</td>
                 </tr>
                 @endforeach
@@ -54,7 +63,8 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                    <button wire:click="rankSubjectResults" type="button" data-bs-dismiss="modal" class="btn btn-outline-primary">Proceed</button>
+                    <button wire:click="rankSubjectResults" type="button" data-bs-dismiss="modal"
+                        class="btn btn-outline-primary">Proceed</button>
                 </div>
             </div>
         </div>

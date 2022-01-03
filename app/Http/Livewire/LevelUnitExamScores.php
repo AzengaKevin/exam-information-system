@@ -334,31 +334,13 @@ class LevelUnitExamScores extends Component
                 ->orderBy($col, 'desc')
                 ->get();
 
-            $prevRank = -1;
-            $currRank = -1;
-            $prevVal = 0;
-            $currVal = 0;
+            $data->each(function($item, $key) use($tblName){
 
-            foreach ($data as $key => $record) {
+                $rank = $key + 1;
 
-                if($key == 0) $currRank = 1;
-
-                $currVal = $record->$col;
-
-                if($key != 0){
-                    if($prevVal == $currVal){
-                        $currRank = $prevRank;
-                    }
-                }
-
-                DB::table($tblName)->updateOrInsert(['admno' => $record->admno],['sp' => $currRank]);
-
-                $prevVal = $currVal;
-
-                $prevRank = $currRank;
-
-                ++$currRank;
-            }
+                DB::table($tblName)->updateOrInsert(['admno' => $item->admno],['sp' => $rank]);
+                
+            });
 
             session()->flash('status', 'Student ranking operation completed successfully');
 

@@ -32,6 +32,9 @@ class SubjectExamScores extends Component
         ]);
     }
 
+    /**
+     * Get the relevant data to show in the view
+     */
     public function getRelevantExamData()
     {
         $tblName = Str::slug($this->exam->shortname);
@@ -47,7 +50,6 @@ class SubjectExamScores extends Component
         if (!is_null($this->levelUnit)) $query->where('students.level_unit_id', $this->levelUnit->id);
             
         return $query->get();
-        
     }
 
     /** 
@@ -78,9 +80,7 @@ class SubjectExamScores extends Component
 
                 $rank = $key + 1;
     
-                $result = DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE admno = {$item->admno}");
-
-                Log::debug($result);
+                DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE admno = {$item->admno}");
 
             });
     
