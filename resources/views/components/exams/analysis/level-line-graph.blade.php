@@ -18,6 +18,8 @@
             <div class="col-md-6">
                 <canvas id="level-{{ $level->id }}-chart" width="600" height="200"></canvas>
             </div>
+
+            @if ($systemSettings->school_level == 'secondary')                
             <div class="col-md-2">
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Mean Points</h6>
@@ -31,12 +33,20 @@
                     <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->grade ?? '-' }}</span>
                 </div>
             </div>
+            @else                
+            <div class="col-md-2">
+                <div class="d-flex flex-column">
+                    <h6 class="text-secondary">Average</h6>
+                    <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->average ?? '-' }}</span>
+                    <span class="text-secondary fw-bold">5.4</span>
+                </div>
+            </div>
+            @endif
             <div class="col-md-2">
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Students</h6>
                     <span class="text-success fw-bolder display-6">{{ $studentsCount }}</span>
                 </div>
-
             </div>
         </div>
     </div>

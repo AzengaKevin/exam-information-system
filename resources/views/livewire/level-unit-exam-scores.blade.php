@@ -17,14 +17,19 @@
                         <tr>
                             @foreach ($cols as $col)
                             @if (in_array($col, $subjectCols))
-                            <td>{{ optional(json_decode($item->$col))->score ?? null }}{{ optional(json_decode($item->$col))->grade ?? null }}
+                            <td>
+                                <span>{{ optional(json_decode($item->$col))->score ?? null }}</span>
+                                @if ($systemSettings->school_level == 'secondary')
+                                <span>{{ optional(json_decode($item->$col))->grade ?? null }}</span>
+                                @endif
                             </td>
                             @else
                             <td>{{ $item->$col }}</td>
                             @endif
                             @endforeach
                             <td>
-                                <button wire:click="showGenerateAggregatesModal({{ $item->admno }})" class="btn btn-sm btn-outline-primary hstack gap-2">
+                                <button wire:click="showGenerateAggregatesModal({{ $item->admno }})"
+                                    class="btn btn-sm btn-outline-primary hstack gap-2">
                                     <i class="fa fa-calculator"></i>
                                     <span>Aggregates</span>
                                 </button>
@@ -45,5 +50,5 @@
     <x-modals.exams.scores.level-units.generate-aggregates :admno="$admno" :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-scores :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.rank :columns="$rankCols" />
-    
+
 </div>

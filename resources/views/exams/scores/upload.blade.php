@@ -73,6 +73,8 @@
                 </tbody>
             </table>
         </div>
+
+        @if ($systemSettings->school_level == 'secondary')
         <div class="mt-3">
             <label for="grading" class="form-label">Grading System</label>
             <select name="grading_id" id="grading" class="form-select @error('grading_id') is-invalid @enderror">
@@ -82,6 +84,7 @@
                 @endforeach
             </select>
         </div>
+        @endif
         <div class="mt-3">
             <button type="submit" class="btn btn-primary d-block w-100 btn-lg">Submit</button>
         </div>

@@ -7,6 +7,7 @@ use App\Models\Grade;
 use App\Models\Grading;
 use Livewire\Component;
 use App\Models\LevelUnit;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
@@ -79,7 +80,20 @@ class LevelUnitExamScores extends Component
 
     public function getAggregateColumns(): array
     {
-        return array("mm", "tm", "mg", "mp", "tp", "sp", "op");
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        $cols = array("mm", "tm", "op");
+
+        if($systemSettings->school_level == 'secondary'){
+            array_push($cols, "mg", "mp", "tp");
+        }
+
+        if ($systemSettings->school_has_streams) {
+            array_push($cols, "sp");
+        }
+
+        return $cols;
     }
 
     public function getColumns()

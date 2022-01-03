@@ -418,6 +418,7 @@
     </div>
     @endcan
 
+    @if ($systemSettings->school_level == 'secondary')
     @can('viewAny', \App\Models\Grading::class)
     <a href="{{ route('gradings.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
         <div class="bg-white shadow-sm card h-100 border-light">
@@ -457,6 +458,7 @@
         </div>
     </div>
     @endcan
+    @endif
 
     @can('viewAny', \App\Models\Responsibility::class)
     <a href="{{ route('responsibilities.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">

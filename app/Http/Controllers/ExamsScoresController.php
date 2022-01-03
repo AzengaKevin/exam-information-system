@@ -218,7 +218,6 @@ class ExamsScoresController extends Controller
      */
     public function manage(Request $request, Exam $exam)
     {
-
         try {
 
             /** @var Subject */

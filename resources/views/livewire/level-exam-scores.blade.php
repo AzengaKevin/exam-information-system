@@ -17,7 +17,11 @@
                             @foreach ($cols as $col)
                             @if (in_array($col, $subjectCols))
                             @php $score = json_decode($item->$col); @endphp
-                            <td>{{ optional($score)->score ?? null }}{{ optional($score)->grade ?? null }}
+                            <td>
+                                <span>{{ optional($score)->score ?? null }}</span>
+                                @if ($systemSettings->school_level == 'secondary')
+                                <span>{{ optional($score)->grade ?? null }}</span>
+                                @endif
                             </td>
                             @else
                             <td>{{ $item->$col }}</td>

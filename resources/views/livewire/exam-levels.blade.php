@@ -9,8 +9,12 @@
                     <tr>
                         <th>#</th>
                         <th>Name</th>
+                        @if ($systemSettings->school_level == 'secondary')
                         <th>Points</th>
                         <th>Grade</th>
+                        @else
+                        <th>Average</th>
+                        @endif
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -20,8 +24,13 @@
                     <tr>
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $level->name }}</td>
+
+                        @if ($systemSettings->school_level == 'secondary')
                         <td>{{ $level->pivot->points ?? '-' }}</td>
                         <td>{{ $level->pivot->grade ?? '-' }}</td>
+                        @else
+                        <td>{{ $level->pivot->average ?? '-' }}</td>
+                        @endif
                         <td>
                             <div class="hstack gap-2 align-items-center">
                                 <button class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
@@ -34,7 +43,7 @@
                     @endforeach
                     @else
                     <tr>
-                        <td colspan="5">
+                        <td colspan="{{ ($systemSettings->school_level == 'secondary') ? 5 : 4}}">
                             <div class="py-1 text-center">No Levels added to exam yet</div>
                         </td>
                     </tr>

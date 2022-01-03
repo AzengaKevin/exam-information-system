@@ -113,6 +113,8 @@
                 </a>
             </li>
             @endcan
+
+            @if ($systemSettings->school_level == 'secondary')              
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('gradings.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('gradings.index') }}">
@@ -131,6 +133,7 @@
                     </div>
                 </a>
             </li>
+            @endif
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('responsibilities.index') }}">

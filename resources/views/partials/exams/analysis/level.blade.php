@@ -2,6 +2,7 @@
     <div class="col-md-12">
         <x-exams.analysis.level-line-graph :exam="$exam" :level="$level" />
     </div>
+    @if ($systemSettings->school_level == 'secondary')        
     <div class="col-md-12">
         <div class="card h-100 rounded-3">
             <div class="card-body">
@@ -66,6 +67,7 @@
             </div>
         </div>
     </div>
+    @endif
 </div>
 
 @push('scripts')

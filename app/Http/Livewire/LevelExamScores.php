@@ -6,6 +6,7 @@ use App\Models\Exam;
 use App\Models\Grade;
 use App\Models\Level;
 use App\Models\Grading;
+use App\Settings\SystemSettings;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -45,7 +46,7 @@ class LevelExamScores extends Component
         $columns = $this->getSubjectColumns();
 
         /** @var array */
-        $aggregateCols = $this->getAggreagateColumns();
+        $aggregateCols = $this->getAggregateColumns();
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
@@ -63,11 +64,28 @@ class LevelExamScores extends Component
        return $this->exam->subjects->pluck("shortname")->toArray();
     }
 
-    public function getAggreagateColumns() : array
-    {
-        $returnArray = array("mm", "tm", "mg", "mp", "tp", "op"); // "sp",
 
-        return $returnArray;
+    /**
+     * Get appropriate level columns
+     * 
+     * @return array
+     */
+    public function getAggregateColumns() : array
+    {
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        $cols = array("mm", "tm", "op");
+
+        if($systemSettings->school_level == 'secondary'){
+            array_push($cols, "mg", "mp", "tp");
+        }
+
+        if ($systemSettings->school_has_streams) {
+            array_push($cols, "sp");
+        }
+
+        return $cols;
     }
 
     public function getColumns()
@@ -76,7 +94,7 @@ class LevelExamScores extends Component
         $columns = $this->getSubjectColumns();
 
         /** @var array */
-        $aggregateCols = $this->getAggreagateColumns();
+        $aggregateCols = $this->getAggregateColumns();
 
         /** @var array */
         $studentLevelCols = array("name", "level");
@@ -425,7 +443,7 @@ class LevelExamScores extends Component
         try {
 
             /** @var Collection */
-            $data = DB::table($tblName)->select(array_merge(["students.id"], $this->getAggreagateColumns()))
+            $data = DB::table($tblName)->select(array_merge(["students.id"], $this->getAggregateColumns()))
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->get();
