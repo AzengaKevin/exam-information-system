@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Message;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -17,6 +18,8 @@ class CreateMessagesTable extends Migration
             $table->id();
             $table->foreignId('sender_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('recipient_id')->constrained('users')->onDelete('cascade');
+            $table->enum('type', Message::typeOptions())->default('direct')->nullable();
+            $table->foreignId('exam_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('content', 160);
             $table->dateTime('read_at')->nullable();
             $table->softDeletesTz();
