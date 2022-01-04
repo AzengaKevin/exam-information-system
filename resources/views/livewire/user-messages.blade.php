@@ -8,7 +8,7 @@
             <div class="accordion accordion-flush" id="messagesAccordion">
 
                 @foreach ($messages as $message)             
-                <div class="accordion-item bg-white">
+                <div class="accordion-item">
                     <h2 class="accordion-header" id="message-heading-{{ $loop->iteration }}">
                         <button class="accordion-button bg-white d-inline-flex gap-2" type="button" data-bs-toggle="collapse" data-bs-target="#message-collapse-{{ $loop->iteration }}"
                             aria-expanded="true" aria-controls="message-collapse-{{ $loop->iteration }}">
