@@ -13,6 +13,8 @@ class Message extends Model
     protected $fillable = [
         'sender_id',
         'recipient_id',
+        'exam_id',
+        'type',
         'content'
     ];
 
@@ -39,5 +41,35 @@ class Message extends Model
     public function recipient()
     {
         return $this->belongsTo(User::class, 'recipient_id');
+    }
+
+    /**
+     * exam_id field mutator and changing of the type of message
+     * 
+     * @param mixed $value
+     */
+    public function setExamId($value)
+    {
+        if (!is_null($value)) {
+            $this->attributes['exam_id'] = $value;
+            $this->attributes['type'] = 'exam-result';
+        }
+
+    }
+
+    /**
+     * Get all possible message types
+     * 
+     * @return array
+     */
+    public static function typeOptions() : array
+    {
+        return array(
+            'direct',
+            'exam-result',
+            'auth',
+            'bulk',
+            'other'
+        );
     }
 }
