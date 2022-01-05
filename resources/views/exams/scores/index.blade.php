@@ -47,7 +47,7 @@
                                 <td>{{ $responsibility->pivot->level->name }}</td>
                                 <td>
                                     <div class="hstack gap-2 align-items-center">
-                                        @if ($responsibility->pivot->subject_id)
+                                        @if ($responsibility->pivot->subject_id && $exam->isInMarking())
                                         <a href="{{ route('exams.scores.upload', [
                                             'exam' => $exam,
                                             'subject' => $responsibility->pivot->subject->id,
@@ -69,7 +69,7 @@
                                             <i class="fa fa-cog"></i>
                                             <span>Manage Scores</span>
                                         </a>
-                                        @if ($responsibility->name == 'Class Teacher')
+                                        @if (($responsibility->name == 'Class Teacher') && $exam->isPublished())
                                         <form action="{{ route('exams.results.send-message', [
                                             'exam' => $exam,
                                             'level-unit' => $responsibility->pivot->levelUnit->id,
