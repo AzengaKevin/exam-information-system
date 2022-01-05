@@ -14,6 +14,7 @@ class CreateGeneralSettings extends SettingsMigration
             $blueprint->add('school_email_address', 'kisumuboys1973@gmail.com');
             $blueprint->add('current_academic_year', intval(now()->format('Y')));
             $blueprint->add('current_term', 'Term 1');
+            $blueprint->add('logo', null);
         });
     }
 }

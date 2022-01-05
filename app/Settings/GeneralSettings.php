@@ -12,6 +12,7 @@ class GeneralSettings extends Settings
     public string $school_email_address;
     public int $current_academic_year;
     public string $current_term;
+    public ?string $logo;
 
     public static function group() : string
     {
