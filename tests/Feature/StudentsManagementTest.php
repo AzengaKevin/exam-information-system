@@ -229,7 +229,7 @@ class StudentsManagementTest extends TestCase
 
         $response->assertViewIs('students.show');
 
-        $response->assertViewHasAll(['student']);
+        $response->assertViewHasAll(['student', 'systemSettings']);
         
     }
 }

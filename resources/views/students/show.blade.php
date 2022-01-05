@@ -34,6 +34,7 @@
                         <dt>UPI</dt>
                         <dd>{{ $student->upi  ?? 'N/A'}}</dd>
                     </dl>
+                    @if ($systemSettings->school_level == 'secondary')
                     <dl class="col-md-4">
                         <dt>KCPE Marks</dt>
                         <dd>{{ $student->kcpe_marks }}</dd>
@@ -42,6 +43,7 @@
                         <dt>KCPE Grade</dt>
                         <dd>{{ $student->kcpe_grade }}</dd>
                     </dl>
+                    @endif
                     <dl class="col-md-4">
                         <dt>Gender</dt>
                         <dd>{{ $student->gender }}</dd>
@@ -62,7 +64,7 @@
                         <dt>Class</dt>
                         <dd>{{ optional($student->levelUnit)->alias }}</dd>
                     </dl>
-                    <dl class="col-md-6">
+                    <dl class="col-md-4">
                         <dt>Join Level</dt>
                         <dd>{{ optional($student->admissionLevel)->name ?? 'N/A' }}</dd>
                     </dl>

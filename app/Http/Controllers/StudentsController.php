@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Student;
+use App\Settings\SystemSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -23,12 +24,12 @@ class StudentsController extends Controller
     }
 
 
-    public function show(Student $student)
+    public function show(Student $student, SystemSettings $systemSettings)
     {
         $access = Gate::inspect('view',$student);
 
         if($access->allowed()){
-            return view('students.show',compact('student'));
+            return view('students.show',compact('student', 'systemSettings'));
         }else{
             session()->flash('error', $access->message());
         }
