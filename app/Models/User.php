@@ -79,4 +79,12 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(Message::class, 'sender_id');
     }
+
+    /**
+     * Get users of a specific type
+     */
+    public function scopeType($query, string $type)
+    {
+        $query->where('authenticatable_type', $type);
+    }
 }

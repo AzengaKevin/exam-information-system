@@ -23,8 +23,7 @@ class StudentsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /** @var Role */
-    private $role;
+    private Role $role;
 
     public function setUp(): void
     {
