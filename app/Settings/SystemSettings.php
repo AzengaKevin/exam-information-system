@@ -10,6 +10,7 @@ class SystemSettings extends Settings
     public string $school_type;
     public string $school_level;
     public bool $school_has_streams;
+    public bool $boarding_school;
     
     public static function group() : string
     {

@@ -256,6 +256,7 @@
     </div>
     @endcan
 
+    @if ($systemSettings->boarding_school)        
     @can('viewAny', \App\Models\Hostel::class)
     <a href="{{ route('hostels.index') }}" class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-decoration-none">
         <div class="bg-white shadow-sm card h-100 border-light">
@@ -295,6 +296,7 @@
         </div>
     </div>
     @endcan
+    @endif
 
     @if ($systemSettings->school_has_streams)
     @can('viewAny', \App\Models\LevelUnit::class)

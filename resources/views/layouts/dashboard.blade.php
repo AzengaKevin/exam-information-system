@@ -73,7 +73,7 @@
                     </div>
                 </a>
             </li>
-            @can('viewAny', \App\Models\Student::class)                
+            @can('viewAny', \App\Models\Student::class)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('students.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('students.index') }}">
@@ -114,7 +114,7 @@
             </li>
             @endcan
 
-            @if ($systemSettings->school_level == 'secondary')              
+            @if ($systemSettings->school_level == 'secondary')
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('gradings.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('gradings.index') }}">
@@ -163,8 +163,10 @@
                         <span>Classes</span>
                     </div>
                 </a>
-            </li>            
+            </li>
             @endif
+
+            @if ($systemSettings->boarding_school)
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('hostels.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('hostels.index') }}">
@@ -174,6 +176,7 @@
                     </div>
                 </a>
             </li>
+            @endif
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('settings.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('settings.index') }}">
