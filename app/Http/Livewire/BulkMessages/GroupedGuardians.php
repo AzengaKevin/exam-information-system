@@ -130,12 +130,15 @@ class GroupedGuardians extends Component
 
         // Send the messages now
         $userIds->each(function($id) use($currentUserId, $data){
-            Message::create([
-                'type' => 'bulk',
-                'content' => $data['content'],
-                'recipient_id' => $id,
-                'sender_id' => $currentUserId
-            ]);
+
+            if ($id) {                
+                Message::create([
+                    'type' => 'bulk',
+                    'content' => $data['content'],
+                    'recipient_id' => $id,
+                    'sender_id' => $currentUserId
+                ]);
+            }
         });
         
     }

@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Livewire\BulkMessages\GroupedGuardians;
+use App\Http\Livewire\BulkMessages\RandomizedGuardians;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
@@ -144,6 +145,46 @@ class BulkMessagesManagementTest extends TestCase
             ->call('sendMessages');
 
         $this->assertEquals($levelUnit->students()->count(), Message::count());
+        
+    }
+
+    /** @group messages */
+    public function testAMessageCanBeSentToRandomizedGuardianBasedOnSTudent()
+    {
+        $this->withoutExceptionHandling();
+
+        Notification::fake();
+
+        Student::factory(2)->create()
+            ->each(function(Student $student){
+                /** @var Guardian */
+                $guardian = Guardian::factory()->create();
+
+                $guardian->auth()->create([
+                    'name' => $this->faker->name(),
+                    'email' => $this->faker->safeEmail(),
+                    'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
+                    'password' => Hash::make('password')
+                ]);
+
+                $student->guardians()->attach($guardian);
+
+            });
+
+        $studentsIds = Student::all(['id'])->pluck('id')->toArray();
+
+        $payload = array();
+
+        foreach($studentsIds as $id){
+            $payload[$id] = 'true' ;
+        }
+
+        Livewire::test(RandomizedGuardians::class)
+            ->set('selectedStudents', $payload)
+            ->set('content', $this->faker->sentence())
+            ->call('sendMessages');
+
+        $this->assertEquals(Student::count(), Message::count());
         
     }
 

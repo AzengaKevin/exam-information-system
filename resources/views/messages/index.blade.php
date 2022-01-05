@@ -28,6 +28,7 @@
 
 <livewire:user-messages :user="Auth::user()" />
 <livewire:bulk-messages.grouped-guardians />
+<livewire:bulk-messages.randomized-guardians />
 
 @endsection
 
@@ -72,7 +73,9 @@
                                     <button type="button" data-bs-toggle="modal"
                                         data-bs-target="#grouped-guardians-bulk-sms-modal"
                                         class="btn btn-primary">Grouped Guardians</button>
-                                    <button class="btn btn-primary">Randomized Guardians</button>
+                                    <button type="button" data-bs-toggle="modal"
+                                        data-bs-target="#randomized-guardians-bulk-sms-modal"
+                                        class="btn btn-primary">Randomized Guardians</button>
                                 </div>
                             </div>
                         </div>
