@@ -27,7 +27,7 @@
 <hr>
 
 <livewire:user-messages :user="Auth::user()" />
-<livewire:bulk-messages.grouped-parents />
+<livewire:bulk-messages.grouped-guardians />
 
 @endsection
 
@@ -49,8 +49,8 @@
                                 data-bs-target="#teacher-collapse" aria-expanded="false"
                                 aria-controls="teacher-collapse">Teachers</button>
                         </h2>
-                        <div id="teacher-collapse" class="accordion-collapse collapse"
-                            aria-labelledby="teacher-heading" data-bs-parent="#bulk-sms-accordion">
+                        <div id="teacher-collapse" class="accordion-collapse collapse" aria-labelledby="teacher-heading"
+                            data-bs-parent="#bulk-sms-accordion">
                             <div class="accordion-body">
                                 <div class="d-flex flex-wrap gap-2">
                                     <button class="btn btn-primary">Grouped Teachers</button>
@@ -60,17 +60,19 @@
                         </div>
                     </div>
                     <div class="accordion-item bg-white">
-                        <h2 class="accordion-header bg-white" id="teacher-heading">
+                        <h2 class="accordion-header bg-white" id="guardian-heading">
                             <button type="button" class="accordion-button bg-white" data-bs-toggle="collapse"
-                                data-bs-target="#parent-collapse" aria-expanded="false"
-                                aria-controls="parent-collapse">Parents</button>
+                                data-bs-target="#guardian-collapse" aria-expanded="false"
+                                aria-controls="guardian-collapse">Guardians</button>
                         </h2>
-                        <div id="parent-collapse" class="accordion-collapse collapse" aria-labelledby="parent-heading"
-                            data-bs-parent="#bulk-sms-accordion">
+                        <div id="guardian-collapse" class="accordion-collapse collapse"
+                            aria-labelledby="guardian-heading" data-bs-parent="#bulk-sms-accordion">
                             <div class="accordion-body">
                                 <div class="d-flex flex-wrap gap-2">
-                                    <button type="button" data-bs-toggle="modal" data-bs-target="#grouped-parents-bulk-sms-modal" class="btn btn-primary">Grouped Parents</button>
-                                    <button class="btn btn-primary">Randomized Parents</button>
+                                    <button type="button" data-bs-toggle="modal"
+                                        data-bs-target="#grouped-guardians-bulk-sms-modal"
+                                        class="btn btn-primary">Grouped Guardians</button>
+                                    <button class="btn btn-primary">Randomized Guardians</button>
                                 </div>
                             </div>
                         </div>
