@@ -12,6 +12,7 @@ class CreateSystemSettings extends SettingsMigration
             $blueprint->add('school_type', 'boys');
             $blueprint->add('school_level', 'secondary');
             $blueprint->add('school_has_streams', true);
+            $blueprint->add('boarding_school', true);
         });
 
     }

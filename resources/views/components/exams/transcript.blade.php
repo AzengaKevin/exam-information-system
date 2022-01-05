@@ -21,7 +21,7 @@
                 <div class="fw-bold">{{ $generalSettings->school_address }}</div>
                 <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
                 <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
-                <hr style="height: 2px; background-color: black; margin-bottom: 0px;">
+                <hr style="height: .5px; background-color: black; margin-bottom: 0px;">
                 <hr style="height: .5px; background-color: black; margin-top: 1px;">
             </div>
         </div>
@@ -36,8 +36,10 @@
                         <td class="text-left">{{ $studentScores->adm_no }}</td>
                         <th class="text-start">FORM:</th>
                         <td class="text-left">{{ $studentScores->alias ?? $studentScores->level }}</td>
+                        @if ($systemSettings->boarding_school)
                         <th class="text-start">HOSTEL:</th>
                         <td class="text-left">{{ $studentScores->hostel ?? 'N/A' }}</td>
+                        @endif
                     </tr>
                 </tbody>
             </table>
@@ -77,8 +79,8 @@
                         <th>OUT OF</th>
                         <td>{{ $outOfs['tm'] ?? '-' }}</td>
                         <td>{{ $outOfs['mm'] ?? '-' }}%</td>
-    
-                        @if ($systemSettings->school_level == 'secondary')                        
+
+                        @if ($systemSettings->school_level == 'secondary')
                         <td>{{ $outOfs['tp'] ?? '-' }}</td>
                         <td>{{ $outOfs['mg'] ?? '-' }}</td>
                         @endif
@@ -102,8 +104,8 @@
                         <th><span>SUBJECT</span></th>
                         <th>MARKS</th>
                         <th><span>DEV.</span></th>
-    
-                        @if ($systemSettings->school_level ==  'secondary')
+
+                        @if ($systemSettings->school_level == 'secondary')
                         <th><span>GR.</span></th>
                         @endif
                         <th><span>RANK</span>
@@ -112,7 +114,7 @@
                     </tr>
                 </thead>
                 <tbody>
-    
+
                     @foreach ($subjectColumns as $col)
                     @if (!is_null($studentScores->$col))
                     <tr>
@@ -126,7 +128,7 @@
                         <td>{{ $subjectScore->grade }}</td>
                         @endif
                         <td>{{ $subjectScore->rank ?? '-' }} / {{ $subjectScore->total ?? '-' }}</td>
-    
+
                         @if ($col == 'kis')
                         <td>{{ $swahiliComments[$subjectScore->grade] ?? 'Hakuna maoni' }}</td>
                         @else

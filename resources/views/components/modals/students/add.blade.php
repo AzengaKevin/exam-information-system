@@ -35,7 +35,8 @@
                             <div class="col-md-3">
                                 <label for="kcpe_marks" class="form-label">KCPE Marks</label>
                                 <input type="number" step="1" min="0" max="500" wire:model.lazy="student.kcpe_marks"
-                                    id="student.kcpe_marks" class="form-control @error('student.kcpe_marks') is-invalid @enderror">
+                                    id="student.kcpe_marks"
+                                    class="form-control @error('student.kcpe_marks') is-invalid @enderror">
                                 @error('student.kcpe_marks')
                                 <span class="invalid-feedback">
                                     <strong>{{ $message }}</strong>
@@ -137,6 +138,7 @@
                             </div>
                             @endif
 
+                            @if ($systemSettings->boarding_school)
                             <div class="col-md-9">
                                 <label for="hostel" class="form-label">Hostel</label>
                                 <select wire:model="student.hostel_id" id="hostel"
@@ -152,6 +154,7 @@
                                 </span>
                                 @enderror
                             </div>
+                            @endif
 
                             <div class="col-md-12">
                                 <label for="description" class="form-label">Description</label>
@@ -182,10 +185,12 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="phone" class="form-label">Phone</label>
-                                <input type="tel" wire:model.lazy="guardian.phone" id="phone" aria-describedby="phone-help"
+                                <input type="tel" wire:model.lazy="guardian.phone" id="phone"
+                                    aria-describedby="phone-help"
                                     class="form-control @error('guardian.phone') is-invalid @enderror"
                                     placeholder="254707427854">
-                                <div id="phone-help" class="form-text">Begin with the Kenyas country code(254) without the (+) symbol.</div>
+                                <div id="phone-help" class="form-text">Begin with the Kenyas country code(254) without
+                                    the (+) symbol.</div>
                                 @error('guardian.phone')
                                 <span class="invalid-feedback">
                                     <strong>{{ $message }}</strong>

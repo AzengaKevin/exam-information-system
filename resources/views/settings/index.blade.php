@@ -70,6 +70,13 @@
                                 <label for="school-has-streams" class="form-check-label">School Has Streams</label>
                             </div>
                         </div>
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input type="checkbox" name="system[boarding_school]" id="school-is-a-bording-one"
+                                    class="form-check-input" {{ (old('system.boarding_school') ?? $systemSettings->boarding_school) ? 'checked' : '' }}>
+                                <label for="school-is-a-bording-one" class="form-check-label">Is a Boarding School</label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

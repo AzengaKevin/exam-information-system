@@ -141,7 +141,7 @@
                         </div>
                         @endif
 
-                        @if ($systemSettings->school_has_streams)                            
+                        @if ($systemSettings->school_has_streams)
                         <div class="col-md-6">
                             <label for="stream" class="form-label">Stream</label>
                             <select wire:model.lazy="stream_id" id="stream"
@@ -159,6 +159,7 @@
                         </div>
                         @endif
 
+                        @if ($systemSettings->boarding_school)
                         <div class="col-md-9">
                             <label for="hostel" class="form-label">Hostel</label>
                             <select wire:model="hostel_id" id="hostel"
@@ -174,6 +175,7 @@
                             </span>
                             @enderror
                         </div>
+                        @endif
 
                         <div class="col-md-12">
                             <label for="description" class="form-label">Description</label>
