@@ -166,7 +166,7 @@ class Streams extends Component
         try {
 
             /** @var Collection */
-            $streams = Stream::all();
+            $streams = Stream::withTrashed()->get();
 
             $streams->each(function(Stream $stream){
                 $stream->forceDelete();

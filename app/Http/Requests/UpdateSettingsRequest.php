@@ -38,6 +38,8 @@ class UpdateSettingsRequest extends FormRequest
             'general.school_email_address' => ['bail', 'required', 'string'],
             'general.current_academic_year' => ['bail', 'required', 'int'],
             'general.current_term' => ['bail', 'required', 'string', Rule::in(Exam::termOptions())],
+
+            'raw.logo' => ['nullable', 'image', 'max:96']
         ];
     }
 }

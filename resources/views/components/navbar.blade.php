@@ -1,6 +1,12 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-primary bg-gradient">
     <div class="container">
-        <a class="navbar-brand fs-4" href="{{ route('welcome') }}">
+        <a class="navbar-brand d-inline-flex gap-2 align-items-center fs-4" href="{{ route('welcome') }}">
+            @if ($generalSettings->logo)
+            <img width="48" src="{{ $generalSettings->logo }}" alt="">
+            @else
+            <i class="fa fa-2x fa-graduation-cap"></i>
+            @endif
+            <div class="vr"></div>
             <span class="d-none d-md-block">{{ $systemSettings->school_name }}</span>
             <span class="d-inline d-md-none">{{ config('app.short_name') }}</span>
         </a>
@@ -10,16 +16,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ route('home') }}">Home</a>
-                </li>
             </ul>
             <div class="hstack gap-3">
                 @auth
                 <ul class="mb-2 navbar-nav ms-md-auto mb-lg-0">
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown"
-                            aria-expanded="false">
+                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                             <div class="d-inline-flex align-items-center">
                                 <span class="fs-4"><i class="fa fa-user"></i></span>
                                 <span class="ms-2">{{ Auth::user()->name }}</span>

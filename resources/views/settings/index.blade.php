@@ -14,7 +14,7 @@
 </div>
 <hr>
 <x-feedback />
-<form action="{{ route('settings.update') }}" method="POST" class="row g-4">
+<form action="{{ route('settings.update') }}" method="POST" enctype="multipart/form-data" class="row g-4">
     @csrf
     @method('PATCH')
     <div class="col-md-12">
@@ -89,6 +89,22 @@
                 <hr>
                 <div class="container-fluid">
                     <div class="row g-3">
+                        <div class="col-md-12">
+                            <label for="logo" class="form-label fw-bold">School Badge | Logo</label>
+                            <div id="logo" class="d-flex align-items-start align-items-md-center flex-wrap gap-2">
+                                <div>
+                                    @if ($generalSettings->logo)
+                                    <img src="{{ $generalSettings->logo }}" width="72" height="auto" alt="{{ $systemSettings->school_name }}">
+                                    @else
+                                    <i class="fa fa-3x fa-graduation-cap"></i>
+                                    @endif
+                                </div>
+                                <div>
+                                    <input type="file" name="raw[logo]" aria-describedby="logo-file-desc" id="logo-file" class="form-control">
+                                    <div class="form-text">Change School Badge | Logo</div>
+                                </div>
+                            </div>
+                        </div>
                         <div class="col-md-4">
                             <div class="form-floating">
                                 <input type="text" class="form-control @error('general.school_website') is-invalid @enderror"

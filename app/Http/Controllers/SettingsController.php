@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\UpdateSettingsRequest;
-use App\Settings\GeneralSettings;
-use App\Settings\SystemSettings;
 use Illuminate\Http\Request;
+use App\Settings\SystemSettings;
+use App\Settings\GeneralSettings;
+use Illuminate\Http\UploadedFile;
+use App\Http\Requests\UpdateSettingsRequest;
+use App\Models\File;
+use Illuminate\Support\Facades\Log;
 
 class SettingsController extends Controller
 {
@@ -33,40 +36,74 @@ class SettingsController extends Controller
     {
         $data = $updateSettingsRequest->validated();
 
-        foreach ($data['system'] as $key => $value) {
+        try {
+    
+            // Raw Files Handling
+            if (isset($data['raw']['logo'])) {
+    
+                /** @var UploadedFile */
+                $logoFile = $data['raw']['logo'];
+    
+                $path = $logoFile->store("images/application", 'public');
+    
+                /** @var File */
+                $file = File::create([
+                    'path' => $path,
+                    'name' => $logoFile->getClientOriginalName(),
+                    'extension' => $logoFile->extension(),
+                    'type' => $logoFile->getMimeType()
+                ]);
 
-            if (in_array($key, ['school_has_streams', 'boarding_school'])) {
-
-                $systemSettings->$key = boolval($value);
-
-            }else{
-
-                $systemSettings->$key = $value;
-
+                $generalSettings->logo = $file->url();
+                
             }
+    
+            // Updating System Settings
+            foreach ($data['system'] as $key => $value) {
+    
+                if (in_array($key, ['school_has_streams', 'boarding_school'])) {
+    
+                    $systemSettings->$key = boolval($value);
+    
+                }else{
+    
+                    $systemSettings->$key = $value;
+    
+                }
+    
+            }
+            
+            // Boolean System Keys handling if they're been unchecked
+    
+            if (!array_key_exists('school_has_streams', $data['system'])) {
+                $systemSettings->school_has_streams = false;
+            }
+            
+            if (!array_key_exists('boarding_school', $data['system'])) {
+                $systemSettings->boarding_school = false;
+            }
+    
+            $systemSettings->save();
+    
+            // Updateing general settings
+            foreach ($data['general'] as $key => $value) {
+    
+                $generalSettings->$key = $value;
+            }
+            
+            $generalSettings->save();
+            
+            session()->flash('status', 'Settings has been successfully updated');
 
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'An error occurred check with the administrator');
+            
         }
-        
-        if (!array_key_exists('school_has_streams', $data['system'])) {
-            $systemSettings->school_has_streams = false;
-        }
-        
-        if (!array_key_exists('boarding_school', $data['system'])) {
-            $systemSettings->boarding_school = false;
-        }
-
-        $systemSettings->save();
-
-        
-        foreach ($data['general'] as $key => $value) {
-
-            $generalSettings->$key = $value;
-        }
-        
-        $generalSettings->save();
-        
-        session()->flash('status', 'Settings has been successfully updated');
-
 
         return redirect()->back();
         
