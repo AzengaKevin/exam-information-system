@@ -36,8 +36,8 @@
                         <div class="col-md-4">
                             <div class="form-check">
                                 <input type="checkbox" wire:model="selectedLevels.{{ $level->id }}"
-                                    i0d="level-{{ $loop->iteration }}" class="form-check-input" value="true">
-                                <label for="level-{{ $level->id }}" class="form-check-label">{{ $level->name }}</label>
+                                    id="level-{{ $loop->iteration }}" class="form-check-input" value="true">
+                                <label for="level-{{ $loop->iteration }}" class="form-check-label">{{ $level->name }}</label>
                             </div>
                         </div>
                         @endforeach
@@ -52,8 +52,8 @@
                         @foreach ($levelUnits as $levelUnit)
                         <div class="col-md-4">
                             <div class="form-check">
-                                <input type="checkbox" wire:model="selectedLevelUnits.{{ $levelUnit->id }}" id="stream-{{ $loop->iteration }}"
-                                    class="form-check-input" value="true">
+                                <input type="checkbox" wire:model="selectedLevelUnits.{{ $levelUnit->id }}"
+                                    id="stream-{{ $loop->iteration }}" class="form-check-input" value="true">
                                 <label for="stream-{{ $loop->iteration }}"
                                     class="form-check-label">{{ $levelUnit->alias }}</label>
                             </div>
@@ -67,11 +67,17 @@
                     <label for="content" class="form-label fw-bold">Content</label>
                     <textarea wire:model.lazy="content" id="content" cols="100" rows="5"
                         class="form-control @error('content') is-invalid @enderror"></textarea>
+                    @error('content')
+                    <span class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                <button type="button" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+                <button type="button" wire:click="sendMessages"
+                    class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
                     <i class="fa fa-paper-plane"></i>
                     <span>Send Message</span>
                 </button>

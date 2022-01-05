@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class GroupedGuardians extends Component
 {
@@ -78,6 +79,46 @@ class GroupedGuardians extends Component
 
             case 'all':
                 $userIds = User::type('guardian')->get(['id'])->pluck('id');
+                break;
+
+            case 'levels':
+                $levels = array_filter($data['selectedLevels'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);
+
+                $userIds = DB::table('students')
+                    ->select('students.id')
+                    ->addSelect([
+                        'recipient_id' => DB::table('student_guardians')
+                        ->join('users', function ($join) {
+                            $join->on('student_guardians.guardian_id', '=', 'users.authenticatable_id')
+                                ->where('users.authenticatable_type', 'guardian');
+                        })
+                        ->select("users.id")
+                        ->whereColumn('students.id', '=', 'student_guardians.student_id')
+                        ->take('1')
+                    ])
+                    ->whereIn('level_id', array_keys($levels))
+                    ->get()
+                    ->pluck('recipient_id');
+                break;
+
+            case 'streams':
+                $levelUnits = array_filter($data['selectedLevelUnits'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);
+
+                $userIds = DB::table('students')
+                    ->select('students.id')
+                    ->addSelect([
+                        'recipient_id' => DB::table('student_guardians')
+                        ->join('users', function ($join) {
+                            $join->on('student_guardians.guardian_id', '=', 'users.authenticatable_id')
+                                ->where('users.authenticatable_type', 'guardian');
+                        })
+                        ->select("users.id")
+                        ->whereColumn('students.id', '=', 'student_guardians.student_id')
+                        ->take('1')
+                    ])
+                    ->whereIn('level_unit_id', array_keys($levelUnits))
+                    ->get()
+                    ->pluck('recipient_id');
                 break;
             
             default:
