@@ -32,7 +32,7 @@ class StreamsManagementTest extends TestCase
         $this->actingAs($user);
     }
 
-    /** @group levels */
+    /** @group streams */
     public function testAuthorizedUserCanBrowseStreams()
     {
         $this->withoutExceptionHandling();
@@ -51,7 +51,7 @@ class StreamsManagementTest extends TestCase
         
     }
 
-    /** @group levels */
+    /** @group streams */
     public function testAuthorizedUserCanTruncateStreams()
     {
         $this->withoutExceptionHandling();

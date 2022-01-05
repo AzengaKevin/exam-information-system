@@ -17,6 +17,7 @@
     <div>
         <div class="text-center">
             <div class="fw-bold">
+                <img width="48" src="{{ $generalSettings->logo }}" alt="{{ $systemSettings->school_name }}">
                 <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
                 <div class="fw-bold">{{ $generalSettings->school_address }}</div>
                 <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>

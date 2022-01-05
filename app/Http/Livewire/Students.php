@@ -372,14 +372,14 @@ class Students extends Component
         
                     session()->flash('status', 'The student and guardian have successfully been added');
         
-                    $this->emit('hide-upsert-guardian-modal');
+                    $this->emit('hide-add-student-modal');
                 }
     
             }else{
     
                 session()->flash('error', $access->message());
     
-                $this->emit('hide-upsert-student-modal');
+                $this->emit('hide-add-student-modal');
     
             }
 
@@ -393,7 +393,7 @@ class Students extends Component
 
             session()->flash('error', 'Fatal error occurred while adding student');
 
-            $this->emit('hide-upsert-student-modal');
+            $this->emit('hide-add-student-modal');
             
         }
     }
