@@ -122,7 +122,7 @@ class Exam extends Model
     public function levelGradesDist()
     {
         return $this->belongsToMany(Level::class, 'exam_level_grade_distribution')
-            ->withPivot(['grade', 'count'])
+            ->withPivot(['grade', 'grade_count'])
             ->withTimestamps();
     }
 
@@ -132,7 +132,7 @@ class Exam extends Model
     public function levelUnitGradesDistribution()
     {
         return $this->belongsToMany(LevelUnit::class, 'exam_level_unit_grade_distribution')
-            ->withPivot(['grade', 'count'])
+            ->withPivot(['grade', 'grade_count'])
             ->withTimestamps();
         
     }

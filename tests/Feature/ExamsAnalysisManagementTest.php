@@ -148,4 +148,58 @@ class ExamsAnalysisManagementTest extends TestCase
         $response->assertViewHasAll(['exam', 'level']);
         
     }
+
+    /** @group exam-analysis */
+    public function testAuthorizedUserCanVisitExamAnalysisLevelUnitPage()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+
+        // Create the Level Unit
+        /** @var LevelUnit */
+        $levelUnit = LevelUnit::factory()->create();
+
+        /** @var Student */
+        $student = Student::factory()->create([
+            'admission_level_id' => $levelUnit->level->id,
+            'level_id' => $levelUnit->level->id,
+            'stream_id' => $levelUnit->stream->id,
+            'level_unit_id' => $levelUnit->id
+        ]);
+
+        // Create the Subject
+        $subject = Subject::factory()->create();
+
+        // Create Responsibility for the current teacher
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_unit_id' => $levelUnit->id,
+            'subject_id' => $subject->id
+        ]);
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($levelUnit->level);
+
+        $exam->subjects()->attach($subject);
+
+        // Create Scores Table
+        CreateScoresTable::invoke($exam);
+
+        $response = $this->get(route('exams.analysis.index', [
+            'exam' => $exam,
+            'level-unit' => $levelUnit
+        ]));
+
+        $response->assertOk();
+
+        $response->assertViewIs('exams.analysis.index');
+
+        $response->assertViewHasAll(['exam', 'levelUnit']);
+        
+    }
 }
