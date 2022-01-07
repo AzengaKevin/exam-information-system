@@ -20,6 +20,8 @@
 
 @if ($level)
 @include('partials.exams.analysis.level')
+@elseif($levelUnit)
+@include('partials.exams.analysis.class')
 @else
 <div class="row g-4 py-3">
     @foreach ($exam->levels as $level)

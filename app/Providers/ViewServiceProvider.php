@@ -49,7 +49,8 @@ class ViewServiceProvider extends ServiceProvider
             'exams.scores.manage',
             'components.modals.students.add',
             'components.exams.analysis.level-subject-performance',
-            'components.exams.analysis.level-student-performance'
+            'components.exams.analysis.level-student-performance',
+            'components.exams.analysis.level-unit-performance',
         ], SettingsComposer::class);
     }
 }
