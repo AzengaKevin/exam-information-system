@@ -2,8 +2,10 @@
 
 namespace App\Http\Livewire;
 
+use App\Models\User;
 use Livewire\Component;
 use App\Models\Guardian;
+use App\Notifications\SendPasswordNotification;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -34,6 +36,9 @@ class Guardians extends Component
         ]);
     }
 
+    /**
+     * Get paginated guardians from the  database
+     */
     public function getPaginatedGuardians()
     {
         return Guardian::latest()->paginate(24);
@@ -48,6 +53,11 @@ class Guardians extends Component
         
     }
 
+    /**
+     * Component fields validation
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -59,6 +69,9 @@ class Guardians extends Component
         ];
     }
 
+    /**
+     * Persist a new guardian to the database
+     */
     public function addGuardian()
     {
         $data = $this->validate();
@@ -72,11 +85,18 @@ class Guardians extends Component
 
             if($guardian){
 
+                /** @var User */
                 $user = $guardian->auth()->create(array_merge($data, [
-                    'password' => Hash::make('password')
+                    'password' => Hash::make($password = Str::random())
                 ]));
 
                 if($user){
+
+                    // Sending email verification link to the user
+                    $user->sendEmailVerificationNotification();
+
+                    // Send the guardian a password
+                    $user->notifyNow(new SendPasswordNotification($password));
 
                     DB::commit();
 

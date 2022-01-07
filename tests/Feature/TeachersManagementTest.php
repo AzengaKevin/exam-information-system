@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Notification;
 
 class TeachersManagementTest extends TestCase
 {
@@ -60,6 +61,8 @@ class TeachersManagementTest extends TestCase
     public function testAuthorizedUserCanAddATeacher()
     {
         $this->withoutExceptionHandling();
+
+        Notification::fake();
 
         $payload = [
             'name' => $this->faker->name(),
