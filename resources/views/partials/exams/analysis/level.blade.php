@@ -68,6 +68,12 @@
         </div>
     </div>
     @endif
+    <div class="col-md-6">
+        <x-exams.analysis.level-subject-performance :exam="$exam" :level="$level" />
+    </div>
+    <div class="col-md-6">
+        <x-exams.analysis.level-student-performance :exam="$exam" :level="$level" />
+    </div>
 </div>
 
 @push('scripts')
