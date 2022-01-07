@@ -52,7 +52,7 @@ class LevelsExamsManagementTest extends TestCase
         
     }
 
-    /** @group level-scores */
+    /** @group exam-scores */
     public function testAuthorizedTeacherCanVisitLevelCreateExamScores()
     {
         $this->withoutExceptionHandling();
@@ -92,7 +92,7 @@ class LevelsExamsManagementTest extends TestCase
         
     }
 
-    /** @group level-scores */
+    /** @group exam-scores */
     public function testLevelSupervisorCanPublishLevelScores()
     {
         $this->withoutExceptionHandling();
@@ -217,7 +217,7 @@ class LevelsExamsManagementTest extends TestCase
         $this->assertNotNull($levelWithScore->pivot->average);
     }
 
-    /** @test level-scores */
+    /** @test exam-scores */
     public function testLevelSupervisorCanPublishExamLevelGradeDistribution()
     {
         
@@ -332,7 +332,7 @@ class LevelsExamsManagementTest extends TestCase
         
     }
 
-    /** @group level-scores */
+    /** @group exam-scores */
     public function _testLevelSupervisorCanPublishExamLevelSubjectPerformance()
     {
         

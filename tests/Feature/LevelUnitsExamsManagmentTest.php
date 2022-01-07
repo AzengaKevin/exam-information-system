@@ -22,7 +22,6 @@ use App\Models\Grade;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Artisan;
 
 class LevelUnitsExamsManagmentTest extends TestCase
 {    use RefreshDatabase, WithFaker;
@@ -53,7 +52,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
         
     }
 
-    /** @group exams-stores */
+    /** @group exam-scores */
     public function testAuthorizedUsersCanGenerateAggregatesForTheWholeClass()
     {
         $this->withoutExceptionHandling();
@@ -137,7 +136,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
     }
 
 
-    /** @group exams-stores */
+    /** @group exam-scores */
     public function testAuthorizedUsersCanGenerateAggregatesForASingleStudent()
     {
         $this->withoutExceptionHandling();
@@ -217,7 +216,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
     }    
 
 
-    /** @group scores */
+    /** @group exam-scores */
     public function testClassTeacherCanPublishClassScores()
     {
         $this->withoutExceptionHandling();
@@ -467,6 +466,122 @@ class LevelUnitsExamsManagmentTest extends TestCase
             ->first();
 
         $this->assertEquals(1, $firstRecordInRank->sp);
+    }
+
+    /** @group exam-scores */
+    public function testAuthorizedTeacherCanPublishExamLevelUnitGradeDistribution()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        // Create the Level Unit
+        /** @var LevelUnit */
+        $levelUnit = LevelUnit::factory()->create();
+
+        $students = Student::factory(2)->create([
+            'admission_level_id' => $levelUnit->level->id,
+            'level_id' => $levelUnit->level->id,
+            'stream_id' => $levelUnit->stream->id,
+            'level_unit_id' => $levelUnit->id
+        ]);
+
+        // Create the Subject
+        $subjects = Subject::limit(2)->get();
+
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_unit_id' => $levelUnit->id,
+        ]);        
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($levelUnit->level);
+
+        $exam->subjects()->attach($subjects);
+
+        // Create Scores Table
+        CreateScoresTable::invoke($exam);
+
+        // Upload students scores
+        foreach ($students as $student) {
+
+            foreach ($subjects as $subject) {
+
+                DB::table(Str::slug($exam->shortname))
+                ->updateOrInsert([
+                    "admno" => $student->adm_no
+                ], [
+                    $subject->shortname => json_encode([
+                            'score' => $this->faker->numberBetween(0, 100),
+                            'grade' => $this->faker->randomElement(Grading::gradeOptions()),
+                            'points' => $this->faker->numberBetween(0, 12),
+                    ]),
+                    'level_id' => $levelUnit->level->id,
+                    'level_unit_id' => $levelUnit->id
+                ]);
+    
+            }
+
+        }
+        
+        // Generate students aggregates
+        $cols = $exam->subjects->pluck("shortname")->toArray();
+
+        $tblName = Str::slug($exam->shortname);
+
+        /** @var Collection */
+        $data = DB::table($tblName)
+            ->where("level_id", $levelUnit->level->id)
+            ->select(array_merge(["admno"], $cols))->get();
+
+        $data->each(function($stuData) use($tblName, $cols){
+            $totalScore = 0;
+            $totalPoints = 0;
+            $populatedCols = 0;
+
+            foreach ($cols as $col) {
+
+                if(!is_null($stuData->$col)){
+                    $populatedCols++;
+
+                    $subData = json_decode($stuData->$col);
+
+                    $totalScore += $subData->score ?? 0;
+                    $totalPoints += $subData->points ?? 0;
+                }
+            }
+
+            $avgPoints = round($totalPoints / $populatedCols);
+            $avgScore = round($totalScore / $populatedCols);
+
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+
+            $avgGrade = $pgm[$avgPoints];
+
+            DB::table($tblName)
+            ->updateOrInsert([
+                "admno" => $stuData->admno
+            ], [
+                "mm" => $avgScore,
+                "mg" => $avgGrade,
+                'mp' => $avgPoints,
+                'tp' => $totalPoints,
+                'tm' => $totalScore
+            ]);
+        });
+
+        // Call the grade distribution method
+        Livewire::test(LevelUnitExamScores::class, ['exam' =>$exam, 'levelUnit' => $levelUnit])
+            ->call('publishLevelUnitGradeDistribution');
+
+        $this->assertEquals(count(Grading::gradeOptions()), $exam->levelUnitGradesDistribution()->count());
+        
     }
 
 }

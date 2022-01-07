@@ -127,6 +127,17 @@ class Exam extends Model
     }
 
     /**
+     * Define exam level unit grade distribution relation
+     */
+    public function levelUnitGradesDistribution()
+    {
+        return $this->belongsToMany(LevelUnit::class, 'exam_level_unit_grade_distribution')
+            ->withPivot(['grade', 'count'])
+            ->withTimestamps();
+        
+    }
+
+    /**
      * Defines exam level subject performance relation
      */
     public function levelSubjectPerformance()
