@@ -54,7 +54,9 @@ Route::group(['middleware' => ['auth']], function(){
         ->only(['index']);
 
     Route::resource('levels',LevelsController::class)
-           ->only(['index']);   
+        ->only(['index']);
+    Route::get('/levels/{level:slug}', [LevelsController::class, 'show'])
+        ->name('levels.show');
            
     Route::resource('streams',StreamsController::class)
            ->only(['index']);        

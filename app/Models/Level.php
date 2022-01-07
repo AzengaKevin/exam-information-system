@@ -27,6 +27,9 @@ class Level extends Model
         
     }
 
+    /**
+     * Level student relation declaration
+     */
     public function students()
     {
         return $this->hasMany(Student::class);
