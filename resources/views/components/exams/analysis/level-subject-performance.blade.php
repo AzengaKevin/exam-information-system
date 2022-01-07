@@ -4,7 +4,7 @@
             <table class="table table-sm table-hover">
                 <thead>
                     <tr>
-                        <th colspan="5">Subject Performance</th>
+                        <th colspan="{{ $systemSettings->school_level === 'secondary' ? 4 : 3 }}">{{ $level->name }} Subject Performance</th>
                     </tr>
                     <tr>
                         <th>#</th>

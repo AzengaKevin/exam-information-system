@@ -48,7 +48,8 @@ class ViewServiceProvider extends ServiceProvider
             'exams.scores.upload',
             'exams.scores.manage',
             'components.modals.students.add',
-            'components.exams.analysis.level-subject-performance'
+            'components.exams.analysis.level-subject-performance',
+            'components.exams.analysis.level-student-performance'
         ], SettingsComposer::class);
     }
 }
