@@ -16,7 +16,7 @@
             <span>Rank</span>
         </a>
     </div>
-
+    <hr>
     <livewire:level-unit-exam-scores :exam="$exam" :levelUnit="$levelUnit" />
 
 </div>

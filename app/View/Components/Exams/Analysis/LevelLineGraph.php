@@ -4,9 +4,11 @@ namespace App\View\Components\Exams\Analysis;
 
 use App\Models\Exam;
 use App\Models\Level;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\Component;
+use App\Settings\SystemSettings;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 class LevelLineGraph extends Component
 {
@@ -38,19 +40,29 @@ class LevelLineGraph extends Component
     {
         $levelUnits = $this->level->levelUnits()->with('stream')->get();
 
-        $pointsData = DB::table('level_units')
-            ->select(['level_units.id', 'exam_level_unit.points'])
+        /** @var Collection */
+        $allData = DB::table('level_units')
+            ->select(['level_units.id', 'exam_level_unit.points', 'exam_level_unit.average'])
             ->leftJoin('exam_level_unit', 'level_units.id', '=', 'exam_level_unit.level_unit_id')
             ->where('level_units.level_id', $this->level->id)
             ->where('exam_level_unit.exam_id', $this->exam->id)
-            ->get(['id', 'points'])
-            ->pluck('points', 'id')
-            ->toArray();
+            ->get(['id', 'points', 'average']);
+
+        $info = array();
+        
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        if ($systemSettings->school_level === 'secondary') {
+            $info = $allData->pluck('points', 'id')->toArray();
+        }else{
+            $info = $allData->pluck('average', 'id')->toArray();
+        }
         
         $data = array();
 
         foreach ($levelUnits as $levelUnit) {
-            $data[$levelUnit->stream->slug] = $pointsData[$levelUnit->id] ?? 0;
+            $data[$levelUnit->stream->slug] = $info[$levelUnit->id] ?? 0;
         }
         
         return $data;

@@ -31,8 +31,11 @@ class Exam extends Model
         'counts' => 'boolean'
     ];
 
-   
-    public static function termOptions()
+    /**
+     * Define an array of all possible term options
+     * @return array
+     */
+    public static function termOptions() : array
     {
         return ['Term 1','Term 2','Term 3'];
     }
@@ -43,6 +46,11 @@ class Exam extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
+    /**
+     * Define all possible states of an exam
+     * 
+     * @return
+     */
     public static function examStatusOptions() : array
     {
         return [
@@ -53,21 +61,39 @@ class Exam extends Model
         ];
     }
 
+    /**
+     * Check whether an exam is in a marking state
+     * 
+     * @return bool
+     */
     public function isInMarking(): bool
     {
         return $this->status == 'Marking';
     }
 
+    /**
+     * Check whether an exam is published
+     * 
+     * @return bool
+     */
     public function isPublished(): bool
     {
         return $this->status == 'Published';
     }
 
+    /**
+     * A hook to update the counts attribute when persisting an exam
+     * 
+     * @param mixed $value
+     */
     public function setCountsAttribute($value)
     {
         $this->attributes['counts'] = boolval($value);
     }
 
+    /**
+     * Defines exam level relation
+     */
     public function levels()
     {
         return $this->belongsToMany(Level::class)
@@ -82,11 +108,17 @@ class Exam extends Model
             ->withPivot(['points', 'grade', 'average']);
     }
 
+    /**
+     * Defines exam level unit relation
+     */
     public function subjects()
     {
         return $this->belongsToMany(Subject::class);
     }
 
+    /**
+     * Defines exam level grade distribution relation
+     */
     public function levelGradesDist()
     {
         return $this->belongsToMany(Level::class, 'exam_level_grade_distribution')
@@ -94,6 +126,9 @@ class Exam extends Model
             ->withTimestamps();
     }
 
+    /**
+     * Defines exam level subject performance relation
+     */
     public function levelSubjectPerformance()
     {
         return $this->belongsToMany(Level::class, 'exam_level_subject_performance')
@@ -101,6 +136,9 @@ class Exam extends Model
             ->withPivot(['points', 'grade', 'average']);
     }
 
+    /**
+     * Defines exam student relation
+     */
     public function students()
     {
         return $this->belongsToMany(Student::class)

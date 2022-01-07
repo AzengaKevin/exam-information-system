@@ -17,7 +17,7 @@
         </ol>
     </nav>
 </div>
-<x-feedback />
+{{-- <x-feedback /> --}}
 <hr>
 
 

@@ -42,12 +42,19 @@ class LevelUnitExamScores extends Component
         ]);
     }
 
+    /**
+     * Get columns that can be used for ranking students
+     */
     public function getRankColumns() : array
     {
-        return [
-            'tp' => 'Aggregate Points',
-            'tm' => 'Total Score'
-        ];
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+        
+        $columns = array('tm' => 'Total Score');
+
+        if($systemSettings->school_level === 'secondary') $columns['tp'] = 'Aggregate Points';
+        
+        return $columns;
     }
 
 
@@ -73,11 +80,20 @@ class LevelUnitExamScores extends Component
             : collect([]);
     }
 
+    /**
+     * Retrieve all columns for the exam
+     * 
+     * @return array
+     */
     public function getSubjectColumns(): array
     {
        return $this->exam->subjects->pluck("shortname")->toArray();
     }
 
+    /**
+     * Appropriate aggregate columns based system settings
+     * @return array
+     */
     public function getAggregateColumns(): array
     {
         /** @var SystemSettings */
@@ -96,7 +112,12 @@ class LevelUnitExamScores extends Component
         return $cols;
     }
 
-    public function getColumns()
+    /**
+     * Get a combination of all columns
+     * 
+     * @return array
+     */
+    public function getColumns() : array
     {
         /** @var array */
         $columns = $this->exam->subjects->pluck("shortname")->toArray();

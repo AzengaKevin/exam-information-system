@@ -88,6 +88,16 @@ class LevelExamScores extends Component
         return $cols;
     }
 
+    /**
+     * All aggregate columns irregardless of settings
+     * 
+     * @return array
+     */
+    public function getAllAgregateColumns(): array
+    {
+        return ["mm", "tm", "op", "mg", "mp", "tp", "sp"];
+    }
+
     public function getColumns()
     {
         /** @var array */
@@ -416,7 +426,7 @@ class LevelExamScores extends Component
         try {
 
             /** @var Collection */
-            $data = DB::table($tblName)->select(array_merge(["students.id"], $this->getAggregateColumns()))
+            $data = DB::table($tblName)->select(array_merge(["students.id"], $this->getAllAgregateColumns()))
                 ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->get();

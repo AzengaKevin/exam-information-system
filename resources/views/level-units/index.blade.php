@@ -1,6 +1,6 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Level Units')
+@section('title', 'Classes')
 
 @section('content')
 
@@ -27,12 +27,12 @@
             <button data-bs-toggle="modal" data-bs-target="#upsert-level-unit-modal"
                 class="btn btn-outline-primary hstack gap-2 align-items-center">
                 <i class="fa fa-plus"></i>
-                <span>Level Unit</span>
+                <span>Class</span>
             </button>
             <button data-bs-toggle="modal" data-bs-target="#generate-level-unit-modal"
                 class="btn btn-outline-primary hstack gap-2 align-items-center">
                 <i class="fa fa-cog"></i>
-                <span>Generate</span>
+                <span>Generate Classes</span>
             </button>
         </div>
     </div>

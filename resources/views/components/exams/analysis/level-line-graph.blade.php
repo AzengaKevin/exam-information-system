@@ -24,7 +24,7 @@
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Mean Points</h6>
                     <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->points ?? '-' }}</span>
-                    <span class="text-secondary fw-bold">+.0054</span>
+                    <span class="text-secondary fw-bold">0</span>
                 </div>
             </div>
             <div class="col-md-2">
@@ -38,7 +38,7 @@
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Average</h6>
                     <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->average ?? '-' }}</span>
-                    <span class="text-secondary fw-bold">5.4</span>
+                    <span class="text-secondary fw-bold">0</span>
                 </div>
             </div>
             @endif
