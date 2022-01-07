@@ -70,12 +70,14 @@ class LevelLineGraph extends Component
 
     /**
      * Get the count of students that did the exam in the current level
+     * 
+     * @return int
      */
-    public function studentsCount()
+    public function studentsCount() : int
     {
-        $tblName = Str::slug($this->exam->shortname);
-
-        return DB::table($tblName)->where('level_id', $this->level->id)->count();
+        return $this->exam->students()
+            ->where('students.level_id', $this->level->id)
+            ->count();
     }
 
     /**

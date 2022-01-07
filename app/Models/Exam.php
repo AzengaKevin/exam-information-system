@@ -131,9 +131,9 @@ class Exam extends Model
      */
     public function levelSubjectPerformance()
     {
-        return $this->belongsToMany(Level::class, 'exam_level_subject_performance')
+        return $this->belongsToMany(Subject::class, 'exam_level_subject_performance', 'exam_id', 'subject_id')
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average']);
+            ->withPivot(['points', 'grade', 'average', 'level_id']);
     }
 
     /**
