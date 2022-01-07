@@ -15,13 +15,29 @@
 
 <div>
     <div>
-        <div class="text-center">
+        <div>
             <div class="fw-bold">
-                <img width="48" src="{{ $generalSettings->logo }}" alt="{{ $systemSettings->school_name }}">
-                <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
-                <div class="fw-bold">{{ $generalSettings->school_address }}</div>
-                <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
-                <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
+                <div class="table-responsive">
+                    <table>
+                        <tbody>
+                            <tr>
+                                @if ($generalSettings->logo)
+                                <td>
+                                    <img width="96" src="{{ $generalSettings->logo }}"
+                                        alt="{{ $systemSettings->school_name }}">
+                                </td>
+                                @endif
+                                <td>
+                                    <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
+                                    <div class="fw-bold">{{ $generalSettings->school_address }}</div>
+                                    <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
+                                    <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
                 <hr style="height: .5px; background-color: black; margin-bottom: 0px;">
                 <hr style="height: .5px; background-color: black; margin-top: 1px;">
             </div>
@@ -174,7 +190,11 @@
                 <tr>
                     <td class="text-start">
                         <span class="fw-bold">
+                            @if ($systemSettings->school_level === 'secondary')
                             <span>Principal's Remarks</span>
+                            @else
+                            <span>Head Teacher's Remarks</span>
+                            @endif
                             <span class="text-secondary"> - {{ $teachers['p'] ?? 'N/A' }}</span>
                         </span>
                     </td>
