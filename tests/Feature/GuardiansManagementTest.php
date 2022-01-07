@@ -10,6 +10,7 @@ use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Notification;
 use Livewire\Livewire;
 
 class GuardiansManagementTest extends TestCase
@@ -57,6 +58,8 @@ class GuardiansManagementTest extends TestCase
     public function testAuthorizedUserAddAGuardian()
     {
         $this->withoutExceptionHandling();
+
+        Notification::fake();
 
         $payload = [
             'name' => $this->faker->name(),

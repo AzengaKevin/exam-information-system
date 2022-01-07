@@ -2,26 +2,27 @@
 
 namespace App\Notifications;
 
-use App\Models\Message;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class NewMessageNotification extends Notification
+class SendPasswordNotification extends Notification
 {
     use Queueable;
 
-    public Message $message;
+    public string $password;
 
     /**
      * Create a new notification instance.
+     * 
+     * @param string $password
      *
      * @return void
      */
-    public function __construct(Message $message)
+    public function __construct(string $password)
     {
-        $this->message = $message;
+        $this->password = $password;
     }
 
     /**
@@ -32,7 +33,7 @@ class NewMessageNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['advanta'];
+        return ['mail', 'advanta'];
     }
 
     /**
@@ -43,23 +44,7 @@ class NewMessageNotification extends Notification
      */
     public function toMail($notifiable)
     {
-        return (new MailMessage)
-            ->line('The introduction to the notification.')
-            ->action('Notification Action', url('/'))
-            ->line('Thank you for using our application!');
-    }
-
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
-    {
-        return [
-            
-        ];
+        return (new MailMessage)->line("Hello {$notifiable->name}, your login password is, {$this->password}. Change it as soon as you login");
     }
 
     /**
@@ -72,7 +57,20 @@ class NewMessageNotification extends Notification
     public function toAdvanta($notifiable)
     {
         return [
-            'content' => $this->message->content
+            'content' => "Hello {$notifiable->name}, your login password is, {$this->password}. Change it as soon as you login"
+        ];
+    }
+
+    /**
+     * Get the array representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return array
+     */
+    public function toArray($notifiable)
+    {
+        return [
+            //
         ];
     }
 }

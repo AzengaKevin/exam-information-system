@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\User;
 use App\Models\Subject;
 use App\Models\Teacher;
+use App\Notifications\SendPasswordNotification;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
@@ -70,6 +71,9 @@ class Teachers extends Component
         ];
     }
 
+    /**
+     * Adding a new teacher record in the database
+     */
     public function addTeacher()
     {
         $data = $this->validate();
@@ -85,12 +89,14 @@ class Teachers extends Component
 
                 /** @var User */
                 $user = $teacher->auth()->create(array_merge($data, [
-                    'password' => Hash::make('password')
+                    'password' => Hash::make($password = Str::random())
                 ]));
 
-                //$user->sendEmailVerificationNotification();
+                // Sending email verification link to the user
+                $user->sendEmailVerificationNotification();
 
-                // Send Phone Verification Notification
+                // Send the guardian a password
+                $user->notifyNow(new SendPasswordNotification($password));
 
                 if($user){
 
