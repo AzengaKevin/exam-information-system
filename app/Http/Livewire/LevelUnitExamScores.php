@@ -379,4 +379,132 @@ class LevelUnitExamScores extends Component
         }   
         
     }
+
+    /**
+     * Publish current exam level unit grade distribution
+     */
+    public function publishLevelUnitGradeDistribution()
+    {
+        
+        try {
+            
+            $tblName = Str::slug($this->exam->shortname);
+
+            /** @var Collection */
+            $data = DB::table($tblName)
+                ->where('level_unit_id', $this->levelUnit->id)
+                ->selectRaw("mg, COUNT(mg) AS grade_count")
+                ->distinct("mg")
+                ->groupBy('mg')
+                ->get()
+                ->pluck('grade_count', 'mg');
+
+            if ($data->count()) {
+
+                DB::beginTransaction();
+    
+                foreach (Grading::gradeOptions() as $grade) {
+
+                    DB::table('exam_level_unit_grade_distribution')
+                        ->updateOrInsert([
+                            'exam_id' => $this->exam->id,
+                            'level_unit_id' => $this->levelUnit->id,
+                            'grade' => $grade,
+                        ],['grade_count' => $data[$grade] ?? 0]);
+                }
+                DB::commit();
+    
+                session()->flash('status', 'Level Unit grade distribution has been successfully published');
+            }
+
+            $this->emit('hide-publish-level-unit-grade-dist-modal');
+            
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred, consult admin');
+
+            $this->emit('hide-publish-level-unit-grade-dist-modal');
+            
+        }
+        
+    }
+
+    /**
+     * Publish current level unit subject performance
+     */
+    public function publishLevelUnitSubjectPerformance()
+    {
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            DB::beginTransaction();
+
+            $atLeastASubjectPublished = false;
+
+            foreach ($this->exam->subjects as $subject) {
+
+                $col = $subject->shortname;
+
+                $data = DB::table($tblName)
+                    ->selectRaw("AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.points\"))) AS avg_points, AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.score\"))) AS avg_score")
+                    ->where('level_unit_id', $this->levelUnit->id)
+                    ->whereNotNull($col)
+                    ->first();
+
+                if (!is_null($data->avg_points) && !is_null($data->avg_score)) {
+
+                    $atLeastASubjectPublished = true;
+                    
+                    $avgTotal = number_format($data->avg_score, 2);
+                    $avgPoints = number_format($data->avg_points, 4);
+    
+                    $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+    
+                    $avgGrade = $pgm[intval(round($avgPoints))];
+    
+                    DB::table('exam_level_unit_subject_performance')
+                        ->updateOrInsert([
+                            'exam_id' => $this->exam->id,
+                            'level_unit_id' => $this->levelUnit->id,
+                            'subject_id' => $subject->id
+                        ], [
+                            'average' => $avgTotal,
+                            'points' => $avgPoints,
+                            'grade' => $avgGrade
+                        ]);
+                }
+
+            }
+
+            DB::commit();
+
+            if ($atLeastASubjectPublished) {
+                session()->flash('status', 'Level unit subject performance has been successfully published');
+            }
+
+            $this->emit('hide-publish-class-subjects-performance-modal');
+            
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-publish-class-subjects-performance-modal');
+            
+        }
+        
+    }
 }

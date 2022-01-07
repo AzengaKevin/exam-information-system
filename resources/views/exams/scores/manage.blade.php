@@ -40,11 +40,19 @@
 
     livewire.on('hide-publish-class-scores-modal', () =>
         $('#publish-class-scores-modal').modal('hide'));
+
     livewire.on('hide-publish-level-grade-dist-modal', () =>
         $('#publish-level-grade-dist-modal').modal('hide'));
 
+    livewire.on('hide-publish-level-unit-grade-dist-modal', () =>
+        $('#publish-level-unit-grade-dist-modal').modal('hide'));
+
     livewire.on('hide-publish-subjects-performance-modal', () =>
         $('#publish-subjects-performance-modal').modal('hide'));
+
+    livewire.on('hide-publish-class-subjects-performance-modal', () =>
+        $('#publish-class-subjects-performance-modal').modal('hide'));
+
     livewire.on('hide-rank-class-modal', () => $('#rank-class-modal').modal('hide'));
 
     livewire.on('hide-publish-students-results-modal', () =>
