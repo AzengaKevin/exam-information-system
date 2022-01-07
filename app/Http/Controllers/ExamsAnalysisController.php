@@ -23,9 +23,6 @@ class ExamsAnalysisController extends Controller
     {
         try {
             
-            /** @var Subject */
-            $subject = Subject::find(intval($request->get('subject')));
-
             /** @var LevelUnit */
             $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
 
@@ -35,49 +32,14 @@ class ExamsAnalysisController extends Controller
             // Compute the proper title
             $title = "{$exam->name} Analysis";
 
-            if($subject) $title = "Upload {$exam->name} - {$levelUnit->alias} - {$subject->name} Scores";
-            elseif($levelUnit) $title = "{$levelUnit->alias} Scores Management";
+            if($levelUnit) $title = "{$exam->name} - {$levelUnit->alias} - Analysis";
             elseif($level) $title = "{$exam->name} - {$level->name} - Analysis";
-
-            // Load level grade distribution
-            $levelGradeDistribution = collect();
-
-            $classScores = array();
-
-            if($level){
-
-                $levelGradeDistribution = DB::table('exam_level_grade_distribution')
-                    ->where('level_id', $level->id)
-                    ->select(['grade', 'grade_count'])
-                    ->get(['grade', 'grade_count'])
-                    ->pluck('grade_count', 'grade')
-                    ->toArray();
-
-                $levelUnits = $level->levelUnits()->with('stream')->get();
-
-                $pointsData = DB::table('level_units')
-                    ->select(['level_units.id', 'exam_level_unit.points'])
-                    ->leftJoin('exam_level_unit', 'level_units.id', '=', 'exam_level_unit.level_unit_id')
-                    ->where('level_units.level_id', $level->id)
-                    ->where('exam_level_unit.exam_id', $exam->id)
-                    ->get(['id', 'points'])
-                    ->pluck('points', 'id')
-                    ->toArray();
-                
-                $classScores = array();
-        
-                foreach ($levelUnits as $levelUnit) {
-                    $classScores[$levelUnit->stream->slug] = $pointsData[$levelUnit->id] ?? 0;
-                }
-
-            }
 
             return view('exams.analysis.index', [
                 'exam' => $exam,
                 'level' => $level,
+                'levelUnit' => $levelUnit,
                 'title' => $title,
-                'levelGradeDistribution' => $levelGradeDistribution,
-                'classScores' => $classScores
             ]);
             
         } catch (\Exception $exception) {
@@ -87,8 +49,6 @@ class ExamsAnalysisController extends Controller
                 'exam-id' => $exam->id
             ]);
 
-            abort(500, 'A fatal server error occurred');
-            
         }
 
         
