@@ -434,4 +434,77 @@ class LevelUnitExamScores extends Component
         }
         
     }
+
+    /**
+     * Publish current level unit subject performance
+     */
+    public function publishLevelUnitSubjectPerformance()
+    {
+
+        try {
+
+            $tblName = Str::slug($this->exam->shortname);
+
+            DB::beginTransaction();
+
+            $atLeastASubjectPublished = false;
+
+            foreach ($this->exam->subjects as $subject) {
+
+                $col = $subject->shortname;
+
+                $data = DB::table($tblName)
+                    ->selectRaw("AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.points\"))) AS avg_points, AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.score\"))) AS avg_score")
+                    ->where('level_unit_id', $this->levelUnit->id)
+                    ->whereNotNull($col)
+                    ->first();
+
+                if (!is_null($data->avg_points) && !is_null($data->avg_score)) {
+
+                    $atLeastASubjectPublished = true;
+                    
+                    $avgTotal = number_format($data->avg_score, 2);
+                    $avgPoints = number_format($data->avg_points, 4);
+    
+                    $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+    
+                    $avgGrade = $pgm[intval(round($avgPoints))];
+    
+                    DB::table('exam_level_unit_subject_performance')
+                        ->updateOrInsert([
+                            'exam_id' => $this->exam->id,
+                            'level_unit_id' => $this->levelUnit->id,
+                            'subject_id' => $subject->id
+                        ], [
+                            'average' => $avgTotal,
+                            'points' => $avgPoints,
+                            'grade' => $avgGrade
+                        ]);
+                }
+
+            }
+
+            DB::commit();
+
+            if ($atLeastASubjectPublished) {
+                session()->flash('status', 'Level unit subject performance has been successfully published');
+            }
+
+            $this->emit('hide-publish-class-subjects-performance-modal');
+            
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', 'A fatal error occurred');
+
+            $this->emit('hide-publish-class-subjects-performance-modal');
+            
+        }
+        
+    }
 }

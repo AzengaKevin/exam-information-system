@@ -49,6 +49,10 @@
 
     livewire.on('hide-publish-subjects-performance-modal', () =>
         $('#publish-subjects-performance-modal').modal('hide'));
+
+    livewire.on('hide-publish-class-subjects-performance-modal', () =>
+        $('#publish-class-subjects-performance-modal').modal('hide'));
+
     livewire.on('hide-rank-class-modal', () => $('#rank-class-modal').modal('hide'));
 
     livewire.on('hide-publish-students-results-modal', () =>

@@ -148,6 +148,17 @@ class Exam extends Model
     }
 
     /**
+     * Defines exam level-unit subject performance relation
+     */
+    public function levelUnitSubjectPerformance()
+    {
+        return $this->belongsToMany(Subject::class, 'exam_level_unit_subject_performance')
+            ->withTimestamps()
+            ->withPivot(['points', 'grade', 'average', 'level_unit_id']);
+        
+    }
+
+    /**
      * Defines exam student relation
      */
     public function students()

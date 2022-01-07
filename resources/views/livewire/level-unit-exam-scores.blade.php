@@ -50,6 +50,7 @@
     <x-modals.exams.scores.level-units.generate-aggregates :admno="$admno" :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-scores :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-grade-distribution :levelUnit="$levelUnit" />
+    <x-modals.exams.scores.level-units.publish-subject-performance :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.rank :columns="$rankCols" />
 
 </div>

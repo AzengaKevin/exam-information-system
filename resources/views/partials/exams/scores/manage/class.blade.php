@@ -19,6 +19,10 @@
             class="btn btn-primary d-inline-flex gap-2 align-items-center">
             <i class="fa fa-upload"></i>
             <span>Publish Level Dist.</span>
+        <a href="#" data-bs-toggle="modal" data-bs-target="#publish-class-subjects-performance-modal" role="button"
+            class="btn btn-primary hstack gap-2">
+            <i class="fa fa-upload"></i>
+            <span>Publish Subject Perf.</span>
         </a>
     </div>
     <hr>
