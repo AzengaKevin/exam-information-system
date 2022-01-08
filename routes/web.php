@@ -24,6 +24,7 @@ use App\Http\Controllers\GradingsController;
 use App\Http\Controllers\LevelUnitsController;
 use App\Http\Controllers\MessagesController;
 use App\Http\Controllers\PermissionsController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResponsibilitiesController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\TeachersResponsibilitiesController;
@@ -49,6 +50,8 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/home', HomeController::class)->name('home');
 
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile');
 
     Route::resource('users', UsersController::class)
         ->only(['index']);

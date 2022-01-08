@@ -6,6 +6,7 @@ use App\Channels\AdvantaChannel;
 use App\Models\Guardian;
 use App\Models\Message;
 use App\Models\Teacher;
+use App\Models\User;
 use App\Observers\MessageObserver;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\Paginator;
@@ -36,7 +37,8 @@ class AppServiceProvider extends ServiceProvider
 
         Relation::enforceMorphMap([
             'teacher' => Teacher::class,
-            'guardian' => Guardian::class
+            'guardian' => Guardian::class,
+            'user' => User::class,
         ]);
 
         // Register new notification channel

@@ -221,7 +221,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <a class="dropdown-item text-muted" href="#">
+                            <a class="dropdown-item text-muted" href="{{ route('profile') }}">
                                 <span><i class="fa fa-user"></i></span>
                                 <span class="ms-2">My Profile</span>
                             </a>
