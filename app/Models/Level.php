@@ -27,6 +27,9 @@ class Level extends Model
         
     }
 
+    /**
+     * Level student relation declaration
+     */
     public function students()
     {
         return $this->hasMany(Student::class);
@@ -39,8 +42,22 @@ class Level extends Model
             ->withPivot(['points', 'grade', 'average']);
     }
 
+    /**
+     * Level - Level Unit relation
+     */
     public function levelUnits()
     {
         return $this->hasMany(LevelUnit::class);
+    }
+
+    /**
+     * Level Responsibility relation
+     */
+    public function responsibilities()
+    {
+        return $this->belongsToMany(Responsibility::class, 'responsibility_teacher')
+            ->using(ResponsibilityTeacher::class)
+            ->withTimestamps()
+            ->withPivot(['teacher_id', 'subject_id']);
     }
 }

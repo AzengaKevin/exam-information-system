@@ -7,6 +7,7 @@ use App\Models\Level;
 use App\Models\Permission;
 use Tests\TestCase;
 use App\Models\Role;
+use App\Models\Student;
 use App\Models\User;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -61,5 +62,29 @@ class LevelsManagementTest extends TestCase
             ->call('truncateLevels');
 
         $this->assertEquals(0, Level::count());
+    }
+
+    /** @group levels */
+    public function testAuthorizedUserCanVisitLevelShowPage()
+    {
+        $this->withoutExceptionHandling();
+
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        Student::factory(2)->create(['admission_level_id' => $level->id]);
+
+        $response = $this->get(route('levels.show', $level));
+
+        $response->assertOk();
+
+        $response->assertViewIs('levels.show');
+
+        $response->assertViewHasAll(['level', 'systemSettings']);
+
+        $response->assertSeeLivewire('level-students');
+
+        $response->assertSeeLivewire('level-responsibilities');
+        
     }
 }
