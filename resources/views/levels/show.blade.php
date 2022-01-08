@@ -23,6 +23,9 @@
     <div class="col-md-12">
         <livewire:level-students :level="$level" />
     </div>
+    <div class="col-md-6">
+        <livewire:level-responsibilities :level="$level" />
+    </div>
 </div>
 
 @endsection

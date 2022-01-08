@@ -83,6 +83,8 @@ class LevelsManagementTest extends TestCase
         $response->assertViewHasAll(['level', 'systemSettings']);
 
         $response->assertSeeLivewire('level-students');
+
+        $response->assertSeeLivewire('level-responsibilities');
         
     }
 }

@@ -38,6 +38,10 @@ class LevelUnit extends Model
             ->withPivot(['points', 'grade', 'average']);
     }
 
+    /**
+     * Level Unit Responsibility relation
+     * 
+     */
     public function responsibilities()
     {
         return $this->belongsToMany(Responsibility::class, 'responsibility_teacher')
