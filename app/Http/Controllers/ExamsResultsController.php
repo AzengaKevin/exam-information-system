@@ -6,6 +6,7 @@ use App\Models\Exam;
 use App\Models\User;
 use App\Models\Level;
 use App\Models\LevelUnit;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
@@ -25,7 +26,7 @@ class ExamsResultsController extends Controller
     /**
      * Send messages to student guardians
      */
-    public function sendMessage(Request $request, Exam $exam)
+    public function sendMessage(Request $request, Exam $exam, SystemSettings $systemSettings)
     {
         /** @var User */
         $currentUser = $request->user();
@@ -72,7 +73,7 @@ class ExamsResultsController extends Controller
             /** @var Collection */
             $studentsScores = $studentsScoresQuery->get();
 
-            $studentsScores->each(function($studentScores) use($exam, $subjectColumns, $currentUser){
+            $studentsScores->each(function($studentScores) use($exam, $subjectColumns, $currentUser, $systemSettings){
 
                 // Compose the content
                 $content = "{$studentScores->name}";
@@ -87,15 +88,20 @@ class ExamsResultsController extends Controller
                 foreach ($subjectColumns as $col) {
                     $upperCol = strtoupper($col);
                     $score = json_decode($studentScores->$col);
-                    $content = "{$content},{$upperCol}-{$score->score}{$score->grade}";
+                    $content = "{$content},{$upperCol}-{$score->score}";
+
+                    if ($systemSettings->school_level === 'secondary') $content = "{$content}{$score->grade}";
                 }
 
                 $content = "{$content},MM-{$studentScores->mm}";
                 $content = "{$content},TM-{$studentScores->tm}";
-                $content = "{$content},MG-{$studentScores->mg}";
-                $content = "{$content},MP-{$studentScores->mp}";
-                $content = "{$content},TP-{$studentScores->tp}";
-                $content = "{$content},SP-{$studentScores->sp}";
+                
+                if ($systemSettings->school_level === 'secondary') $content = "{$content},MG-{$studentScores->mg}";
+                if ($systemSettings->school_level === 'secondary') $content = "{$content},MP-{$studentScores->mp}";
+                if ($systemSettings->school_level === 'secondary') $content = "{$content},TP-{$studentScores->tp}";
+
+                if ($systemSettings->school_has_streams) $content = "{$content},SP-{$studentScores->sp}";
+
                 $content = "{$content},OP-{$studentScores->op}";
                 
                 if ($studentScores->recipient_id) {
