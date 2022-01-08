@@ -54,6 +54,25 @@ class User extends Authenticatable implements MustVerifyEmail
     }
 
     /**
+     * User profile photo fil relation
+     */
+    public function profilePhoto()
+    {
+        return $this->morphOne(File::class, 'fileable');
+    }
+
+    public function image(): ?string
+    {
+        if(!is_null($this->profilePhoto)){
+
+            return $this->profilePhoto->url();
+            
+        }
+
+        return null;
+    }
+
+    /**
      * Makes sure the phone number starts with 254
      */
     public function setPhoneAttribute($value)
