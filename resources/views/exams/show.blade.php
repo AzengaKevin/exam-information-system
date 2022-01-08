@@ -44,6 +44,8 @@
                         <dt>End Date</dt>
                         <dd>{{ $exam->end_date }}</dd>
                     </dl>
+
+                    @if (false)
                     <div class="col-md-12">
                         <div class="form-check">
                             <input type="checkbox" class="form-check-input" id="counts" @if($exam->counts)checked
@@ -57,6 +59,7 @@
                         <dt>Weight on Report Form in Percentage</dt>
                         <dd>{{ $exam->weight }}</dd>
                     </dl>
+                    @endif
                     @endif
                 </div>
             </div>

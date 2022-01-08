@@ -84,6 +84,7 @@
                             @enderror
                         </div>
 
+                        @if (false)
                         <div class="col-md-12">
                             <label for="weight" class="form-label">Weight the Exam has on Report Form</label>
                             <input type="number" step="0.01" wire:model.lazy="weight" id="weight"
@@ -101,6 +102,7 @@
                                 <label for="counts" class="form-check-label">Counts on Report Form</label>
                             </div>
                         </div>
+                        @endif
 
                         @if (!is_null($this->examId))
                         <div class="col-md-12">
