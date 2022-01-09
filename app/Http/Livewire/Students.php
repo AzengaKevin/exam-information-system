@@ -139,10 +139,10 @@ class Students extends Component
     {
         return [
             'name' => ['bail', 'required', 'string'],
-            'adm_no' => ['bail', 'required', Rule::unique('students')->ignore($this->studentId)],
+            'adm_no' => ['bail', Rule::unique('students')->ignore($this->studentId)],
             'upi' => ['bail', 'nullable'],
-            'gender' => ['bail', Rule::in(User::genderOptions())],
-            'dob' => ['bail', 'string'],
+            'gender' => ['bail', 'nullable', Rule::in(User::genderOptions())],
+            'dob' => ['bail', 'nullable', 'string'],
             'admission_level_id' => ['bail', 'nullable', 'integer'],
             'level_id' => ['bail', 'nullable', 'integer'],
             'hostel_id' => ['bail', 'nullable', 'integer'],

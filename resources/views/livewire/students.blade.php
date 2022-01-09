@@ -22,7 +22,7 @@
                 @foreach ($students as $student)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ $student->adm_no }}</td>
+                    <td>{{ $student->adm_no ?? '-' }}</td>
                     @if ($systemSettings->school_level == 'secondary')
                     <td>{{ $student->kcpe_marks }}</td>
                     @endif
@@ -32,7 +32,7 @@
                     @else
                     <td>{{ optional($student->level)->name ?? 'N/A' }}</td>
                     @endif
-                    <td>{{ $student->dob->diffInYears(now()) }}</td>
+                    <td>{{ optional($student->dob)->diffInYears(now()) }}</td>
                     <td>{{ $student->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">

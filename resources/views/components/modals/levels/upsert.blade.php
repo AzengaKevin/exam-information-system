@@ -8,7 +8,7 @@
                 @if (is_null($levelId))
                 <h5 id="upsert-level-modal-title" class="modal-title">Add Level</h5>
                 @else
-                <h5 id="upsert-level-modal-title" class="modal-title">Update Level ({{ $levelId }})</h5>
+                <h5 id="upsert-level-modal-title" class="modal-title">Update Level</h5>
                 @endif
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>

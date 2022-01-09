@@ -90,10 +90,7 @@ Route::group(['middleware' => ['auth']], function(){
         ->only('index');
   
     Route::resource('students', StudentsController::class)
-        ->only(['index']);
-
-    Route::get('/students/{student:adm_no}',[StudentsController::class,'show'])
-        ->name('students.show');
+        ->only(['index', 'show']);
 
     Route::resource('exams', ExamsController::class)
         ->only(['index']);

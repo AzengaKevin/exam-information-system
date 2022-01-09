@@ -109,6 +109,49 @@ class StudentsManagementTest extends TestCase
     }
 
     /** @group students */
+    public function testAuthorizedUserCanAddStudentWithNameAndClassOnly()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Create']));
+        
+        /** @var LevelUnit */
+        $LevelUnit = LevelUnit::factory()->create();
+
+        $payload = Student::factory([
+            'admission_level_id' => $LevelUnit->level->id,
+            'stream_id' => $LevelUnit->stream->id,
+            'adm_no' => null,
+            'dob' => null,
+            'kcpe_marks' => null,
+            'kcpe_grade' => null,
+            'gender' => null,
+            'hostel_id' => null,
+            'description' => null,
+        ])->make()->toArray();
+
+        Livewire::test(Students::class)
+            ->set('name', $payload['name'])
+            ->set('admission_level_id', $payload['admission_level_id'])
+            ->set('stream_id', $payload['stream_id'])
+            ->call('addStudent');
+
+        /** @var Student */
+        $student = Student::first();
+
+        $this->assertNotNull($student);
+
+        $this->assertEquals($payload['name'], $student->name);
+        $this->assertEquals($payload['admission_level_id'], $student->admission_level_id);
+        $this->assertEquals($payload['level_id'], $student->level_id);
+
+        $this->assertNotNull($student->level_unit_id);
+
+        $this->assertTrue($LevelUnit->is($student->levelUnit));
+        
+    }
+
+    /** @group students */
     public function testAuthorizedUserCanUpdateAStudent()
     {
         $this->withoutExceptionHandling();
