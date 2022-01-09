@@ -2,7 +2,7 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover text-center">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>#</th>
@@ -13,7 +13,7 @@
                     <th>Name</th>
                     <th>Class</th>
                     <th>Age</th>
-                    <th>Joined</th>
+                    <th>Created At</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -24,18 +24,18 @@
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $student->adm_no ?? '-' }}</td>
                     @if ($systemSettings->school_level == 'secondary')
-                    <td>{{ $student->kcpe_marks }}</td>
+                    <td>{{ $student->kcpe_marks ?? '-' }}</td>
                     @endif
                     <td>{{ $student->name }}</td>
                     @if ($systemSettings->school_has_streams)
-                    <td>{{ optional($student->levelUnit)->alias ?? 'N/A' }}</td>
+                    <td>{{ optional($student->levelUnit)->alias ?? '-' }}</td>
                     @else
-                    <td>{{ optional($student->level)->name ?? 'N/A' }}</td>
+                    <td>{{ optional($student->level)->name ?? '-' }}</td>
                     @endif
-                    <td>{{ optional($student->dob)->diffInYears(now()) }}</td>
+                    <td>{{ optional($student->dob)->diffInYears(now()) ?? '-' }}</td>
                     <td>{{ $student->created_at->format('d/m/Y') }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center justify-content-center">
+                        <div class="hstack gap-2 align-items-center">
                             <a href="{{route('students.show', $student)}}"
                                 class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
