@@ -63,7 +63,7 @@ class Teachers extends Component
     {
         return [
             'name' => ['bail', 'required', 'string'],
-            'email' => ['bail', 'required', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
+            'email' => ['bail', 'nullable', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
             'phone' => ['bail', 'required', Rule::unique('users')->ignore($this->userId), new MustBeKenyanPhone()],
             'employer' => ['bail', 'required', Rule::in(Teacher::employerOptions())],
             'tsc_number' => ['bail', 'nullable', Rule::unique('teachers')->ignore($this->teacherId)],
@@ -89,11 +89,11 @@ class Teachers extends Component
 
                 /** @var User */
                 $user = $teacher->auth()->create(array_merge($data, [
-                    'password' => Hash::make($password = Str::random())
+                    'password' => Hash::make($password = Str::random(6))
                 ]));
 
                 // Sending email verification link to the user
-                $user->sendEmailVerificationNotification();
+                if(!empty($user->email)) $user->sendEmailVerificationNotification();
 
                 // Send the guardian a password
                 $user->notifyNow(new SendPasswordNotification($password));

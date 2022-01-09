@@ -11,7 +11,7 @@
                     <th>Tasks</th>
                     <th>Active?</th>
                     <th>Employer</th>
-                    <th>Joined</th>
+                    <th>Created At</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -21,10 +21,10 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ optional($teacher->auth)->name }}</td>
-                    <td>{{ optional($teacher->auth)->email }}</td>
+                    <td>{{ optional($teacher->auth)->email ?? '-' }}</td>
                     <td>{{ $teacher->responsibilities->count() }}</td>
                     <td>{{ optional($teacher->auth)->active ? 'True' : 'False' }}</td>
-                    <td>{{ $teacher->employer }}</td>
+                    <td>{{ $teacher->employer ?? '-' }}</td>
                     <td>{{ $teacher->created_at->format('d/m/Y') }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center">

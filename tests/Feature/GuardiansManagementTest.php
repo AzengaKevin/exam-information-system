@@ -92,6 +92,40 @@ class GuardiansManagementTest extends TestCase
     }
 
     /** @group guardians */
+    public function testAuthorizedUserAddAGuardianWithoutEmailAddress()
+    {
+        $this->withoutExceptionHandling();
+
+        Notification::fake();
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
+            'location' => $this->faker->streetAddress(),
+            'profession' => $this->faker->company()
+        ];
+
+        Livewire::test(Guardians::class)
+            ->set('name', $payload['name'])
+            ->set('phone', $payload['phone'])
+            ->set('profession', $payload['profession'])
+            ->set('location', $payload['location'])
+            ->call('addGuardian');
+
+        $guardian = Guardian::first();
+
+        $this->assertNotNull($guardian);
+
+        $this->assertEquals($payload['profession'], $guardian->profession);
+        $this->assertEquals($payload['location'], $guardian->location);
+
+        $this->assertNotNull($guardian->auth);
+
+        $this->assertEquals($payload['name'], $guardian->auth->name);
+        
+    }
+
+    /** @group guardians */
     public function testAuthorizedUsersCanUpdateAGuardian()
     {
         $this->withoutExceptionHandling();

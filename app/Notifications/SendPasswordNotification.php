@@ -33,7 +33,11 @@ class SendPasswordNotification extends Notification
      */
     public function via($notifiable)
     {
-        return ['mail', 'advanta'];
+        $viaArray = array('advanta');
+
+        if(!empty($$notifiable->email)) array_push($viaArray, "mail");
+        
+        return $viaArray;
     }
 
     /**
