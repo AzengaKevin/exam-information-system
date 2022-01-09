@@ -98,7 +98,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
             foreach ($subjects as $subject) {
 
                 DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert(["admno" => $student->adm_no], [
+                    ->updateOrInsert(["student_id" => $student->id], [
                         $subject->shortname => json_encode([
                                 'score' => $this->faker->numberBetween(0, 100),
                                 'grade' => $this->faker->randomElement(Grading::gradeOptions()),
@@ -175,6 +175,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
         $exam->subjects()->attach($subjects);
 
         // Create Scores Table
+
         CreateScoresTable::invoke($exam);
 
         foreach ($students as $student) {
@@ -183,7 +184,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
                 DB::table(Str::slug($exam->shortname))
                 ->updateOrInsert([
-                    "admno" => $student->adm_no
+                    "student_id" => $student->id
                 ], [
                     $subject->shortname => json_encode([
                             'score' => $this->faker->numberBetween(0, 100),
@@ -198,15 +199,17 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
         }
 
+        /** @var Student */
+        $firstStudent = Student::first();
+
         Livewire::test(LevelUnitExamScores::class, [
             'exam' => $exam,
             'levelUnit' => $levelUnit
-        ])->call('showGenerateAggregatesModal', $students->first()->adm_no)
-            ->call('generateAggregates');
+        ])->call('showGenerateAggregatesModal', $firstStudent->id)->call('generateAggregates');
 
         $tblName = Str::slug($exam->shortname);
 
-        $data = DB::table($tblName)->where('admno', $students->first()->adm_no)->select(["mm", "tm", "mp", "tp", "mg"])->first();
+        $data = DB::table($tblName)->where('student_id', $firstStudent->id)->select(["mm", "tm", "mp", "tp", "mg"])->first();
         
         $this->assertTrue(!is_null($data->tm));
         $this->assertTrue(!is_null($data->mp));
@@ -263,7 +266,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
             foreach ($subjects as $subject) {
 
                 DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert(["admno" => $student->adm_no], [
+                    ->updateOrInsert(["student_id" => $student->id], [
                         $subject->shortname => json_encode([
                             'score' => $this->faker->numberBetween(0, 100),
                             'grade' => $grade = $this->faker->randomElement(Grading::gradeOptions()),
@@ -286,7 +289,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
         /** @var Collection */
         $data = DB::table($tblName)
             ->where("level_unit_id", $levelUnit->id)
-            ->select(array_merge(["admno"], $cols))->get();
+            ->select(array_merge(["student_id"], $cols))->get();
 
         $data->each(function($stuData) use($tblName, $cols){
 
@@ -314,7 +317,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
             $avgGrade = $pgm[$avgPoints];
 
             DB::table($tblName)
-                ->updateOrInsert(["admno" => $stuData->admno], [
+                ->updateOrInsert(["student_id" => $stuData->student_id], [
                     "mm" => $avgScore,
                     "mg" => $avgGrade,
                     'mp' => $avgPoints,
@@ -388,7 +391,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
             foreach ($subjects as $subject) {
 
                 DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert(["admno" => $student->adm_no], [
+                    ->updateOrInsert(["student_id" => $student->id], [
                         $subject->shortname => json_encode([
                             'score' => $this->faker->numberBetween(0, 100),
                             'grade' => $grade = $this->faker->randomElement(Grading::gradeOptions()),
@@ -411,7 +414,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
         /** @var Collection */
         $data = DB::table($tblName)
             ->where("level_unit_id", $levelUnit->id)
-            ->select(array_merge(["admno"], $cols))->get();
+            ->select(array_merge(["student_id"], $cols))->get();
 
         $data->each(function($stuData) use($tblName, $cols){
 
@@ -439,7 +442,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
             $avgGrade = $pgm[$avgPoints];
 
             DB::table($tblName)
-                ->updateOrInsert(["admno" => $stuData->admno], [
+                ->updateOrInsert(["student_id" => $stuData->student_id], [
                     "mm" => $avgScore,
                     "mg" => $avgGrade,
                     'mp' => $avgPoints,
@@ -461,7 +464,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
         $firstRecordInRank = DB::table($tblName)
             ->where('level_unit_id', $levelUnit->id)
-            ->select(['admno', $col, 'sp'])
+            ->select(['student_id', $col, 'sp'])
             ->orderBy($col, 'desc')
             ->first();
 
@@ -514,9 +517,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
             foreach ($subjects as $subject) {
 
                 DB::table(Str::slug($exam->shortname))
-                ->updateOrInsert([
-                    "admno" => $student->adm_no
-                ], [
+                ->updateOrInsert(["student_id" => $student->id], [
                     $subject->shortname => json_encode([
                             'score' => $this->faker->numberBetween(0, 100),
                             'grade' => $this->faker->randomElement(Grading::gradeOptions()),
@@ -538,7 +539,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
         /** @var Collection */
         $data = DB::table($tblName)
             ->where("level_id", $levelUnit->level->id)
-            ->select(array_merge(["admno"], $cols))->get();
+            ->select(array_merge(["student_id"], $cols))->get();
 
         $data->each(function($stuData) use($tblName, $cols){
             $totalScore = 0;
@@ -566,7 +567,7 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
             DB::table($tblName)
             ->updateOrInsert([
-                "admno" => $stuData->admno
+                "student_id" => $stuData->student_id
             ], [
                 "mm" => $avgScore,
                 "mg" => $avgGrade,

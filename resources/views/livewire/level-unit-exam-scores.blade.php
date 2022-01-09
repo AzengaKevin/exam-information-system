@@ -1,6 +1,5 @@
 <div>
     <x-feedback />
-
     <div class="card mt-3">
         <div class="card-body">
             <div class="table-responsive">
@@ -28,7 +27,7 @@
                             @endif
                             @endforeach
                             <td>
-                                <button wire:click="showGenerateAggregatesModal({{ $item->admno }})"
+                                <button wire:click="showGenerateAggregatesModal({{ $item->student_id }})"
                                     class="btn btn-sm btn-outline-primary hstack gap-2">
                                     <i class="fa fa-calculator"></i>
                                     <span>Aggregates</span>
@@ -47,7 +46,7 @@
         </div>
     </div>
 
-    <x-modals.exams.scores.level-units.generate-aggregates :admno="$admno" :levelUnit="$levelUnit" />
+    <x-modals.exams.scores.level-units.generate-aggregates :name="$name" :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-scores :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-grade-distribution :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-subject-performance :levelUnit="$levelUnit" />

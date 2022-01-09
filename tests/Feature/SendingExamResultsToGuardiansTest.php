@@ -58,7 +58,6 @@ class SendingExamResultsToGuardiansTest extends TestCase
      */
     public function testAuthorizedUserCanSendLevelUnitExamResults()
     {
-        
         $this->withoutExceptionHandling();
 
         Notification::fake();
@@ -124,7 +123,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
 
                 DB::table(Str::slug($exam->shortname))
                 ->updateOrInsert([
-                    "admno" => $student->adm_no
+                    "student_id" => $student->id
                 ], [
                     $subject->shortname => json_encode([
                             'score' => $this->faker->numberBetween(0, 100),
@@ -140,7 +139,6 @@ class SendingExamResultsToGuardiansTest extends TestCase
         }
         
         // Generating students aggregates
-
         $cols = $exam->subjects->pluck("shortname")->toArray();
 
         $tblName = Str::slug($exam->shortname);
@@ -148,7 +146,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
         /** @var Collection */
         $data = DB::table($tblName)
             ->where("level_id", $levelUnit->level->id)
-            ->select(array_merge(["admno"], $cols))->get();
+            ->select(array_merge(["student_id"], $cols))->get();
 
         $data->each(function($stuData) use($tblName, $cols){
             $totalScore = 0;
@@ -174,7 +172,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
 
             $avgGrade = $pgm[$avgPoints];
 
-            DB::table($tblName)->updateOrInsert(["admno" => $stuData->admno], [
+            DB::table($tblName)->updateOrInsert(["student_id" => $stuData->student_id], [
                 "mm" => $avgScore,
                 "mg" => $avgGrade,
                 'mp' => $avgPoints,
@@ -193,7 +191,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
 
         /** @var Collection */
         $data = DB::table($tblName)
-            ->select(['admno', $col])
+            ->select(['student_id', $col])
             ->where('level_unit_id', $levelUnit->id)
             ->orderBy($col, 'desc')
             ->get();
@@ -215,7 +213,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
                 }
             }
 
-            DB::table($tblName)->updateOrInsert(['admno' => $record->admno],['sp' => $currRank]);
+            DB::table($tblName)->updateOrInsert(['student_id' => $record->student_id],['sp' => $currRank]);
 
             $prevVal = $currVal;
 
@@ -230,7 +228,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
 
         /** @var Collection */
         $data = DB::table($tblName)
-            ->select(['admno', $col])
+            ->select(['student_id', $col])
             ->where('level_id', $levelUnit->level->id)
             ->orderBy($col, 'desc')
             ->get();
@@ -252,7 +250,7 @@ class SendingExamResultsToGuardiansTest extends TestCase
                 }
             }
 
-            DB::table($tblName)->updateOrInsert(['admno' => $record->admno],[
+            DB::table($tblName)->updateOrInsert(['student_id' => $record->student_id],[
                 'op' => $currRank
             ]);
 
