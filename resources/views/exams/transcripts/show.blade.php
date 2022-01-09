@@ -36,7 +36,7 @@
                     <h5>{{ $studentScores->name }}</h5>
                     <a href="{{ route('exams.transcripts.print-one', [
                         'exam' => $exam,
-                        'admno' => $studentScores->adm_no
+                        'id' => $studentScores->student_id
                     ]) }}" class="btn btn-light d-inline-flex gap-2 align-items-center" download>
                         <i class="fa fa-download"></i>
                         <span>Transcript</span>

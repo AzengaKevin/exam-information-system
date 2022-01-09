@@ -33,7 +33,6 @@ class CreateScoresTable
 
         Schema::create($tableName, function(Blueprint $table) use($exam){
             $table->foreignId('student_id')->unique()->constrained()->onDelete('cascade');
-            $table->string('admno')->unique()->nullable();
             $table->string('level_id');
             $table->string('level_unit_id')->nullable();
             foreach ($exam->subjects as $subject) $table->jsonb($subject->shortname)->nullable();

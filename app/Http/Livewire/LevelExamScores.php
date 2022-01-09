@@ -50,7 +50,7 @@ class LevelExamScores extends Component
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
-                ->select(array_merge(["admno", "levels.name AS level", "students.name"], $columns, $aggregateCols))
+                ->select(array_merge(["levels.name AS level", "students.name"], $columns, $aggregateCols))
                 ->join("students", "{$tblName}.student_id", '=', 'students.id')
                 ->join("levels", "{$tblName}.level_id", '=', 'levels.id')
                 ->where("{$tblName}.level_id", $this->level->id)

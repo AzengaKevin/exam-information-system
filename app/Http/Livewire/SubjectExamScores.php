@@ -45,7 +45,7 @@ class SubjectExamScores extends Component
 
         $query = DB::table('students')
             ->leftJoin("{$tblName}", "students.id", "=", "{$tblName}.student_id")
-            ->selectRaw("students.id, students.adm_no, students.name, `{$tblName}`.{$col}, JSON_UNQUOTE(JSON_EXTRACT(`{$tblName}`.$col,\"$.score\")) AS score");
+            ->selectRaw("students.id, students.adm_no, students.name, `{$tblName}`.{$col}, CAST(JSON_UNQUOTE(JSON_EXTRACT(`{$tblName}`.$col,\"$.score\")) AS UNSIGNED) AS score");
 
         if ($this->level) $query->where('students.level_id', $this->level->id);
 
@@ -66,7 +66,7 @@ class SubjectExamScores extends Component
             $col = $this->subject->shortname;
             
             /** @var Collection */
-            $query = DB::table($tblName)->selectRaw("student_id, JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS score");
+            $query = DB::table($tblName)->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS UNSIGNED) AS score");
     
             if(!is_null($this->level)) $query->where("level_id", $this->level->id);
     

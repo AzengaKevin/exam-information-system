@@ -49,9 +49,16 @@
                     <tr>
                         <th class="text-start">NAME:</th>
                         <td class="text-left">{{ $studentScores->name }}</td>
+
+                        @if ($systemSettings->school_level === 'secondary')     
                         <th class="text-start">ADMNO:</th>
                         <td class="text-left">{{ $studentScores->adm_no }}</td>
+                        @endif
+                        @if ($systemSettings->school_level === 'secondary')
                         <th class="text-start">FORM:</th>
+                        @else
+                        <th class="text-start">CLASS:</th>
+                        @endif
                         <td class="text-left">{{ $studentScores->alias ?? $studentScores->level }}</td>
                         @if ($systemSettings->boarding_school)
                         <th class="text-start">HOSTEL:</th>

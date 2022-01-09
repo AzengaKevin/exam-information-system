@@ -207,7 +207,6 @@ class ExamsScoresController extends Controller
             $values = $grading->values;
 
             // Process Uploading the scores
-
             foreach ($data["scores"] as $stid => $scoreData) {
 
                 $score = $scoreData['score'] ?? null;
@@ -228,15 +227,16 @@ class ExamsScoresController extends Controller
                 
                 if ($extra) {
                     $score = 0;
+                    $points = 0;
                     switch ($extra) {
                         case 'missing':
-                            $points = 'X';
+                            $grade = 'X';
                             break;
                         case 'cheated':
-                            $points = 'Y';
+                            $grade = 'Y';
                             break;
                         default:
-                            $points = 'P';
+                            $grade = 'P';
                             break;
                     }
                 }
@@ -244,9 +244,9 @@ class ExamsScoresController extends Controller
                 DB::table(Str::slug($exam->shortname))
                     ->updateOrInsert(["student_id" => $stid], [
                         $subject->shortname => json_encode([
-                            'score' => $score,
+                            'score' => intval($score),
                             'grade' => $grade,
-                            'points' => $points,
+                            'points' => intval($points),
                         ]),
 
                         'level_id' => optional($level)->id ?? optional($levelUnit)->level->id,

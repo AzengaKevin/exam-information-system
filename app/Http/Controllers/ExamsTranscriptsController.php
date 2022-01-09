@@ -104,14 +104,14 @@ class ExamsTranscriptsController extends Controller
             if ($levelUnit) {
                 
                 $outOfs["lsc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
+                    ->select("student_id")
+                    ->distinct("student_id")
                     ->where('level_id', $levelUnit->level_id)
                     ->count();
     
                 $outOfs["lusc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
+                    ->select("student_id")
+                    ->distinct("student_id")
                     ->where('level_unit_id', $levelUnit->id)
                     ->count();
             }
@@ -119,15 +119,15 @@ class ExamsTranscriptsController extends Controller
             if($level){
                 
                 $outOfs["lsc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
+                    ->select("student_id")
+                    ->distinct("student_id")
                     ->where('level_id', $level->id)
                     ->count();
             }
             
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
+                ->addSelect(["students.name", "students.adm_no", "students.id AS student_id", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
                 ->join("students", "{$examScoresTblName}.student_id", "=", "students.id")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
                 ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
@@ -323,12 +323,12 @@ class ExamsTranscriptsController extends Controller
     public function printOne(Request $request, Exam $exam, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
 
-        $admno = $request->get('admno');
+        $id = $request->get('id');
 
         try {
 
-            // Get subject teachers
-            $student = Student::where('adm_no', $admno)->firstOrFail();
+            /** @var Student */
+            $student = Student::findOrFail($id);
 
             $outOfs = array();
             
@@ -378,21 +378,21 @@ class ExamsTranscriptsController extends Controller
                 if ($systemSettings->school_has_streams) {
                     
                     $outOfs["lsc"] = DB::table($examScoresTblName)
-                        ->select("admno")
-                        ->distinct("admno")
+                        ->select("student_id")
+                        ->distinct("student_id")
                         ->where('level_id', $student->level_id)
                         ->count();
     
                     $outOfs["lusc"] = DB::table($examScoresTblName)
-                        ->select("admno")
-                        ->distinct("admno")
+                        ->select("student_id")
+                        ->distinct("student_id")
                         ->where('level_unit_id', $student->level_unit_id)
                         ->count();
                 }else{
                     
                     $outOfs["lsc"] = DB::table($examScoresTblName)
-                        ->select("admno")
-                        ->distinct("admno")
+                        ->select("student_id")
+                        ->distinct("student_id")
                         ->where('level_id', $student->level_id)
                         ->count();
                 }
@@ -401,11 +401,11 @@ class ExamsTranscriptsController extends Controller
             $studentScores = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
-                ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
+                ->join("students", "{$examScoresTblName}.student_id", "=", "students.id")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
                 ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
-                ->where("{$examScoresTblName}.admno", $admno)
+                ->where("{$examScoresTblName}.student_id", $student->id)
                 ->first();
 
             $subjectsCount = 0;
@@ -436,13 +436,12 @@ class ExamsTranscriptsController extends Controller
                 'generalSettings' => $generalSettings
             ]);
     
-            return $pdf->download("{$exam->shortname}-{$admno}.pdf");
+            return $pdf->download("{$exam->shortname}-{$id}.pdf");
 
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
                 'exam-id' => $exam->id,
-                'admno' => $admno,
                 'action' => __METHOD__
             ]);
 
@@ -519,14 +518,14 @@ class ExamsTranscriptsController extends Controller
             if ($levelUnit) {
                 
                 $outOfs["lsc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
+                    ->select("student_id")
+                    ->distinct("student_id")
                     ->where('level_id', $levelUnit->level_id)
                     ->count();
     
                 $outOfs["lusc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
+                    ->select("student_id")
+                    ->distinct("student_id")
                     ->where('level_unit_id', $levelUnit->id)
                     ->count();
             }
@@ -534,8 +533,8 @@ class ExamsTranscriptsController extends Controller
             if ($level) {
 
                 $outOfs["lsc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
+                    ->select("student_id")
+                    ->distinct("student_id")
                     ->where('level_id', $level->id)
                     ->count();
             }
@@ -543,7 +542,7 @@ class ExamsTranscriptsController extends Controller
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
-                ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
+                ->join("students", "{$examScoresTblName}.student_id", "=", "students.id")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
                 ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
