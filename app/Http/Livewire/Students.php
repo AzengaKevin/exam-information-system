@@ -139,7 +139,7 @@ class Students extends Component
     {
         return [
             'name' => ['bail', 'required', 'string'],
-            'adm_no' => ['bail', Rule::unique('students')->ignore($this->studentId)],
+            'adm_no' => ['bail', 'nullable', Rule::unique('students')->ignore($this->studentId)],
             'upi' => ['bail', 'nullable'],
             'gender' => ['bail', 'nullable', Rule::in(User::genderOptions())],
             'dob' => ['bail', 'nullable', 'string'],
@@ -314,10 +314,10 @@ class Students extends Component
         
         $data = $this->validate([
             'student.name' => ['bail', 'required', 'string'],
-            'student.adm_no' => ['bail', 'required', Rule::unique('students', 'adm_no')],
+            'student.adm_no' => ['bail', 'nullable', Rule::unique('students', 'adm_no')],
             'student.upi' => ['bail', 'nullable'],
             'student.gender' => ['bail', Rule::in(User::genderOptions())],
-            'student.dob' => ['bail', 'string'],
+            'student.dob' => ['bail', 'nullable', 'string'],
             'student.admission_level_id' => ['bail', 'nullable', 'integer'],
             'student.level_id' => ['bail', 'nullable', 'integer'],
             'student.hostel_id' => ['bail', 'nullable', 'integer'],
@@ -391,7 +391,7 @@ class Students extends Component
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'Fatal error occurred while adding student');
+            session()->flash('error', 'Most likely you have not, generated the respective class from the level and stream, check with the admin');
 
             $this->emit('hide-add-student-modal');
             
@@ -476,22 +476,40 @@ class Students extends Component
         
     }
 
+    /**
+     * Export students as an excel sheet
+     * 
+     * @return mixed
+     */
     public function downloadSpreadSheet()
     {
         return Excel::download(new StudentsExport, 'students.xlsx');
     }
 
+    /**
+     * Download excel file for uploading students
+     * 
+     * @return mixed
+     */
     public function downloadUploadStudentsExcelFile()
     {
-        // $cols = [["Adm. No.", "Name", "KCPE Marks", "KCPE Grade", "Gender (Male, Female, Other)", "DOB (YYYY-MM-DD)", "class (1B)"]];
-        $cols = [["ADMNO","NAME","KCPEMARKS","KCPEGRADE","GENDER (Male, Female, Other)","DOB (YYYY-MM-DD)","CLASS (1B)"]];
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        $cols = [["NAME","ADMNO","LEVEL","STREAM","GENDER (Male, Female, Other)","DOB (YYYY-MM-DD)","UPI"]];
+
+        if($systemSettings->school_level === 'secondary')
+            $cols = [["NAME","ADMNO","LEVEL","STREAM","GENDER (Male, Female, Other)","DOB (YYYY-MM-DD)","UPI", "KCPEMARKS", "KCPEGRADE"]];
         
         $headers = collect($cols);
 
-        return $headers->downloadExcel("new-student.xlsx");
+        return $headers->downloadExcel("new-students.xlsx");
         
     }
 
+    /**
+     * Importing students from an excel file to the database students table
+     */
     public function importStudents()
     {
         $data = $this->validate(['studentsFile' => ['file', 'mimes:xlsx,csv,ods,xlsm,xltx,xltm,xls,xlt,xml']]);
