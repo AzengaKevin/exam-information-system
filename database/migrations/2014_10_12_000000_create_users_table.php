@@ -19,7 +19,7 @@ class CreateUsersTable extends Migration
             $table->unsignedBigInteger('authenticatable_id')->nullable();
             $table->text('authenticatable_type')->nullable();
             $table->string('name');
-            $table->string('email')->unique();
+            $table->string('email')->nullable()->unique();
             $table->string('phone', 12)->unique();
             $table->enum('gender', User::genderOptions())->nullable();
             $table->boolean('active')->default(true);

@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Hash;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\Paginator;
+use App\Notifications\SendPasswordNotification;
 
 class Students extends Component
 {
@@ -307,7 +308,7 @@ class Students extends Component
     }
 
     /**
-     * Add a new student
+     * Add a new student with guardian at a one go
      */
     public function newAddStudent()
     {
@@ -326,7 +327,7 @@ class Students extends Component
             'student.kcpe_grade' => ['bail', 'nullable', Rule::in(Student::kcpeGradeOptions())],
             'student.kcpe_marks' => ['bail', 'nullable', 'integer', 'between:1,500'],
             'guardian.name' => ['bail', 'required', 'string'],
-            'guardian.email' => ['bail', 'required', 'string', 'email', Rule::unique('users', 'email')],
+            'guardian.email' => ['bail', 'nullable', 'string', 'email', Rule::unique('users', 'email')],
             'guardian.phone' => ['bail', 'required', Rule::unique('users', 'phone'), new MustBeKenyanPhone()],
             'guardian.profession' => ['bail', 'nullable'],
             'guardian.location' => ['bail', 'nullable']
@@ -358,7 +359,17 @@ class Students extends Component
                 /** @var Guardian */
                 $guardian = Guardian::create($data['guardian']);
 
-                if($guardian) $guardian->auth()->create(array_merge($data['guardian'], ['password' => Hash::make('password')]));
+                if($guardian){
+
+                    /** @var User */
+                    $user = $guardian->auth()->create(array_merge($data['guardian'], ['password' => Hash::make($password = Str::random(6))]));
+
+                    // Sending email verification link to the user
+                    if(!empty($user->email)) $user->sendEmailVerificationNotification();
+
+                    // Send the guardian a password
+                    $user->notifyNow(new SendPasswordNotification($password));
+                }
     
                 if($student && $guardian){
 

@@ -62,7 +62,7 @@ class Guardians extends Component
     {
         return [
             'name' => ['bail', 'required', 'string'],
-            'email' => ['bail', 'required', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
+            'email' => ['bail', 'nullable', 'string', 'email', Rule::unique('users')->ignore($this->userId)],
             'phone' => ['bail', 'required', Rule::unique('users')->ignore($this->userId), new MustBeKenyanPhone()],
             'profession' => ['bail', 'nullable'],
             'location' => ['bail', 'nullable']
@@ -87,13 +87,13 @@ class Guardians extends Component
 
                 /** @var User */
                 $user = $guardian->auth()->create(array_merge($data, [
-                    'password' => Hash::make($password = Str::random())
+                    'password' => Hash::make($password = Str::random(6))
                 ]));
 
                 if($user){
 
                     // Sending email verification link to the user
-                    $user->sendEmailVerificationNotification();
+                    if(!empty($user->email)) $user->sendEmailVerificationNotification();
 
                     // Send the guardian a password
                     $user->notifyNow(new SendPasswordNotification($password));
@@ -126,6 +126,11 @@ class Guardians extends Component
         
     }
 
+    /**
+     * Show a modal for editing the specified guardian
+     * 
+     * @param Guardian $guardian
+     */
     public function editGuardian(Guardian $guardian)
     {
         
@@ -143,6 +148,9 @@ class Guardians extends Component
 
     }
 
+    /**
+     * Updating a guardian database record
+     */
     public function updateGuardian()
     {
         $data = $this->validate();
@@ -184,7 +192,11 @@ class Guardians extends Component
         }
     }
 
-
+    /**
+     * Show a deletion confirmation modal for the specified guardian
+     * 
+     * @param Guardian $quardian
+     */
     public function showDeleteGuardianModal(Guardian $guardian)
     {
         $this->guardianId = $guardian->id;

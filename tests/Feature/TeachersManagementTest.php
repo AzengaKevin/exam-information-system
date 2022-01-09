@@ -95,6 +95,41 @@ class TeachersManagementTest extends TestCase
     }
 
     /** @group teachers */
+    public function testAuthorizedUserCanAddATeacherWithoutAnEmailAddress()
+    {
+        $this->withoutExceptionHandling();
+
+        Notification::fake();
+
+        $payload = [
+            'name' => $this->faker->name(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
+            'employer' => $this->faker->randomElement(Teacher::employerOptions()),
+            'tsc_number' => $this->faker->numberBetween(123456, 999999),
+        ];
+
+        Livewire::test(Teachers::class)
+            ->set('name', $payload['name'])
+            ->set('phone', $payload['phone'])
+            ->set('employer', $payload['employer'])
+            ->set('tsc_number', $payload['tsc_number'])
+            ->call('addTeacher');
+
+        $teacher = Teacher::first();
+
+        $this->assertNotNull($teacher);
+
+        $this->assertEquals($payload['employer'], $teacher->employer);
+        $this->assertEquals($payload['tsc_number'], $teacher->tsc_number);
+
+        $this->assertNotNull($teacher->auth);
+
+        $this->assertEquals($payload['name'], $teacher->auth->name);
+        $this->assertEquals(Str::start($payload['phone'], '254'), $teacher->auth->phone);
+        
+    }
+
+    /** @group teachers */
     public function testAuthorizedUserCanAddATeacherWhilstAssigningSubjects()
     {
         $this->withoutExceptionHandling();
