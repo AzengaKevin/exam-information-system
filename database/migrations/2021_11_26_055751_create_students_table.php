@@ -18,12 +18,12 @@ class CreateStudentsTable extends Migration
         Schema::create('students', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('adm_no')->unique();
+            $table->string('adm_no')->nullable()->unique();
             $table->string('upi')->nullable();
             $table->integer('kcpe_marks')->nullable();
             $table->enum('kcpe_grade', Student::kcpeGradeOptions())->nullable();
-            $table->enum('gender', User::genderOptions());
-            $table->date('dob');
+            $table->enum('gender', User::genderOptions())->nullable();
+            $table->date('dob')->nullable();
             $table->foreignId('level_id')->nullable()->constrained();
             $table->foreignId('stream_id')->nullable()->constrained();
             $table->unsignedBigInteger('hostel_id')->nullable();

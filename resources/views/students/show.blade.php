@@ -28,7 +28,7 @@
                     </dl>
                     <dl class="col-md-4">
                         <dt>Admission Number</dt>
-                        <dd>{{ $student->adm_no }}</dd>
+                        <dd>{{ $student->adm_no ?? 'N/A' }}</dd>
                     </dl>
                     <dl class="col-md-4">
                         <dt>UPI</dt>
@@ -37,33 +37,36 @@
                     @if ($systemSettings->school_level == 'secondary')
                     <dl class="col-md-4">
                         <dt>KCPE Marks</dt>
-                        <dd>{{ $student->kcpe_marks }}</dd>
+                        <dd>{{ $student->kcpe_marks ?? 'N/A' }}</dd>
                     </dl>
                     <dl class="col-md-4">
                         <dt>KCPE Grade</dt>
-                        <dd>{{ $student->kcpe_grade }}</dd>
+                        <dd>{{ $student->kcpe_grade ?? 'N/A' }}</dd>
                     </dl>
                     @endif
                     <dl class="col-md-4">
                         <dt>Gender</dt>
-                        <dd>{{ $student->gender }}</dd>
+                        <dd>{{ $student->gender ?? 'N/A' }}</dd>
                     </dl>
                     <dl class="col-md-4">
                         <dt>Age</dt>
-                        <dd>{{ $student->dob->diffInYears(now()) }}</dd>
+                        <dd>{{ optional($student->dob)->diffInYears(now()) ?? 'N/A' }}</dd>
                     </dl>
                     <dl class="col-md-4">
                         <dt>Level</dt>
-                        <dd>{{ $student->level->name }}</dd>
+                        <dd>{{ optional($student->level)->name ?? 'N/A' }}</dd>
                     </dl>
+
+                    @if ($systemSettings->school_has_streams)
                     <dl class="col-md-4">
                         <dt>Stream</dt>
-                        <dd>{{ $student->stream->name }}</dd>
+                        <dd>{{ optional($student->stream)->name ?? 'N/A' }}</dd>
                     </dl>
                     <dl class="col-md-4">
                         <dt>Class</dt>
                         <dd>{{ optional($student->levelUnit)->alias }}</dd>
                     </dl>
+                    @endif
                     <dl class="col-md-4">
                         <dt>Join Level</dt>
                         <dd>{{ optional($student->admissionLevel)->name ?? 'N/A' }}</dd>

@@ -12,19 +12,17 @@
         </ol>
     </nav>
     <div class="hstack flex-wrap gap-2">
-
-        @if ($systemSettings->school_level == 'secondary')            
         <button data-bs-toggle="modal" data-bs-target="#import-student-spreadsheet-modal"
             class="btn btn-outline-primary hstack gap-2 align-items-center">
             <i class="fa fa-file-upload"></i>
             <span>Import</span>
         </button>
+        
         <button data-bs-toggle="modal" data-bs-target="#export-student-spreadsheet-modal"
             class="btn btn-outline-primary hstack gap-2 align-items-center">
             <i class="fa fa-file-excel"></i>
             <span>Download</span>
         </button>
-        @endif
 
         <button data-bs-toggle="modal" data-bs-target="#upsert-student-modal"
             class="btn btn-outline-primary hstack gap-2 align-items-center">
