@@ -182,5 +182,86 @@ class UploadingExamsScoresManagementTest extends TestCase
         ]));
         
     }
+
+    /** @group exam-scores */
+    public function testAuthorizedUserCanUploadLevelSegmentSubjectScores()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+    
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        $students = Student::factory(2)->create([
+            'kcpe_marks' => null,
+            'kcpe_grade' => null,
+            'stream_id' => null,
+            'admission_level_id' => $level->id,
+        ]);
+
+        /** @var Subject */
+        $subject = Subject::factory()->create([
+            'name' => 'English',
+            'shortname' => 'eng',
+            'segments' => [ 'outOf60' => 60, 'comp' => 40]
+        ]);
+
+        // Create Responsibility for the current teacher
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_id' => $level->id,
+            'subject_id' => $subject->id
+        ]);
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($level);
+
+        $exam->subjects()->attach($subject);
+
+        // Create Subject Scores
+        $scores = array();
+
+        foreach ($students as $student) {
+            $scores[$student->id]['outOf60'] = $this->faker->numberBetween(0, 60);
+            $scores[$student->id]['comp'] = $this->faker->numberBetween(0, 40);
+        }
+
+        CreateScoresTable::invoke($exam);
+
+        $response = $this->put(route('exams.scores.upload', [
+            'exam' => $exam,
+            'subject' => $subject->id,
+            'level' => $level->id
+        ]), [
+            'scores' => $scores
+        ]);
+
+        $tblName = Str::slug($exam->shortname);
+        $subCol = $subject->shortname;
+
+        /** @var Collection */
+        $data = DB::table($tblName)
+            ->select($subCol)
+            ->where('level_id', $level->id)
+            ->get();
+
+        $this->assertEquals($level->students()->count(), $data->count());
+
+        $data->each(function($item) use($subCol){
+            $this->assertNotNull($item->$subCol);
+        });
+
+        $response->assertRedirect(route('exams.scores.manage', [
+            'exam' => $exam,
+            'subject' => $subject->id,
+            'level' => $level->id
+        ]));
+        
+    }
     
 }

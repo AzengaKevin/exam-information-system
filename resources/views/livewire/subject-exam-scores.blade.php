@@ -1,5 +1,8 @@
 <div>
     <x-feedback />
+    @php
+    $segments = $subject->segments;
+    @endphp
 
     <div class="table-responsive">
         <table class="table table-hover">
@@ -8,6 +11,11 @@
                     <th>Student ID</th>
                     <th>Name</th>
                     <th>Adm. No.</th>
+                    @if (!empty($segments))
+                    @foreach ($segments as $key => $value)
+                    <th>{{ $key }}({{ $value }})</th>
+                    @endforeach
+                    @endif
                     <th>% Score</th>
                     @if ($systemSettings->school_level == 'secondary')
                     <th>Points</th>
@@ -26,6 +34,11 @@
                     <td>{{ $item->id }}</td>
                     <td>{{ $item->name }}</td>
                     <td>{{ $item->adm_no }}</td>
+                    @if (!empty($segments))
+                    @foreach ($segments as $key => $value)
+                    <td>{{ optional($score)->$key }}</td>
+                    @endforeach
+                    @endif
                     <td>
                         <span>{{ optional($score)->score }}</span>
                         @if ($systemSettings->school_level == 'secondary')
