@@ -100,7 +100,7 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::resource('exams.scores', ExamsScoresController::class)
         ->middleware('can:access-upload-scores-page')
-        ->only(['index', 'create', 'store']);
+        ->only(['index']);
 
     Route::get('/exams/{exam:slug}/scores/upload', [ExamsScoresController::class, 'upload'])
         ->name('exams.scores.upload');
