@@ -1,4 +1,4 @@
-@props(['departmentId' => null,'departments','subjectId'=>null])
+@props(['departmentId' => null,'departments','subjectId'=>null, 'segments' => []])
 
 <div wire:ignore.self id="upsert-subject-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-subject-modal-title">
@@ -53,6 +53,28 @@
                         <option value="{{$department->id}}">{{$department->name}}</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="mt-3">
+                    <label for="segments" class="form-label fw-bold">Segments(Optional)</label>
+                    <fieldset id="segments" class="d-flex flex-column gap-3">
+                        @foreach ($segments as $segment)
+                        <div class="input-group">
+                            <input type="text" wire:model.lazy="segments.{{ $loop->index }}.key" class="form-control"
+                                placeholder="Field" aria-label="Field">
+                            <input type="number" wire:model.lazy="segments.{{ $loop->index }}.value"
+                                class="form-control" placeholder="Out Of" aria-label="Out Of">
+                            <button type="button" wire:click="removeSegmentFields({{ $loop->index }})"
+                                class="btn btn-outline-danger"><i class="fa fa-minus"></i></button>
+                        </div>
+                        @endforeach
+                        <div>
+                            <button type="button" wire:click="addSegmentFields"
+                                class="btn btn-sm btn-outline-primary d-inline-flex gap-2 align-items-center">
+                                <i class="fa fa-plus"></i>
+                                <span>Fields</span>
+                            </button>
+                        </div>
+                    </fieldset>
                 </div>
                 <div class="mt-3">
                     <label for="name" class="form-label">Description</label>
