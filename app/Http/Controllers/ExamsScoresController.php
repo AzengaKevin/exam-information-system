@@ -11,11 +11,8 @@ use App\Models\LevelUnit;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Responsibility;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Schema;
-use App\Http\Requests\UpsertScoresRequest;
 use App\Models\Grading;
 use App\Models\Level;
 
@@ -72,83 +69,6 @@ class ExamsScoresController extends Controller
     }
 
     /**
-     * Show page for uploading students marks
-     * 
-     * @param Request $request
-     * @param Exam $exam
-     * 
-     */
-    public function create(Request $request, Exam $exam)
-    {
-
-        try {
-
-            /** @var Subject */
-            $subject = Subject::find(intval($request->get('subject')));
-
-            /** @var LevelUnit */
-            $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
-
-            /** @var Level */
-            $level = Level::find(intval($request->get('level')));
-
-            $gradings = Grading::all(['id', 'name']);
-
-            // Get previous scores if available
-            $scores = array();
-
-            $title = "Manage Scores";
-
-            if($subject) $title = "Upload {$exam->name} - {$levelUnit->alias} - {$subject->name} Scores";
-            elseif($levelUnit) $title = "{$levelUnit->alias} Scores Management";
-            elseif($level) $title = "{$level->name} Scores Management";
-
-            if ($subject) {
-                
-                if (Schema::hasTable(Str::slug($exam->shortname))) {
-    
-                    if($subject){
-    
-                        $col = $subject->shortname;
-        
-                        /** @var Collection */
-                        $data = DB::table(Str::slug($exam->shortname))
-                            ->select('admno', $col)
-                            ->where('level_unit_id', $levelUnit->id)
-                            ->get();
-                            
-                        foreach ($data as $value) {
-                            $scores[$value->admno] = optional(json_decode($value->$col))->score ?? null;
-                        }
-                        
-                    }
-                }
-
-            }
-
-            return view('exams.scores.create', [
-                'subject' => $subject,
-                'levelUnit' => $levelUnit,
-                'level' => $level,
-                'exam' => $exam,
-                'scores' => $scores,
-                'gradings' => $gradings,
-                'title' => $title
-            ]);
-
-        } catch (\Exception $exception) {
-
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'exam-id' => $exam->id
-            ]);
-
-            abort(500, 'A fatal server error occurred');
-            
-        }
-    }
-
-    /**
      * Show the table / form for uploading scores for both school with streams and ones with no streams
      * 
      * @param Request $request
@@ -175,8 +95,8 @@ class ExamsScoresController extends Controller
             $col = $subject->shortname;
 
             $query = DB::table('students')
-                ->leftJoin("{$tblName}", "students.adm_no", "=", "{$tblName}.admno")
-                ->select("students.adm_no", "students.name", "{$tblName}.{$col}");
+                ->leftJoin("{$tblName}", "students.id", "=", "{$tblName}.student_id")
+                ->select("students.id AS stid", "students.adm_no AS admno", "students.name", "{$tblName}.{$col}");
 
             if ($level) $query->where('students.level_id', $level->id);
 
@@ -288,7 +208,7 @@ class ExamsScoresController extends Controller
 
             // Process Uploading the scores
 
-            foreach ($data["scores"] as $admno => $scoreData) {
+            foreach ($data["scores"] as $stid => $scoreData) {
 
                 $score = $scoreData['score'] ?? null;
                 $grade = null;
@@ -297,49 +217,38 @@ class ExamsScoresController extends Controller
                 $extra = $scoreData['extra'] ?? null;
 
                 if ($score) {
-
                     foreach ($values as $value) {
-
                         if($score >= $value['min'] && $score <= $value['max']){
                             $grade = $value['grade'];
                             $points = $value['points'];
                             break;
                         }
-    
                     }
-                    
-                }else{
-
-                    if ($extra) {
-
-                        $score = 0;
-
-                        switch ($extra) {
-                            case 'missing':
-                                $points = 'X';
-                                break;
-                            case 'cheated':
-                                $points = 'Y';
-                                break;
-                            
-                            default:
-                                $points = 'P';
-                                break;
-                        }
-                        
+                }
+                
+                if ($extra) {
+                    $score = 0;
+                    switch ($extra) {
+                        case 'missing':
+                            $points = 'X';
+                            break;
+                        case 'cheated':
+                            $points = 'Y';
+                            break;
+                        default:
+                            $points = 'P';
+                            break;
                     }
-
                 }
 
                 DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert([
-                        "admno" => $admno
-                    ], [
+                    ->updateOrInsert(["student_id" => $stid], [
                         $subject->shortname => json_encode([
-                                'score' => $score,
-                                'grade' => $grade,
-                                'points' => $points,
+                            'score' => $score,
+                            'grade' => $grade,
+                            'points' => $points,
                         ]),
+
                         'level_id' => optional($level)->id ?? optional($levelUnit)->level->id,
                         'level_unit_id' => optional($levelUnit)->id
                     ]);
@@ -368,71 +277,4 @@ class ExamsScoresController extends Controller
         }
     }
 
-    /**
-     * Record stores to the database
-     */
-    public function store(UpsertScoresRequest $request, Exam $exam)
-    {
-        $data = $request->validated();
-
-        try {
-
-            /** @var Subject */
-            $subject = Subject::findOrFail(intval($request->get('subject')));
-
-            /** @var LevelUnit */
-            $levelUnit = LevelUnit::findOrFail(intval($request->get('level-unit')));
-
-            $grading = Grading::find($data['grading_id'] ?? 1) ?? Grading::first();
-
-            $values = $grading->values;
-
-            foreach ($data["scores"] as $admno => $score) {
-
-                $grade = null;
-                $points = null;
-
-                foreach ($values as $value) {
-
-                    if($score >= $value['min'] && $score <= $value['max']){
-                        $grade = $value['grade'];
-                        $points = $value['points'];
-                        break;
-                    }
-
-                }
-                
-                DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert([
-                        "admno" => $admno
-                    ], [
-                        $subject->shortname => json_encode([
-                                'score' => $score,
-                                'grade' => $grade,
-                                'points' => $points,
-                        ]),
-                        'level_id' => $levelUnit->level->id,
-                        'level_unit_id' => $levelUnit->id
-                    ]);
-            }
-
-            session()->flash('status', 'Scores updated');
-
-            return back();
-            
-
-        } catch (\Exception $exception) {
-
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'exam-id' => $exam->id
-            ]);
-
-            session()->flash('error', 'A fatal error occurred while uploading scores check with the admin incase of recurrence');
-
-            return back();
-            
-        }
-        
-    }
 }

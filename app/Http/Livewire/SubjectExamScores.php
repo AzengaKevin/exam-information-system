@@ -34,6 +34,8 @@ class SubjectExamScores extends Component
 
     /**
      * Get the relevant data to show in the view
+     * 
+     * @return Collection
      */
     public function getRelevantExamData()
     {
@@ -42,14 +44,14 @@ class SubjectExamScores extends Component
         $col = $this->subject->shortname;
 
         $query = DB::table('students')
-            ->leftJoin("{$tblName}", "students.adm_no", "=", "{$tblName}.admno")
-            ->select("students.adm_no", "students.name", "{$tblName}.{$col}");
+            ->leftJoin("{$tblName}", "students.id", "=", "{$tblName}.student_id")
+            ->selectRaw("students.id, students.adm_no, students.name, `{$tblName}`.{$col}, JSON_UNQUOTE(JSON_EXTRACT(`{$tblName}`.$col,\"$.score\")) AS score");
 
         if ($this->level) $query->where('students.level_id', $this->level->id);
 
         if (!is_null($this->levelUnit)) $query->where('students.level_unit_id', $this->levelUnit->id);
             
-        return $query->get();
+        return $query->orderBy('score', 'desc')->get();
     }
 
     /** 
@@ -64,7 +66,7 @@ class SubjectExamScores extends Component
             $col = $this->subject->shortname;
             
             /** @var Collection */
-            $query = DB::table($tblName)->selectRaw("admno, JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS score");
+            $query = DB::table($tblName)->selectRaw("student_id, JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS score");
     
             if(!is_null($this->level)) $query->where("level_id", $this->level->id);
     
@@ -80,7 +82,7 @@ class SubjectExamScores extends Component
 
                 $rank = $key + 1;
     
-                DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE admno = {$item->admno}");
+                DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE student_id = {$item->student_id}");
 
             });
     

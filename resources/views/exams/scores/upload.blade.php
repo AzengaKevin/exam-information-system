@@ -32,9 +32,9 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>#</th>
-                        <th>Adm. No.</th>
+                        <th>Student ID</th>
                         <th>Name</th>
+                        <th>Adm. No.</th>
                         <th>% Score</th>
                         <th>Missing / Cheated</th>
                     </tr>
@@ -47,15 +47,15 @@
                     $score = json_decode($item->$col);
                     @endphp
                     <tr>
-                        <td>{{ $loop->iteration }}</td>
-                        <td>{{ $item->adm_no }}</td>
+                        <td>{{ $item->stid }}</td>
                         <td>{{ $item->name }}</td>
-                        <td><input type="number" name="scores[{{ $item->adm_no }}][score]" min="0" max="100"
+                        <td>{{ $item->admno }}</td>
+                        <td><input type="number" name="scores[{{ $item->stid }}][score]" min="0" max="100"
                                 class="form-control form-control-sm"
-                                value="{{ old("scores.{$item->adm_no}.score") ?? optional($score)->score }}">
+                                value="{{ old("scores.{$item->stid}.score") ?? optional($score)->score }}">
                         </td>
                         <td>
-                            <select name="scores[{{ $item->adm_no }}][extra]" class="form-select form-select-sm">
+                            <select name="scores[{{ $item->stid }}][extra]" class="form-select form-select-sm">
                                 <option value="">-- Select --</option>
                                 <option value="missing" {{ optional($score)->grade == 'X' }}>Missing</option>
                                 <option value="cheated" {{ optional($score)->grade == 'Y' }}>Cheated</option>
