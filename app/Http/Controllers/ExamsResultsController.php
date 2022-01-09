@@ -62,7 +62,7 @@ class ExamsResultsController extends Controller
                         ->whereColumn('students.id', '=', 'student_guardians.student_id')
                         ->take('1')
                 ])
-                ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
+                ->join("students", "{$examScoresTblName}.student_id", "=", "students.id")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
                 ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");

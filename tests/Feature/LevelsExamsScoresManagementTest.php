@@ -98,7 +98,7 @@ class LevelsExamsScoresManagementTest extends TestCase
 
                 DB::table(Str::slug($exam->shortname))
                 ->updateOrInsert([
-                    "admno" => $student->adm_no
+                    "student_id" => $student->id
                 ], [
                     $subject->shortname => json_encode([
                         'score' => $this->faker->numberBetween(0, 100),
@@ -120,7 +120,7 @@ class LevelsExamsScoresManagementTest extends TestCase
         /** @var Collection */
         $data = DB::table($tblName)
             ->where("level_id", $level->id)
-            ->select(array_merge(["admno"], $cols))->get();
+            ->select(array_merge(["student_id"], $cols))->get();
 
         $data->each(function($stuData) use($tblName, $cols){
             $totalScore = 0;
@@ -148,7 +148,7 @@ class LevelsExamsScoresManagementTest extends TestCase
 
             DB::table($tblName)
             ->updateOrInsert([
-                "admno" => $stuData->admno
+                "student_id" => $stuData->student_id
             ], [
                 "mm" => $avgScore,
                 "mg" => $avgGrade,
@@ -218,7 +218,7 @@ class LevelsExamsScoresManagementTest extends TestCase
 
                 DB::table(Str::slug($exam->shortname))
                 ->updateOrInsert([
-                    "admno" => $student->adm_no
+                    "student_id" => $student->id
                 ], [
                     $subject->shortname => json_encode([
                         'score' => $this->faker->numberBetween(0, 100),

@@ -7,6 +7,7 @@ use App\Models\Grade;
 use App\Models\Grading;
 use Livewire\Component;
 use App\Models\LevelUnit;
+use App\Models\Student;
 use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -22,7 +23,8 @@ class LevelUnitExamScores extends Component
 
     public LevelUnit $levelUnit;
 
-    public $admno;
+    public $student_id;
+    public $name;
 
     public $col;
 
@@ -70,9 +72,9 @@ class LevelUnitExamScores extends Component
 
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
-                ->select(array_merge(["admno"], $columns, $aggregateCols))
+                ->select(array_merge(["student_id"], $columns, $aggregateCols))
                 ->addSelect("students.name", "level_units.alias")
-                ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
+                ->join("students", "{$tblName}.student_id", '=', 'students.id')
                 ->join("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_unit_id", $this->levelUnit->id)
                 ->orderBy("sp")
@@ -145,7 +147,7 @@ class LevelUnitExamScores extends Component
             /** @var Collection */
             $data = DB::table($tblName)
                 ->where("level_unit_id", $this->levelUnit->id)
-                ->select(array_merge(["admno"], $cols))->get();
+                ->select(array_merge(["student_id"], $cols))->get();
 
             $data->each(function($stuData) use($tblName, $cols){
                 $totalScore = 0;
@@ -173,7 +175,7 @@ class LevelUnitExamScores extends Component
 
                 DB::table($tblName)
                 ->updateOrInsert([
-                    "admno" => $stuData->admno
+                    "student_id" => $stuData->student_id
                 ], [
                     "mm" => $avgScore,
                     "mg" => $avgGrade,
@@ -204,11 +206,16 @@ class LevelUnitExamScores extends Component
     /**
      * Triggers Javascript to show modal for generating aggregates
      * 
-     * @param string $admno
+     * @param string $student_id
      */
-    public function showGenerateAggregatesModal(string $admno)
+    public function showGenerateAggregatesModal(string $student_id)
     {
-        $this->admno = $admno;
+        $this->student_id = $student_id;
+
+        /** @var Student */
+        $student = Student::findOrFail($this->student_id);
+
+        $this->name = $student->name;
 
         $this->emit('show-generate-scores-aggregates-modal');
         
@@ -221,15 +228,18 @@ class LevelUnitExamScores extends Component
     {
 
         try {
-            
+
+            /** @var Student */
+            $student = Student::findOrFail($this->student_id);
+
             $cols = $this->getSubjectColumns();
 
             $tblName = Str::slug($this->exam->shortname);
 
             $stuData = DB::table($tblName)
                 ->where("level_unit_id", $this->levelUnit->id)
-                ->where('admno', $this->admno)
-                ->select(array_merge(["admno"], $cols))->first();
+                ->where('student_id', $student->id)
+                ->select(array_merge(["student_id"], $cols))->first();
 
             $totalScore = 0;
             $totalPoints = 0;
@@ -256,7 +266,7 @@ class LevelUnitExamScores extends Component
 
             DB::table($tblName)
             ->updateOrInsert([
-                "admno" => $stuData->admno
+                "student_id" => $stuData->student_id
             ], [
                 "mm" => $avgScore,
                 "mg" => $avgGrade,
@@ -265,9 +275,9 @@ class LevelUnitExamScores extends Component
                 'tm' => $totalScore
             ]);
 
-            $this->reset('admno');
+            $this->reset(['student_id', 'name']);
 
-            session()->flash('status', "Aggregates for {$this->admno} class successfully generated");
+            session()->flash('status', "Aggregates for {$student->name} class successfully generated");
 
             $this->emit('hide-generate-scores-aggregates-modal');   
 
@@ -277,7 +287,7 @@ class LevelUnitExamScores extends Component
                 'action' => __METHOD__
             ]);
 
-            $this->reset('admno');
+            $this->reset(['student_id', 'name']);
 
             session()->flash('error', 'A fatal error occurred');
 
@@ -350,7 +360,7 @@ class LevelUnitExamScores extends Component
 
             /** @var Collection */
             $data = DB::table($tblName)
-                ->select(['admno', $col])
+                ->select(['student_id', $col])
                 ->where('level_unit_id', $this->levelUnit->id)
                 ->orderBy($col, 'desc')
                 ->get();
@@ -359,7 +369,7 @@ class LevelUnitExamScores extends Component
 
                 $rank = $key + 1;
 
-                DB::table($tblName)->updateOrInsert(['admno' => $item->admno],['sp' => $rank]);
+                DB::table($tblName)->updateOrInsert(['student_id' => $item->student_id],['sp' => $rank]);
                 
             });
 

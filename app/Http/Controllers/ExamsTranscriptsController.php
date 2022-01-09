@@ -128,7 +128,7 @@ class ExamsTranscriptsController extends Controller
             $studentsScoresQuery = DB::table($examScoresTblName)
                 ->select(array_merge($subjectColumns, $aggregateColumns))
                 ->addSelect(["students.name", "students.adm_no", "level_units.alias", "levels.name AS level", "hostels.name AS hostel"])
-                ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
+                ->join("students", "{$examScoresTblName}.student_id", "=", "students.id")
                 ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
                 ->leftJoin("levels", "{$examScoresTblName}.level_id", "=", "levels.id")
                 ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id");
