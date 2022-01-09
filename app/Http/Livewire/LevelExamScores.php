@@ -51,7 +51,7 @@ class LevelExamScores extends Component
         return Schema::hasTable($tblName)
             ? DB::table($tblName)
                 ->select(array_merge(["admno", "levels.name AS level", "students.name"], $columns, $aggregateCols))
-                ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
+                ->join("students", "{$tblName}.student_id", '=', 'students.id')
                 ->join("levels", "{$tblName}.level_id", '=', 'levels.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy('op')
@@ -126,7 +126,7 @@ class LevelExamScores extends Component
             /** @var Collection */
             $data = DB::table($tblName)
                 ->where("level_id", $this->level->id)
-                ->select(array_merge(["admno"], $cols))->get();
+                ->select(array_merge(["student_id"], $cols))->get();
     
             $data->each(function($stuData) use($tblName, $cols){
     
@@ -155,7 +155,7 @@ class LevelExamScores extends Component
     
                 DB::table($tblName)
                 ->updateOrInsert([
-                    "admno" => $stuData->admno
+                    "student_id" => $stuData->student_id
                 ], [
                     "mm" => $avgScore,
                     "mg" => $avgGrade,
@@ -388,7 +388,7 @@ class LevelExamScores extends Component
 
             /** @var Collection */
             $data = DB::table($tblName)
-                ->select(['admno', $col])
+                ->select(['student_id', $col])
                 ->where('level_id', $this->level->id)
                 ->orderBy($col, 'desc')
                 ->get();
@@ -397,7 +397,7 @@ class LevelExamScores extends Component
 
                 $rank = $key + 1;
     
-                DB::table($tblName)->updateOrInsert(['admno' => $item->admno],['op' => $rank]);
+                DB::table($tblName)->updateOrInsert(['student_id' => $item->student_id],['op' => $rank]);
 
             });
 
@@ -427,7 +427,7 @@ class LevelExamScores extends Component
 
             /** @var Collection */
             $data = DB::table($tblName)->select(array_merge(["students.id"], $this->getAllAgregateColumns()))
-                ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
+                ->join("students", "{$tblName}.student_id", '=', 'students.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->get();
 

@@ -46,8 +46,8 @@ class ManageExamsScoresManagementTest extends TestCase
     }
 
 
-    /** @group exams-scores */
-    public function testAuthorizedUserCanVisitManageLevelSubjectScores()
+    /** @group exam-scores */
+    public function _testAuthorizedUserCanVisitManageLevelSubjectScores()
     {
         $this->withoutExceptionHandling();
 

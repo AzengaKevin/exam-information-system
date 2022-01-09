@@ -137,7 +137,7 @@ class ExamsTranscriptsManagementTest extends TestCase
             foreach ($subjects as $subject) {
 
                 DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert(["admno" => $student->adm_no], [
+                    ->updateOrInsert(["student_id" => $student->id], [
                         $subject->shortname => json_encode([
                             'score' => $this->faker->numberBetween(0, 100),
                             'grade' => $this->faker->randomElement(Grading::gradeOptions()),
@@ -159,7 +159,7 @@ class ExamsTranscriptsManagementTest extends TestCase
         /** @var Collection */
         $data = DB::table($tblName)
             ->where("level_unit_id", $levelUnit->id)
-            ->select(array_merge(["admno"], $cols))->get();
+            ->select(array_merge(["student_id"], $cols))->get();
 
         $data->each(function($stuData) use($tblName, $cols){
 
@@ -187,7 +187,7 @@ class ExamsTranscriptsManagementTest extends TestCase
             $avgGrade = $pgm[$avgPoints];
 
             DB::table($tblName)
-                ->updateOrInsert(["admno" => $stuData->admno], [
+                ->updateOrInsert(["student_id" => $stuData->student_id], [
                     "mm" => $avgScore,
                     "mg" => $avgGrade,
                     'mp' => $avgPoints,
@@ -269,7 +269,7 @@ class ExamsTranscriptsManagementTest extends TestCase
 
                 DB::table(Str::slug($exam->shortname))
                 ->updateOrInsert([
-                    "admno" => $student->adm_no
+                    "student_id" => $student->id
                 ], [
                     $subject->shortname => json_encode([
                         'score' => $this->faker->numberBetween(0, 100),
