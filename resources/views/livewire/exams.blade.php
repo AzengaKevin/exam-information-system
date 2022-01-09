@@ -3,15 +3,17 @@
     <x-feedback />
 
     <div class="table-responsive">
-        <table class="table table-hover text-center">
+        <table class="table table-hover">
             <thead>
                 <tr>
                     <th>#</th>
                     <th>Shortname</th>
                     <th>Year</th>
                     <th>Term</th>
+                    @if (false)    
                     <th>Weight</th>
                     <th>Counts</th>
+                    @endif
                     <th>Status</th>
                     <th>Actions</th>
                 </tr>
@@ -24,11 +26,13 @@
                     <td>{{ $exam->shortname }}</td>
                     <td>{{ $exam->year }}</td>
                     <td>{{ $exam->term }}</td>
+                    @if (false)
                     <td>{{ $exam->weight }}</td>
                     <td>{{ $exam->counts ? 'True' : 'False' }}</td>
+                    @endif
                     <td>{{ $exam->status }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center justify-content-center">
+                        <div class="d-inline-flex gap-2 align-items-center">
                             <a href="{{ route('exams.show', $exam) }}" class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>

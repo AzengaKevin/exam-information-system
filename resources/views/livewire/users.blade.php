@@ -8,8 +8,8 @@
                     <th></th>
                     <th>#</th>
                     <th>Name</th>
-                    <th>Email</th>
                     <th>Phone</th>
+                    <th>Email</th>
                     <th>Type</th>
                     <th>Role</th>
                     <th>Active?</th>
@@ -24,8 +24,8 @@
                     <td><input type="checkbox" class="form-check" wire:model="selectedUsers.{{ $user->id }}"></td>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
                     <td>{{ $user->phone }}</td>
+                    <td>{{ !empty($user->email) ? $user->email : '-' }}</td>
                     <td>{{ ucfirst($user->authenticatable_type ?? 'Anonymous') }}</td>
                     <td>{{ $user->role->name }}</td>
                     <td>{{ $user->active ? 'True' : 'False' }}</td>

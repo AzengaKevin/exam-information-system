@@ -236,7 +236,7 @@ class Students extends Component
         $this->adm_no = $student->adm_no;
         $this->upi = $student->upi;
         $this->name = $student->name;
-        $this->dob = $student->dob->format('Y-m-d');
+        $this->dob = optional($student->dob)->format('Y-m-d');
         $this->gender = $student->gender;
         $this->kcpe_marks = $student->kcpe_marks;
         $this->kcpe_grade = $student->kcpe_grade;
@@ -300,7 +300,7 @@ class Students extends Component
                 'student-id' => $this->studentId
             ]);
 
-            session()->flash('error', 'Fatal error occurred while udating student, perhaps the result class is missing');
+            session()->flash('error', 'Fatal error occurred while updating student, perhaps the result class is missing');
 
             $this->emit('hide-upsert-student-modal');
         }

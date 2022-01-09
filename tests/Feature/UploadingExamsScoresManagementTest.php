@@ -48,8 +48,8 @@ class UploadingExamsScoresManagementTest extends TestCase
         
     }
 
-    /** @group exams-scores */
-    public function testAuthorizedUserCanVisitPageToUploadLevelSubjectScores()
+    /** @group exam-scores */
+    public function testAuthorizedTeacherCanVisitPageToUploadLevelSubjectScoresForStudentsWithoutAdmNo()
     {
         $this->withoutExceptionHandling();
 
@@ -59,6 +59,7 @@ class UploadingExamsScoresManagementTest extends TestCase
         $level = Level::factory()->create();
 
         Student::factory(2)->create([
+            'adm_no' => null,
             'kcpe_marks' => null,
             'kcpe_grade' => null,
             'stream_id' => null,
@@ -102,7 +103,7 @@ class UploadingExamsScoresManagementTest extends TestCase
         
     }
 
-    /** @group exams-scores */
+    /** @group exam-scores */
     public function testAuthorizedUserCanUploadLevelSubjectScores()
     {
         $this->withoutExceptionHandling();
@@ -142,12 +143,11 @@ class UploadingExamsScoresManagementTest extends TestCase
         $exam->subjects()->attach($subjects);
 
         // Create Subject Scores
-
         $scores = array();
 
         foreach ($students as $student) {
-            $scores[$student->adm_no]['score'] = $this->faker->numberBetween(50, 100);
-            $scores[$student->adm_no]['extra'] = null;
+            $scores[$student->id]['score'] = $this->faker->numberBetween(50, 100);
+            $scores[$student->id]['extra'] = null;
         }
 
         CreateScoresTable::invoke($exam);

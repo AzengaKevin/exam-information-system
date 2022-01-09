@@ -7,6 +7,7 @@
                 <tr>
                     <th>#</th>
                     <th>Name</th>
+                    <th>Phone</th>
                     <th>Email</th>
                     <th>Tasks</th>
                     <th>Active?</th>
@@ -21,6 +22,7 @@
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ optional($teacher->auth)->name }}</td>
+                    <td>{{ optional($teacher->auth)->phone }}</td>
                     <td>{{ optional($teacher->auth)->email ?? '-' }}</td>
                     <td>{{ $teacher->responsibilities->count() }}</td>
                     <td>{{ optional($teacher->auth)->active ? 'True' : 'False' }}</td>
@@ -52,7 +54,7 @@
                 @endforeach
                 @else
                 <tr>
-                    <td colspan="8">
+                    <td colspan="9">
                         <div class="py-1 text-center">No Teachers Added Yet</div>
                     </td>
                 </tr>
@@ -60,7 +62,7 @@
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="8">
+                    <td colspan="9">
                         {{ $teachers->links() }}
                         @if ($teachers->count())
                         <div class="text-muted">{{ $teachers->firstItem() }} - {{ $teachers->lastItem() }} out of

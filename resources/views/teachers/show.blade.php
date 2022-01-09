@@ -25,19 +25,19 @@
                 <div class="row g-2 align-items-center">
                     <dl class="col-md-6">
                         <dt>Name</dt>
-                        <dd>{{ $teacher->auth->name }}</dd>
-                    </dl>
-                    <dl class="col-md-6">
-                        <dt>Email</dt>
-                        <dd>{{ $teacher->auth->email }}</dd>
+                        <dd>{{ optional($teacher->auth)->name ?? '-' }}</dd>
                     </dl>
                     <dl class="col-md-6">
                         <dt>Phone</dt>
-                        <dd>{{ $teacher->auth->phone  ?? 'N/A'}}</dd>
+                        <dd>{{ optional($teacher->auth)->phone ?? '-' }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Email</dt>
+                        <dd>{{ optional($teacher->auth)->email ?? '-' }}</dd>
                     </dl>
                     <dl class="col-md-6">
                         <dt>TSC Number</dt>
-                        <dd>{{ $teacher->tsc_number }}</dd>
+                        <dd>{{ $teacher->tsc_number ?? '-' }}</dd>
                     </dl>
                 </div>
             </div>

@@ -5,9 +5,9 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Adm. No.</th>
+                    <th>Student ID</th>
                     <th>Name</th>
+                    <th>Adm. No.</th>
                     <th>% Score</th>
                     @if ($systemSettings->school_level == 'secondary')
                     <th>Points</th>
@@ -23,9 +23,9 @@
                 $score = json_decode($item->$col);
                 @endphp
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->adm_no }}</td>
+                    <td>{{ $item->id }}</td>
                     <td>{{ $item->name }}</td>
+                    <td>{{ $item->adm_no }}</td>
                     <td>
                         <span>{{ optional($score)->score }}</span>
                         @if ($systemSettings->school_level == 'secondary')
