@@ -52,9 +52,9 @@ class ExamsMeritListController extends Controller
             if(Schema::hasTable($tblName)){
 
                 $query = DB::table($tblName)
-                    ->select(array_merge(["admno"], $columns, $aggregateCols))
+                    ->select(array_merge(["students.adm_no AS admno"], $columns, $aggregateCols))
                     ->addSelect("students.name", "level_units.alias as stream", "levels.name as level")
-                    ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
+                    ->join("students", "{$tblName}.student_id", '=', 'students.id')
                     ->leftJoin("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                     ->leftJoin("levels", "{$tblName}.level_id", '=', 'levels.id')
                     ->orderBy($this->orderBy ?? 'op');

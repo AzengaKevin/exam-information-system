@@ -18,9 +18,7 @@ class ExamsResultsController extends Controller
 
     public function index(Request $request, Exam $exam)
     {
-
         return view('exams.results.index', compact('exam'));
-        
     }
 
     /**
