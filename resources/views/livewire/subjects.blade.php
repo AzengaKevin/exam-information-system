@@ -64,7 +64,8 @@
         </table>
     </div>
 
-    <x-modals.subjects.upsert :departmentId="$departmentId" :subjectId="$subjectId" :departments="$departments" />
+    <x-modals.subjects.upsert :departmentId="$departmentId" :subjectId="$subjectId"
+        :departments="$departments" :segments="$segments" />
     <x-modals.subjects.delete :name="$name" />
     <x-modals.subjects.truncate />
 

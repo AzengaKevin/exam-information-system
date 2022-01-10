@@ -26,6 +26,7 @@ class Subjects extends Component
     public $subject_code;
     public $department_id;
     public $description;
+    public $segments = array();
 
     public $teachers;
 
@@ -42,11 +43,21 @@ class Subjects extends Component
         ]);
     }
 
+    /**
+     * Get all database deparments
+     * 
+     * @return Collection
+     */
     public function getDepartments()
     {
-        return Department::get();
+        return Department::all(['id', 'name']);
     }
 
+    /**
+     * Get paginated subjects from the database
+     * 
+     * @return Paginator
+     */
     public function getPaginatedSubjects()
     {
         return Subject::with(['teachers'])->paginate(24);
@@ -68,9 +79,21 @@ class Subjects extends Component
         $this->department_id = $subject->department_id;
         $this->description = $subject->description;
 
+        if(!empty($subject->segments)){
+            foreach ($subject->segments as $key => $value) {
+                array_push($this->segments, [
+                    'key' => $key,
+                    'value' => $value
+                ]);
+            }
+        }
+
         $this->emit('show-upsert-subject-modal');
     }
 
+    /**
+     * Show a modal of teachers that teaches the subject
+     */
     public function showTeachers(Subject $subject)
     {
         $this->name = $subject->name;
@@ -81,6 +104,11 @@ class Subjects extends Component
         
     }
 
+    /**
+     * Subjects fields validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -89,6 +117,9 @@ class Subjects extends Component
             'shortname' => ['bail', 'required', 'max:5', new LowerAlphaOnly],
             'subject_code' => ['bail', 'nullable'],
             'department_id' => ['bail', 'nullable'],
+            'segments' => ['bail', 'nullable', 'array'],
+            'segments.*.key' => ['bail', 'required'],
+            'segments.*.value' => ['bail', 'required', 'integer']
         ];
     }
 
@@ -97,13 +128,25 @@ class Subjects extends Component
      */
     public function createSubject()
     {
-        $data = $this->validate();
         
+        $data = $this->validate();
+
         try {
+
+            // Mutate the segments
+
+            if(isset($data['segments']) && !empty($data['segments'])){
+
+                $segments = array();
+
+                foreach ($data['segments'] as $item) $segments[$item['key']] = $item['value'];
+
+                $data['segments'] = $segments;
+            }
 
             Subject::create($data);
 
-            $this->reset(['name','shortname','subject_code','description','department_id']);
+            $this->reset(['name','shortname','subject_code','description','department_id', 'segments']);
 
             session()->flash('status', 'Subject successfully created');
 
@@ -112,7 +155,6 @@ class Subjects extends Component
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), [
-
                 'action' => __METHOD__
             ]);
 
@@ -130,6 +172,17 @@ class Subjects extends Component
     {
         $data = $this->validate();
 
+        // Mutate the segments
+
+        if(isset($data['segments']) && !empty($data['segments'])){
+
+            $segments = array();
+
+            foreach ($data['segments'] as $item) $segments[$item['key']] = $item['value'];
+
+            $data['segments'] = $segments;
+        }
+
         try {
 
             /** @var User */
@@ -137,9 +190,9 @@ class Subjects extends Component
 
             if($subject->update($data)){
 
-                $this->reset(['subjectId', 'name','shortname','subject_code','description','department_id']);
+                $this->reset(['subjectId', 'name','shortname','subject_code','description','department_id', 'segments']);
 
-                session()->flash('status', 'subject successfully updated');
+                session()->flash('status', 'Subject successfully updated');
 
                 $this->emit('hide-upsert-subject-modal');
             }
@@ -165,6 +218,31 @@ class Subjects extends Component
         $this->name = $subject->name;
 
         $this->emit('show-delete-subject-modal');
+        
+    }
+
+    /** 
+     * Add another segment field to the segments fieldset
+     */
+    public function addSegmentFields()
+    {
+        array_push($this->segments, array(
+            'key' => null,
+            'value' => null
+        ));
+        
+    }
+
+    /** 
+     * Removes the fields at the specified position
+     * 
+     * @param int $index
+     */
+    public function removeSegmentFields(int $index)
+    {
+        array_splice($this->segments, $index, 1);
+
+        $this->segments = array_values($this->segments);
         
     }
 

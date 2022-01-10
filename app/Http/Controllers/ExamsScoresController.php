@@ -206,52 +206,14 @@ class ExamsScoresController extends Controller
 
             $values = $grading->values;
 
-            // Process Uploading the scores
-            foreach ($data["scores"] as $stid => $scoreData) {
+            if(empty($subject->segments)){
+                // Process Uploading the scores
+                $this->uploadScoresWithoutSegments($data, $values, $level, $levelUnit, $exam, $subject);
 
-                $score = $scoreData['score'] ?? null;
-                $grade = null;
-                $points = null;
+            }else{
 
-                $extra = $scoreData['extra'] ?? null;
+                $this->uploadScoresWithSegments($data, $level, $levelUnit, $exam, $subject);
 
-                if ($score) {
-                    foreach ($values as $value) {
-                        if($score >= $value['min'] && $score <= $value['max']){
-                            $grade = $value['grade'];
-                            $points = $value['points'];
-                            break;
-                        }
-                    }
-                }
-                
-                if ($extra) {
-                    $score = 0;
-                    $points = 0;
-                    switch ($extra) {
-                        case 'missing':
-                            $grade = 'X';
-                            break;
-                        case 'cheated':
-                            $grade = 'Y';
-                            break;
-                        default:
-                            $grade = 'P';
-                            break;
-                    }
-                }
-
-                DB::table(Str::slug($exam->shortname))
-                    ->updateOrInsert(["student_id" => $stid], [
-                        $subject->shortname => json_encode([
-                            'score' => intval($score),
-                            'grade' => $grade,
-                            'points' => intval($points),
-                        ]),
-
-                        'level_id' => optional($level)->id ?? optional($levelUnit)->level->id,
-                        'level_unit_id' => optional($levelUnit)->id
-                    ]);
             }
 
             session()->flash('status', 'Scores successfully updated');
@@ -276,5 +238,105 @@ class ExamsScoresController extends Controller
             
         }
     }
+
+    /**
+     * Upload scores for subjects without segments
+     * 
+     * @param array $data request data
+     * @param array $values grade, points, scores mapping
+     * @param Level $level
+     * @param LevelUnit $levelUnit
+     * @param Exam $exam
+     * @param Subject $subject
+     * 
+     */
+    public function uploadScoresWithoutSegments(
+        array $data, array $values,
+        ?Level $level, ?LevelUnit $levelUnit,
+        Exam $exam, Subject $subject
+    )
+    {
+        $tblName = Str::slug($exam->shortname);
+        // Process Uploading the scores
+        foreach ($data["scores"] as $stid => $scoreData) {
+
+            $score = $scoreData['score'] ?? null;
+            $grade = null;
+            $points = null;
+
+            $extra = $scoreData['extra'] ?? null;
+
+            if ($score) {
+                foreach ($values as $value) {
+                    if($score >= $value['min'] && $score <= $value['max']){
+                        $grade = $value['grade'];
+                        $points = $value['points'];
+                        break;
+                    }
+                }
+            }
+            
+            if ($extra) {
+                $score = 0;
+                $points = 0;
+                switch ($extra) {
+                    case 'missing':
+                        $grade = 'X';
+                        break;
+                    case 'cheated':
+                        $grade = 'Y';
+                        break;
+                    default:
+                        $grade = 'P';
+                        break;
+                }
+            }
+
+            DB::table($tblName)
+                ->updateOrInsert(["student_id" => $stid], [
+                    $subject->shortname => json_encode([
+                        'score' => intval($score),
+                        'grade' => $grade,
+                        'points' => intval($points),
+                    ]),
+
+                    'level_id' => optional($level)->id ?? optional($levelUnit)->level->id,
+                    'level_unit_id' => optional($levelUnit)->id
+                ]);
+        }        
+    }
+
+    /**
+     * Upload scores for subjects without segments
+     * 
+     * @param array $data request data
+     * @param Level $level
+     * @param LevelUnit $levelUnit
+     * @param Exam $exam
+     * @param Subject $subject
+     * 
+     */
+    public function uploadScoresWithSegments(
+        array $data, ?Level $level, ?LevelUnit $levelUnit,
+        Exam $exam, Subject $subject
+    )
+    {
+        $tblName = Str::slug($exam->shortname);
+
+        // Process Uploading the scores
+        foreach ($data["scores"] as $stid => $scoreData) {
+
+            DB::table($tblName)
+                ->updateOrInsert(["student_id" => $stid], [
+                    $subject->shortname => json_encode(array_merge($scoreData, [
+                        'score' => null,
+                        'grade' => null,
+                        'points' => null
+                    ])),
+                    'level_id' => optional($level)->id ?? optional($levelUnit)->level->id,
+                    'level_unit_id' => optional($levelUnit)->id
+                ]);
+        }        
+    }    
 
 }

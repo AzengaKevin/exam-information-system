@@ -52,7 +52,7 @@ class SubjectExamScoresTest extends TestCase
 
 
     /** @group exam-scores */
-    public function _testAuthorizedUserCanRankLevelSubjectScores()
+    public function testAuthorizedUserCanRankLevelSubjectScores()
     {
         $this->withoutExceptionHandling();
 
@@ -151,7 +151,7 @@ class SubjectExamScoresTest extends TestCase
                     ]),
                     'level_id' => optional($level)->id,
                 ]);
-        }        
+        }
         
         Livewire::test(SubjectExamScores::class, [
             'exam' => $exam,
@@ -160,5 +160,80 @@ class SubjectExamScoresTest extends TestCase
             'levelUnit' => null
         ])->call('rankSubjectResults');
         
-    }   
+    }
+    
+    /** @group exam-scores */
+    public function testAuthorizedUserCanGenerateTotalScoreForSegmentSubjectts()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+    
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        $students = Student::factory(2)->create([
+            'kcpe_marks' => null,
+            'kcpe_grade' => null,
+            'stream_id' => null,
+            'admission_level_id' => $level->id,
+        ]);
+
+        /** @var Subject */
+        $subject = Subject::factory()->create([
+            'name' => 'English',
+            'shortname' => 'eng',
+            'segments' => [ 'outOf60' => 60, 'comp' => 40]
+        ]);
+
+        // Create Responsibility for the current teacher
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_id' => $level->id,
+            'subject_id' => $subject->id
+        ]);
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($level);
+
+        $exam->subjects()->attach($subject);
+
+        // Create Subject Scores
+        $scores = array();
+
+        foreach ($students as $student) {
+            $scores[$student->id]['outOf60'] = $this->faker->numberBetween(0, 60);
+            $scores[$student->id]['comp'] = $this->faker->numberBetween(0, 40);
+        }
+
+        CreateScoresTable::invoke($exam);
+
+        $tblName = Str::slug($exam->shortname);
+
+        // Process Uploading the scores
+        foreach ($scores as $stid => $scoreData) {
+
+            DB::table($tblName)
+                ->updateOrInsert(["student_id" => $stid], [
+                    $subject->shortname => json_encode(array_merge($scoreData, [
+                        'score' => null,
+                        'grade' => null,
+                        'points' => null
+                    ])),
+                    'level_id' => optional($level)->id
+                ]);
+        }
+        
+        Livewire::test(SubjectExamScores::class, [
+            'exam' => $exam,
+            'subject' => $subject,
+            'level' => $level,
+            'levelUnit' => null
+        ])->call('calculateTotalScore'); 
+        
+    }
 }

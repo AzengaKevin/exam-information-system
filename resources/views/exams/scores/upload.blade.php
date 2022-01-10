@@ -25,6 +25,9 @@
     'level-unit' => optional($levelUnit)->id,
     'level' => optional($level)->id
 ]) }}" method="post" class="row g-3">
+    @php
+    $segments = $subject->segments;
+    @endphp
     @csrf
     @method('PUT')
     <div class="col-md-8">
@@ -35,8 +38,14 @@
                         <th>Student ID</th>
                         <th>Name</th>
                         <th>Adm. No.</th>
+                        @if (!empty($segments))
+                        @foreach ($segments as $key => $value)
+                        <th>{{ $key }}({{ $value }})</th>
+                        @endforeach
+                        @else
                         <th>% Score</th>
                         <th>Missing / Cheated</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -50,6 +59,15 @@
                         <td>{{ $item->stid }}</td>
                         <td>{{ $item->name }}</td>
                         <td>{{ $item->admno }}</td>
+
+                        @if (!empty($segments))
+                        @foreach ($segments as $key => $value)
+                        <td><input type="number" name="scores[{{ $item->stid }}][{{ $key }}]" min="0" max="{{ $value }}"
+                            class="form-control form-control-sm" placeholder="Score"
+                            value="{{ old("scores.{$item->stid}.{$key}") ?? optional($score)->$key }}"></td>
+                        @endforeach
+
+                        @else
                         <td><input type="number" name="scores[{{ $item->stid }}][score]" min="0" max="100"
                                 class="form-control form-control-sm"
                                 value="{{ old("scores.{$item->stid}.score") ?? optional($score)->score }}">
@@ -61,6 +79,7 @@
                                 <option value="cheated" {{ optional($score)->grade == 'Y' }}>Cheated</option>
                             </select>
                         </td>
+                        @endif
                     </tr>
                     @endforeach
                     @else

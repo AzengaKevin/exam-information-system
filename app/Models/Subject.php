@@ -13,6 +13,8 @@ class Subject extends Model
 
     protected $guarded = [];
 
+    protected $casts = ['segments' => 'array'];
+
     public function department()
     {
         return $this->belongsTo(Department::class);
