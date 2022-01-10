@@ -68,9 +68,9 @@ class LevelExamResults extends Component
         if(Schema::hasTable($tblName)){
 
             $query = DB::table($tblName)
-                ->select(array_merge(["admno"], $columns, $aggregateCols))
+                ->select(array_merge(["students.adm_no AS admno"], $columns, $aggregateCols))
                 ->addSelect("students.name", "level_units.alias")
-                ->join("students", "{$tblName}.admno", '=', 'students.adm_no')
+                ->join("students", "{$tblName}.student_id", '=', 'students.id')
                 ->leftJoin("level_units", "{$tblName}.level_unit_id", '=', 'level_units.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy($this->orderBy ?? 'op');
@@ -80,7 +80,7 @@ class LevelExamResults extends Component
             }
 
             if (!empty($this->admno)) {
-                $query->where("{$tblName}.admno", $this->admno);
+                $query->where("admno", $this->admno);
             }
 
             if(!empty($this->name)){
@@ -94,6 +94,11 @@ class LevelExamResults extends Component
         }
     }
 
+    /**
+     * Get exam subject columns
+     * 
+     * @return array
+     */
     public function getSubjectColumns() : array
     {
        return $this->exam->subjects->pluck("shortname")->toArray();
