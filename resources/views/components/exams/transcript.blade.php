@@ -16,31 +16,29 @@
 <div>
     <div>
         <div>
-            <div class="fw-bold">
-                <div class="table-responsive">
-                    <table>
-                        <tbody>
-                            <tr>
-                                @if ($generalSettings->logo)
-                                <td>
-                                    <img width="96" src="{{ $generalSettings->logo }}"
-                                        alt="{{ $systemSettings->school_name }}">
-                                </td>
-                                @endif
-                                <td>
-                                    <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
-                                    <div class="fw-bold">{{ $generalSettings->school_address }}</div>
-                                    <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
-                                    <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-
-                <hr style="height: .5px; background-color: black; margin-bottom: 0px;">
-                <hr style="height: .5px; background-color: black; margin-top: 1px;">
+            <div class="table-responsive fw-bold">
+                <table>
+                    <tbody>
+                        <tr>
+                            @if ($generalSettings->logo)
+                            <td>
+                                <img width="96" src="{{ $generalSettings->logo }}"
+                                    alt="{{ $systemSettings->school_name }}">
+                            </td>
+                            @endif
+                            <td>
+                                <h1 class="fw-bold">{{ $systemSettings->school_name }}</h1>
+                                <div class="fw-bold">{{ $generalSettings->school_address }}</div>
+                                <div class="fw-bold">Tel: {{ $generalSettings->school_telephone_number }}</div>
+                                <div class="fw-bold">{{ $generalSettings->school_email_address }}</div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
+
+            <hr style="height: .5px; background-color: black; margin-bottom: 0px;">
+            <hr style="height: .5px; background-color: black; margin-top: 1px;">
         </div>
         <h2 style="margin: 0.25rem 0 0.5rem 0; font-size: 1.25rem;">{{ $exam->name }}</h2>
         <div class="table-responsive">
@@ -50,7 +48,7 @@
                         <th class="text-start">NAME:</th>
                         <td class="text-left">{{ $studentScores->name }}</td>
 
-                        @if ($systemSettings->school_level === 'secondary')     
+                        @if ($systemSettings->school_level === 'secondary')
                         <th class="text-start">ADMNO:</th>
                         <td class="text-left">{{ $studentScores->adm_no }}</td>
                         @endif
