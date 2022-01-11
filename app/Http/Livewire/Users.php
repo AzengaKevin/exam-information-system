@@ -34,6 +34,11 @@ class Users extends Component
         ]);
     }
 
+    /**
+     * Get all paginated users from the database
+     * 
+     * @return Paginator
+     */
     public function getPaginatedUsers()
     {
         return User::orderBy('name')
@@ -69,12 +74,15 @@ class Users extends Component
     {
         return [
             'name' => ['bail', 'required', 'string'],
-            'email' => ['bail', 'required', 'email', Rule::unique('users')->ignore($this->userId)],
+            'email' => ['bail', 'nullable', 'email', Rule::unique('users')->ignore($this->userId)],
             'active' => ['bail', 'nullable'],
             'role_id' => ['nullable', 'integer']
         ];
     }
 
+    /**
+     * Updates a database user record
+     */
     public function updateUser()
     {
         $data = $this->validate();
@@ -119,6 +127,11 @@ class Users extends Component
         }
     }
 
+    /**
+     * Shows modal for deleting a user
+     * 
+     * @param User $user
+     */
     public function showDeleteUserModal(User $user)
     {
         $this->userId = $user->id;
@@ -129,6 +142,9 @@ class Users extends Component
         
     }
 
+    /**
+     * Soft deletes a user record from the database
+     */
     public function deleteUser()
     {
         try {
@@ -182,6 +198,11 @@ class Users extends Component
         }
     }
 
+    /**
+     * Toggles the active status of th specified user
+     * 
+     * @param User $user
+     */
     public function toggleUserActiveStatus(User $user)
     {
         
@@ -195,6 +216,9 @@ class Users extends Component
 
     }
 
+    /**
+     * Updated multiple users roles at one go
+     */
     public function bulkUsersRoleUpdate()
     {
         $data = $this->validate([
