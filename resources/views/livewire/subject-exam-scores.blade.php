@@ -61,9 +61,23 @@
                 </tr>
                 @endif
             </tbody>
+            @if ($data->count())
+            <tfoot>
+                <tr>
+                    <td colspan="10">
+                        {{ $data->links() }}
+                        @if ($data->count())
+                        <div class="text-muted">{{ $data->firstItem() }} - {{ $data->lastItem() }} out of
+                            {{ $data->total() }}</div>
+                        @endif
+                    </td>
+                </tr>
+            </tfoot>
+            @endif
         </table>
     </div>
 
+    <!-- Generate ranks modal -->
     <div wire:ignore.self id="generate-rank" class="modal fade" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -83,6 +97,7 @@
         </div>
     </div>
 
+    <!-- Generate totals modal -->
     <div wire:ignore.self id="generate-totals" class="modal fade" tabindex="-1" data-bs-backdrop="static">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -91,7 +106,8 @@
                     <button class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <p>Are you sure you want to generate subject totals? The generate total will be of equal ratio to 100 by all the segments</p>
+                    <p>Are you sure you want to generate subject totals? The generate total will be of equal ratio to
+                        100 by all the segments</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
