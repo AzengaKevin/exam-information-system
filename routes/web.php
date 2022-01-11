@@ -114,6 +114,9 @@ Route::group(['middleware' => ['auth']], function(){
     Route::get('/exams/{exam:slug}/analysis', [ExamsAnalysisController::class, 'index'])
         ->name('exams.analysis.index');
 
+    Route::get('/exams/{exam:slug}/analysis/download', [ExamsAnalysisController::class, 'download'])
+        ->name('exams.analysis.download');
+
     Route::get('/exams/{exam:slug}/results', [ExamsResultsController::class, 'index'])
         ->name('exams.results.index');
 
