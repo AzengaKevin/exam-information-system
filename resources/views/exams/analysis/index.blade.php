@@ -18,18 +18,22 @@
     </nav>
 </div>
 
-@if ($level)
-@include('partials.exams.analysis.level')
-@elseif($levelUnit)
-@include('partials.exams.analysis.class')
-@else
-<div class="row g-4 py-3">
-    @foreach ($exam->levels as $level)
-    <div class="col-md-12">
-        <x-exams.analysis.level-line-graph :exam="$exam" :level="$level" />
+<div class="py-3">
+    <x-feedback />
+    
+    @if ($level)
+    @include('partials.exams.analysis.level')
+    @elseif($levelUnit)
+    @include('partials.exams.analysis.class')
+    @else
+    <div class="row g-4">
+        @foreach ($exam->levels as $level)
+        <div class="col-md-12">
+            <x-exams.analysis.level-line-graph :exam="$exam" :level="$level" />
+        </div>
+        @endforeach
     </div>
-    @endforeach
+    @endif
 </div>
-@endif
 
 @endsection

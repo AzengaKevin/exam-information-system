@@ -11,28 +11,26 @@
                 <canvas id="level-pie-chart" width="400" height="400"></canvas>
             </div>
             <div class="col-md-12">
-                <div>
-                    <div class="table-responsive">
-                        <table class="table table-bordered table-hover">
-                            <thead>
-                                <tr>
-                                    <th colspan="{{ count(array_keys($gradeDist)) }}">Grade Distribution</th>
-                                </tr>
-                                <tr>
-                                    @foreach (array_keys($gradeDist) as $key)
-                                    <th>{{ $key }}</th>
-                                    @endforeach
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    @foreach (array_keys($gradeDist) as $key)
-                                    <td>{{ $gradeDist[$key] }}</td>
-                                    @endforeach
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th colspan="{{ count(array_keys($gradeDist)) }}">Grade Distribution</th>
+                            </tr>
+                            <tr>
+                                @foreach (array_keys($gradeDist) as $key)
+                                <th>{{ $key }}</th>
+                                @endforeach
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                @foreach (array_keys($gradeDist) as $key)
+                                <td>{{ $gradeDist[$key] }}</td>
+                                @endforeach
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>

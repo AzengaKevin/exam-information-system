@@ -1,3 +1,12 @@
+<hr>
+<div class="d-flex flex-wrap gap-2">
+    <a href="{{ route('exams.analysis.download', ['exam' => $exam, 'level' => $level->id]) }}"
+        class="btn btn-outline-primary d-inline-flex gap-2 align-items-center" download>
+        <i class="fa fa-print"></i>
+        <span>Download Analysis</span>
+    </a>
+</div>
+<hr>
 <div class="row g-4 py-3">
     <div class="col-md-12">
         <x-exams.analysis.level-line-graph :exam="$exam" :level="$level" />

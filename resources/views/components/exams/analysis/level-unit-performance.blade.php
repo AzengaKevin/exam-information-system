@@ -15,7 +15,7 @@
                         @else
                         <th>Average</th>
                         @endif
-                        <th>Action</th>
+                        <th class="d-print-none">Action</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -30,7 +30,7 @@
                         @else
                         <td>{{ $levelUnit->pivot->average }}</td>
                         @endif
-                        <th>
+                        <th class="d-print-none">
                             <a href="{{ route('exams.analysis.index', [
                                 'exam' => $exam,
                                 'level-unit' => $levelUnit
