@@ -36,10 +36,9 @@ class Users extends Component
 
     public function getPaginatedUsers()
     {
-        /** @var Role */
-        $adminRole = Role::firstOrCreate(['name' => 'Administrator']);
-
-        return User::orderBy('name')->paginate(24);
+        return User::orderBy('name')
+            ->where('email', '!=', 'azenga.kevin7@gmail.com')
+            ->paginate(24);
     }
 
     public function getAllRoles()

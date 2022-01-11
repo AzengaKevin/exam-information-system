@@ -22,7 +22,9 @@ class SettingsController extends Controller
      */
     public function index(Request $request, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
-        return view('settings.index', compact('systemSettings', 'generalSettings'));
+        $user = $request->user();
+
+        return view('settings.index', compact('systemSettings', 'generalSettings', 'user'));
     }
 
     /**
