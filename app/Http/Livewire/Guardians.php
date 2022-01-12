@@ -116,7 +116,7 @@ class Guardians extends Component
             DB::rollBack();
 
             Log::error($exception->getMessage(), [
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A fatal error occurred check the logs');
@@ -183,7 +183,7 @@ class Guardians extends Component
 
             Log::error($exception->getMessage(), [
                 'guardian-id' => $this->guardianId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A fatal error occurred check the logs');
@@ -237,7 +237,7 @@ class Guardians extends Component
 
             Log::error($exception->getMessage(), [
                 'guardian-id' => $this->guardianId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A fatal error occurred check the logs');
