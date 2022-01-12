@@ -214,10 +214,14 @@ class ExamsScoresController extends Controller
                 $this->uploadScoresWithoutSegments($data, $values, $level, $levelUnit, $exam, $subject);
 
                 CompleteUpload::rank($exam, $subject, $level, $levelUnit);
-
+                
             }else{
-
+                
                 $this->uploadScoresWithSegments($data, $level, $levelUnit, $exam, $subject);
+                
+                CompleteUpload::calculateTotals($exam, $subject, $level, $levelUnit);
+                
+                CompleteUpload::rank($exam, $subject, $level, $levelUnit);
 
             }
 
