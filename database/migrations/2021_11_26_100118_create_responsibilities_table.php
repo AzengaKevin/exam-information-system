@@ -19,8 +19,8 @@ class CreateResponsibilitiesTable extends Migration
             $table->string('description')->nullable();
             $table->string('slug')->nullable();
             $table->json('requirements')->nullable();
+            $table->timestampsTz();
             $table->softDeletesTz();
-            $table->timestamps();
         });
     }
 

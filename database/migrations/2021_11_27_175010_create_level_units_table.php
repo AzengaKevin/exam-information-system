@@ -19,7 +19,8 @@ class CreateLevelUnitsTable extends Migration
             $table->foreignId('stream_id')->nullable()->constrained()->onDelete('cascade');
             $table->string('alias')->nullable()->unique();
             $table->mediumText('description')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

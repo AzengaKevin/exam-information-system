@@ -11,7 +11,11 @@ class Role extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'slug',
+        'description'
+    ];
 
     public function setNameAttribute($value)
     {
@@ -21,11 +25,17 @@ class Role extends Model
         
     }
 
+    /**
+     * Role - Permission Relation
+     */
     public function permissions()
     {
         return $this->belongsToMany(Permission::class);
     }
 
+    /**
+     * Role - User Relation
+     */
     public function users()
     {
         return $this->hasMany(User::class);
