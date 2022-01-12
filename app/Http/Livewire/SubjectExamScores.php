@@ -10,14 +10,26 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
+use Livewire\WithPagination;
 
 class SubjectExamScores extends Component
 {
+    use WithPagination;
+
     public Exam $exam;
     public Subject $subject;
     public $level;
     public $levelUnit;
 
+    /**
+     * Call when the subject-exam-scores compoent is mounting
+     * 
+     * @param Exam $exam
+     * @param Subject $subject
+     * @param mixed $level
+     * @param mixed $levelUnit
+     * 
+     */
     public function mount(Exam $exam, Subject $subject, $level = null, $levelUnit = null)
     {
         $this->exam = $exam;
@@ -36,7 +48,7 @@ class SubjectExamScores extends Component
     /**
      * Get the relevant data to show in the view
      * 
-     * @return Collection
+     * @return Paginator
      */
     public function getRelevantExamData()
     {
@@ -53,8 +65,8 @@ class SubjectExamScores extends Component
 
         if (!is_null($this->levelUnit)) $query->where('students.level_unit_id', $this->levelUnit->id);
             
-        //return $query->orderBy('score', 'desc')->get();
-        return $query->get();
+        //return $query->orderBy('score', 'desc')->paginate(24);
+        return $query->paginate(24);
     }
 
     /** 

@@ -132,7 +132,7 @@ class Teachers extends Component
                 'action' => __CLASS__ . '@' . __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred check the logs');
+            session()->flash('error', $exception->getMessage());
 
         }
         

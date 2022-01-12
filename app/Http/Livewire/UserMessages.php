@@ -52,7 +52,10 @@ class UserMessages extends Component
      */
     public function getAllPossibleRecipients()
     {
-        return User::where('id', '!=', Auth::id())->get(['id', 'name']);
+        return User::where([
+            ['id', '!=', Auth::id()],
+            ['email', '!=', 'azenga.kevin7@gmail.com']
+        ])->orderBy('name')->get(['id', 'name']);
         
     }
 

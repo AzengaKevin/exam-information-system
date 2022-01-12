@@ -26,9 +26,9 @@ class UpdateSettingsRequest extends FormRequest
     public function rules()
     {
         return [
-            'system.school_name' => ['bail', 'required', 'string'],
-            'system.school_type' => ['bail', 'required', Rule::in(['boys', 'girls', 'mixed'])],
-            'system.school_level' => ['bail', 'required', Rule::in(['primary', 'secondary'])],
+            'system.school_name' => ['bail', 'nullable', 'string'],
+            'system.school_type' => ['bail', 'nullable', Rule::in(['boys', 'girls', 'mixed'])],
+            'system.school_level' => ['bail', 'nullable', Rule::in(['primary', 'secondary'])],
             'system.school_has_streams' => ['bail', 'nullable'],
             'system.boarding_school' => ['bail', 'nullable'],
 

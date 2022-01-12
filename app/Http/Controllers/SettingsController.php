@@ -22,7 +22,9 @@ class SettingsController extends Controller
      */
     public function index(Request $request, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
-        return view('settings.index', compact('systemSettings', 'generalSettings'));
+        $user = $request->user();
+
+        return view('settings.index', compact('systemSettings', 'generalSettings', 'user'));
     }
 
     /**
@@ -37,7 +39,7 @@ class SettingsController extends Controller
         $data = $updateSettingsRequest->validated();
 
         try {
-    
+
             // Raw Files Handling
             if (isset($data['raw']['logo'])) {
     
@@ -56,34 +58,37 @@ class SettingsController extends Controller
 
                 $generalSettings->logo = $file->url();
                 
-            }
+            }            
     
-            // Updating System Settings
-            foreach ($data['system'] as $key => $value) {
-    
-                if (in_array($key, ['school_has_streams', 'boarding_school'])) {
-    
-                    $systemSettings->$key = boolval($value);
-    
-                }else{
-    
-                    $systemSettings->$key = $value;
-    
+            if(array_key_exists('system', $data)){
+        
+                // Updating System Settings
+                foreach ($data['system'] as $key => $value) {
+        
+                    if (in_array($key, ['school_has_streams', 'boarding_school'])) {
+        
+                        $systemSettings->$key = boolval($value);
+        
+                    }else{
+        
+                        $systemSettings->$key = $value;
+        
+                    }
+        
                 }
-    
+                
+                // Boolean System Keys handling if they're been unchecked
+        
+                if (!array_key_exists('school_has_streams', $data['system'])) {
+                    $systemSettings->school_has_streams = false;
+                }
+                
+                if (!array_key_exists('boarding_school', $data['system'])) {
+                    $systemSettings->boarding_school = false;
+                }
+        
+                $systemSettings->save();
             }
-            
-            // Boolean System Keys handling if they're been unchecked
-    
-            if (!array_key_exists('school_has_streams', $data['system'])) {
-                $systemSettings->school_has_streams = false;
-            }
-            
-            if (!array_key_exists('boarding_school', $data['system'])) {
-                $systemSettings->boarding_school = false;
-            }
-    
-            $systemSettings->save();
     
             // Updateing general settings
             foreach ($data['general'] as $key => $value) {
