@@ -104,7 +104,7 @@ class ExamsScoresController extends Controller
 
             if ($levelUnit) $query->where('students.level_unit_id', $levelUnit->id);
                 
-            $data = $query->get();
+            $data = $query->orderBy('students.name')->get();
 
             $title = "Upload " . (optional($level)->name ?? optional($levelUnit)->alias) . " - {$subject->name} Scores";
 
