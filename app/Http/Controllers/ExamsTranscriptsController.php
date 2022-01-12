@@ -29,6 +29,8 @@ class ExamsTranscriptsController extends Controller
      */
     public function index(Request $request, Exam $exam)
     {
+        $this->authorize('viewTranscripts', $exam);
+
         $levelsIds = $exam->levels->pluck('id')->toArray();
 
         $levelUnits = LevelUnit::whereIn('level_id', $levelsIds)->get();

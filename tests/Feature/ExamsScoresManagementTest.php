@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\Actions\Exam\CreateScoresTable;
 use Tests\TestCase;
 use App\Models\Exam;
 use App\Models\Role;
+use App\Models\Level;
 use Livewire\Livewire;
 use App\Models\Student;
 use App\Models\Subject;
@@ -15,6 +15,7 @@ use Illuminate\Support\Str;
 use App\Models\Responsibility;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use App\Actions\Exam\CreateScoresTable;
 use App\Http\Livewire\ExamQuickActions;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -51,11 +52,90 @@ class ExamsScoresManagementTest extends TestCase
     }
 
     /** @group exam-scores */
-    public function testAuthorizedUserCanVisitExamScoresPageAndViewOwnClasses()
+    public function testLevelSupervisorCanVisitExamScoresPageWhenApplicable()
     {
         $this->withoutExceptionHandling();
 
+        $this->artisan('db:seed --class=SubjectsSeeder');
+    
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        Student::factory(2)->create([
+            'adm_no' => null,
+            'kcpe_marks' => null,
+            'kcpe_grade' => null,
+            'stream_id' => null,
+            'admission_level_id' => $level->id,
+        ]);
+
+        // Create Responsibility for the current teacher
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_id' => $level->id,
+        ]);
+
+        /** @var Exam */
         $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($level);
+
+        $subjects = Subject::limit(2)->get();
+
+        $exam->subjects()->attach($subjects);
+
+        CreateScoresTable::invoke($exam);
+
+        $exam->update(['status' => 'Marking']);
+
+        $response = $this->get(route('exams.scores.index', $exam));
+
+        $response->assertOk();
+
+        $response->assertViewIs('exams.scores.index');
+
+        $response->assertViewHasAll(['exam', 'responsibilities', 'systemSettings']);
+        
+    }
+
+    /** @group exam-scores */
+    public function testDosCanVisitExamScoresPageWhenApplicable()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+    
+        /** @var Level */
+        $level = Level::factory()->create();
+
+        Student::factory(2)->create([
+            'adm_no' => null,
+            'kcpe_marks' => null,
+            'kcpe_grade' => null,
+            'stream_id' => null,
+            'admission_level_id' => $level->id,
+        ]);
+
+        // Create Responsibility for the current teacher
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility);
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($level);
+
+        $subjects = Subject::limit(2)->get();
+
+        $exam->subjects()->attach($subjects);
+
+        CreateScoresTable::invoke($exam);
+
+        $exam->update(['status' => 'Marking']);
 
         $response = $this->get(route('exams.scores.index', $exam));
 

@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\User;
 use App\Models\Message;
 use App\Notifications\NewMessageNotification;
+use Illuminate\Support\Facades\Log;
 
 class MessageObserver
 {
@@ -20,8 +21,10 @@ class MessageObserver
         /** @var User */
         $recipient = $message->recipient;
 
+        Log::debug($message->content);
+
         // Send the new notification immediately
-        $recipient->notifyNow(new NewMessageNotification($message));
+        // $recipient->notifyNow(new NewMessageNotification($message));
     }
 
     /**

@@ -4,8 +4,10 @@ namespace App\Policies;
 
 use App\Models\Exam;
 use App\Models\User;
+use App\Models\Teacher;
 use Illuminate\Support\Str;
 use App\Models\Responsibility;
+use App\Settings\SystemSettings;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -112,7 +114,7 @@ class ExamPolicy
      * @param User $user
      * @param Exam $exam
      * 
-     * @rerun Response|bool
+     * @return Response|bool
      */
     public function updateScoresTable(User $user, Exam $exam)
     {
@@ -130,5 +132,173 @@ class ExamPolicy
         return $isDos && Schema::hasTable(Str::slug($exam->shortname))
             ? Response::allow()
             : Response::deny('Only DOS can perform this action, after the table is already create');
+    }
+
+    /**
+     * Determine whether a user is allowed to view scores page
+     * 
+     * @param Response
+     */
+    public function viewScoresPage(User $user, Exam $exam)
+    {
+        if(!$exam->isInMarking()) {
+            return $exam->isPublished()
+                ? Response::deny("The exam, {$exam->name}, has already been published, scores pages are out of bounds")
+                : Response::deny("The exam, {$exam->name}, is not at marking stage yet, stay put");
+        }
+
+        $isTeacher = $user->authenticatable_type == 'teacher';
+
+        $isDos = false;
+        $isLsInCurrExam = false;
+        $isCtInCurrExam = false;
+        $isStInCurrExam = false;
+    
+        /** @var Teacher */
+        $teacher = $user->authenticatable;
+
+        $dosRes = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+    
+        if($isTeacher) $isDos = $teacher->responsibilities->contains($dosRes);
+
+        if($isDos){
+
+            return Response::allow();
+
+        }else{
+
+            $lsRes = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+    
+            if($isTeacher) $isLsInCurrExam = $teacher->responsibilities()
+                ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                ->get()
+                ->contains($lsRes);
+
+            if ($isLsInCurrExam) {
+
+                return Response::allow();
+
+            }else{
+
+                $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+    
+                /** @var SystemSettings */
+                $systemSettings = app(SystemSettings::class);
+        
+                if ($systemSettings->school_has_streams) {
+                    
+                    if($isTeacher) $isCtInCurrExam = $teacher->responsibilities()
+                        ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
+                        ->get()
+                        ->contains($ctRes);
+                }else{
+                    
+                    if($isTeacher) $isCtInCurrExam = $teacher->responsibilities()
+                        ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                        ->get()
+                        ->contains($ctRes);
+        
+                }
+
+                if($isCtInCurrExam){
+
+                    return Response::allow();
+
+                }else{
+
+                    $stRes = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+        
+                    if ($systemSettings->school_has_streams) {
+                        
+                        if($isTeacher) $isStInCurrExam = $teacher->responsibilities()
+                            ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
+                            ->wherePivotIn('subject_id', $exam->subjects->pluck('id')->all())
+                            ->get()
+                            ->contains($stRes);
+                    }else{
+                        
+                        if($isTeacher) $isStInCurrExam = $teacher->responsibilities()
+                            ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                            ->wherePivotIn('subject_id', $exam->subjects->pluck('id')->all())
+                            ->get()
+                            ->contains($stRes);
+            
+                    }
+
+                    return $isStInCurrExam
+                        ? Response::allow()
+                        : Response::deny("You're not allowed to view the exam, {$exam->name}, scores page");
+                }
+            }
+        }
+    }
+
+    /**
+     * Determine whether a user can view exam transcripts at any given time
+     * 
+     * @return Response
+     */
+    public function viewTranscripts(User $user, Exam $exam)
+    {
+
+        if(!$exam->isPublished()) return Response::deny("The exam, {$exam->name}, is not published yet, stay put");
+
+        $isTeacher = $user->authenticatable_type == 'teacher';
+
+        $isDos = false;
+        $isLsInCurrExam = false;
+        $isCtInCurrExam = false;
+    
+        /** @var Teacher */
+        $teacher = $user->authenticatable;
+
+        $dosRes = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+    
+        if($isTeacher) $isDos = $teacher->responsibilities->contains($dosRes);
+
+        if($isDos){
+
+            return Response::allow();
+
+        }else{
+
+            $lsRes = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+    
+            if($isTeacher) $isLsInCurrExam = $teacher->responsibilities()
+                ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                ->get()
+                ->contains($lsRes);
+
+            if ($isLsInCurrExam) {
+
+                return Response::allow();
+
+            }else{
+
+                $ctRes = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+    
+                /** @var SystemSettings */
+                $systemSettings = app(SystemSettings::class);
+        
+                if ($systemSettings->school_has_streams) {
+                    
+                    if($isTeacher) $isCtInCurrExam = $teacher->responsibilities()
+                        ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
+                        ->get()
+                        ->contains($ctRes);
+                }else{
+                    
+                    if($isTeacher) $isCtInCurrExam = $teacher->responsibilities()
+                        ->wherePivotIn('level_id', $exam->levels()->pluck('id')->all())
+                        ->get()
+                        ->contains($ctRes);
+        
+                }
+                
+                return $isCtInCurrExam
+                    ? Response::allow()
+                    : Response::deny("You're not allowed to view the exam, {$exam->name}. transcripts page");
+            }
+        }
     }
 }

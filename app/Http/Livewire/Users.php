@@ -42,7 +42,7 @@ class Users extends Component
     public function getPaginatedUsers()
     {
         return User::orderBy('name')
-            ->where('email', '!=', 'azenga.kevin7@gmail.com')
+            ->where('phone', '!=', '254114023230')
             ->paginate(24);
     }
 

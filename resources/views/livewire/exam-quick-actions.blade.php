@@ -5,8 +5,7 @@
         <x-feedback />
         <div class="d-flex gap-3 flex-wrap">
 
-            <a href="#"
-                class="btn btn-outline-primary gap-2 align-items-center disabled" >
+            <a href="#" class="btn btn-outline-primary gap-2 align-items-center disabled">
                 <i class="fa fa-table"></i>
                 <span class="">Exam Timetable</span>
             </a>
@@ -26,14 +25,13 @@
             </button>
             @endcan
 
-            @can('access-upload-scores-page')
-            @if ($exam->fresh()->isInMarking() || $exam->fresh()->isPublished())
+            @can('viewScoresPage', $exam)
             <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
+                <i class="fa fa-cog"></i>
                 <span class="">Manage Scores</span>
             </a>
-            @endif
-
             @endcan
+
             @if ($exam->fresh()->isPublished())
             <a href="{{ route('exams.results.index', $exam) }}"
                 class="btn btn-outline-primary gap-2 align-items-center">
@@ -45,13 +43,16 @@
                 <i class="fa fa-poll"></i>
                 <span class="">Analysis</span>
             </a>
+
+            @endif
+
+            @can('viewTranscripts', $exam)
             <a href="{{ route('exams.transcripts.index', $exam) }}"
                 class="btn btn-outline-primary gap-2 align-items-center">
                 <i class="fa fa-eye"></i>
                 <span class="">Transcripts</span>
             </a>
-            @endif
-
+            @endcan
 
         </div>
 

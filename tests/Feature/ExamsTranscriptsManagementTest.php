@@ -70,6 +70,14 @@ class ExamsTranscriptsManagementTest extends TestCase
             'level_unit_id' => $levelUnit->id
         ]);
 
+        // Create Responsibility for the current teacher
+        $responsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($responsibility, [
+            'level_id' => $levelUnit->level->id,
+        ]);
+
         // Create the Subject
         $subjects = Subject::limit(2)->get();
 
@@ -79,6 +87,10 @@ class ExamsTranscriptsManagementTest extends TestCase
         $exam->levels()->attach($levelUnit->level);
         
         $exam->subjects()->attach($subjects);
+
+        CreateScoresTable::invoke($exam);
+
+        $exam->update(['status' => 'Published']);
 
         $response = $this->get(route('exams.transcripts.index', $exam));
 
