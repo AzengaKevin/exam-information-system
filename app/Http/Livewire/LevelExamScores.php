@@ -7,6 +7,7 @@ use App\Models\Grade;
 use App\Models\Level;
 use App\Models\Grading;
 use App\Settings\SystemSettings;
+use Illuminate\Pagination\Paginator;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -22,12 +23,21 @@ class LevelExamScores extends Component
 
     public $col;
 
+    /**
+     * Lifecylce method that runs once when the component is mounting
+     * @param Exam $exam
+     * @param Level $level
+     */
     public function mount(Exam $exam, Level $level)
     {
         $this->exam = $exam;
         $this->level = $level;
     }
 
+    /**
+     * Render and re-render the level-exam-scores component
+     * @return View
+     */
     public function render()
     {
         return view('livewire.level-exam-scores', [
@@ -38,6 +48,10 @@ class LevelExamScores extends Component
         ]);
     }
 
+    /**
+     * Get paginated results of the the current level in the current exam
+     * @return Paginator
+     */
     public function getResults()
     {
         $tblName = Str::slug($this->exam->shortname);
@@ -48,17 +62,28 @@ class LevelExamScores extends Component
         /** @var array */
         $aggregateCols = $this->getAggregateColumns();
 
-        return Schema::hasTable($tblName)
-            ? DB::table($tblName)
+        if (Schema::hasTable($tblName)) {
+
+            return DB::table($tblName)
                 ->select(array_merge(["levels.name AS level", "students.name"], $columns, $aggregateCols))
                 ->join("students", "{$tblName}.student_id", '=', 'students.id')
                 ->join("levels", "{$tblName}.level_id", '=', 'levels.id')
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy('op')
-                ->paginate(24)
-            : collect([]);
+                ->paginate(24)->withQueryString();
+
+        }else{
+
+            return new Paginator([], 24);
+
+        }
     }
 
+    /**
+     * Get exam subject columns
+     * 
+     * @return array
+     */
     public function getSubjectColumns(): array
     {
        return $this->exam->subjects->pluck("shortname")->toArray();
@@ -98,6 +123,11 @@ class LevelExamScores extends Component
         return ["mm", "tm", "op", "mg", "mp", "tp", "sp"];
     }
 
+    /**
+     * Get all the coluns that have been fetched and relevation for showing the data
+     * 
+     * @return array
+     */
     public function getColumns()
     {
         /** @var array */

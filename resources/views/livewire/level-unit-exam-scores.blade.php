@@ -41,6 +41,21 @@
                         </tr>
                         @endif
                     </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="{{ count($cols) }}">
+                                <div class="d-flex flex-column flex-md-row align-items-center align-items-md-start">
+                                    {{ $data->links() }}
+                                    @if ($data->count())
+                                    <div class="text-muted ms-md-3">{{ $data->firstItem() }} -
+                                        {{ $data->lastItem() }}
+                                        out of
+                                        {{ $data->total() }}</div>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
                 </table>
             </div>
         </div>

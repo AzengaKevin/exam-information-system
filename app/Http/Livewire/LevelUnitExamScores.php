@@ -9,6 +9,7 @@ use Livewire\Component;
 use App\Models\LevelUnit;
 use App\Models\Student;
 use App\Settings\SystemSettings;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Collection;
@@ -28,12 +29,23 @@ class LevelUnitExamScores extends Component
 
     public $col;
 
+    /**
+     * Lifecyle method that runs once when the component is mounting
+     * 
+     * @param Exam $exam
+     * @param LevelUnit $levelUnit
+     */
     public function mount(Exam $exam, LevelUnit $levelUnit)
     {
         $this->exam = $exam;
         $this->levelUnit = $levelUnit;
     }
 
+    /**
+     * Rendering and re-rendering a component when the state of the component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.level-unit-exam-scores', [
@@ -46,6 +58,8 @@ class LevelUnitExamScores extends Component
 
     /**
      * Get columns that can be used for ranking students
+     * 
+     * @return array
      */
     public function getRankColumns() : array
     {
@@ -59,7 +73,11 @@ class LevelUnitExamScores extends Component
         return $columns;
     }
 
-
+    /**
+     * Get the level unit results data
+     * 
+     * @return Paginator
+     */
     public function getResults()
     {
         $tblName = Str::slug($this->exam->shortname);
@@ -70,8 +88,9 @@ class LevelUnitExamScores extends Component
         /** @var array */
         $aggregateCols = $this->getAggregateColumns();
 
-        return Schema::hasTable($tblName)
-            ? DB::table($tblName)
+        if (Schema::hasTable($tblName)) {
+
+            return DB::table($tblName)
                 ->select(array_merge(["student_id"], $columns, $aggregateCols))
                 ->addSelect("students.name", "level_units.alias")
                 ->join("students", "{$tblName}.student_id", '=', 'students.id')
@@ -79,7 +98,14 @@ class LevelUnitExamScores extends Component
                 ->where("{$tblName}.level_unit_id", $this->levelUnit->id)
                 ->orderBy("sp")
                 ->paginate(24)
-            : collect([]);
+                ->withQueryString();
+
+        }else{
+
+            return new Paginator([], 24);
+
+        }
+        
     }
 
     /**
