@@ -15,7 +15,9 @@
                         @else
                         <th>Average</th>
                         @endif
+                        @can('update', $exam)
                         <th>Actions</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody>
@@ -31,6 +33,7 @@
                         @else
                         <td>{{ $level->pivot->average ?? '-' }}</td>
                         @endif
+                        @can('update', $exam)                            
                         <td>
                             <div class="hstack gap-2 align-items-center">
                                 <button class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
@@ -39,11 +42,12 @@
                                 </button>
                             </div>
                         </td>
+                        @endcan
                     </tr>
                     @endforeach
                     @else
                     <tr>
-                        <td colspan="{{ ($systemSettings->school_level == 'secondary') ? 5 : 4}}">
+                        <td colspan="{{ ($systemSettings->school_level == 'secondary') ? 4 : 3 }}">
                             <div class="py-1 text-center">No Levels added to exam yet</div>
                         </td>
                     </tr>

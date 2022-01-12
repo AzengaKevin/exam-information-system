@@ -10,7 +10,9 @@
                         <th>#</th>
                         <th>Name</th>
                         <th>Shortname</th>
+                        @can('update', $exam)
                         <th>Actions</th>
+                        @endcan
                     </tr>
                 </thead>
                 <tbody>
@@ -20,6 +22,8 @@
                         <td>{{ $loop->iteration }}</td>
                         <td>{{ $subject->name }}</td>
                         <td>{{ $subject->shortname }}</td>
+
+                        @can('update', $exam)                            
                         <td>
                             <div class="hstack gap-2 align-items-center">
                                 <button class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
@@ -28,6 +32,7 @@
                                 </button>
                             </div>
                         </td>
+                        @endcan
                     </tr>
                     @endforeach
                     @else

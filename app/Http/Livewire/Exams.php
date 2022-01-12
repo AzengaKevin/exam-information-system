@@ -5,13 +5,14 @@ namespace App\Http\Livewire;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Models\Subject;
-use App\Settings\GeneralSettings;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use App\Settings\GeneralSettings;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Database\Eloquent\Collection;
 
 class Exams extends Component
 {
@@ -38,17 +39,29 @@ class Exams extends Component
     /** @var GeneralSettings */
     protected $generalSettings;
 
+    /**
+     * Creates the exams component
+     * 
+     * @return Exams
+     */
     public function __construct() {
         $this->generalSettings = app(GeneralSettings::class);
     }
 
+    /**
+     * Lifecycle method called when the component is mounting
+     */
     public function mount()
     {
         $this->year = $this->generalSettings->current_academic_year;
         $this->term = $this->generalSettings->current_term;
-
     }
 
+    /**
+     * Lifecycle method to render and re-render the component when the component state changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.exams', [
@@ -60,24 +73,44 @@ class Exams extends Component
         ]);
     }
 
+    /**
+     * Get the available term options
+     * 
+     * @return array
+     */
     public function getTerms()
     {
         return Exam::termOptions();
     }
     
+    /**
+     * Get all school levels from the database
+     * 
+     * @return Collection
+     */
     public function getLevels()
     {
         return Level::all(['id', 'name']);
     }
 
+    /**
+     * Get all subjects from the database
+     * 
+     * @return Collection
+     */
     public function getSubjects()
     {
         return Subject::all(['id', 'name']);
     }
 
+    /**
+     * Get paginated exams from the database
+     * 
+     * @return Paginator
+     */
     public function getPaginatedExams()
     {
-        return Exam::latest()->paginate(16);
+        return Exam::latest()->paginate(24);
     }
 
     /**
@@ -113,6 +146,11 @@ class Exams extends Component
         $this->emit('show-upsert-exam-modal');
     }
 
+    /**
+     * Exams general fields validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -131,6 +169,9 @@ class Exams extends Component
         ];
     }
 
+    /**
+     * Creates a new exam entry to the database and enroll subjects and levels if applicable
+     */
     public function createExam()
     {
        $data = $this->validate();
@@ -192,18 +233,18 @@ class Exams extends Component
 
             DB::rollBack();
             
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'A fatal error occurred while trying to add an exam');
+            session()->flash('error', $exception->getMessage());
 
             $this->emit('hide-upsert-exam-modal');
 
         }
     }
 
-
+    /**
+     * Updates an exam database record with enrolled subjects and levels if applicable
+     */
     public function updateExam()
     {
         $data = $this->validate();
@@ -264,16 +305,21 @@ class Exams extends Component
             
             Log::error($exception->getMessage(), [
                 'exam-id' => $this->examId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred while trying to add an exam');
+            session()->flash('error', $exception->getMessage());
 
             $this->emit('hide-upsert-exam-modal');
 
         }
     }
 
+    /**
+     * Show the modal for deleting an exam
+     * 
+     * @param Exam $exam
+     */
     public function showDeleteExamModal(Exam $exam)
     {
         $this->examId = $exam->id;
@@ -283,7 +329,10 @@ class Exams extends Component
         $this->emit('show-delete-exam-modal');
     }
 
-    public function deleteExam(Exam $exam)
+    /**
+     * Soft delete an exam, Trash an exam
+     */
+    public function deleteExam()
     {
         try {
 
@@ -315,15 +364,20 @@ class Exams extends Component
             
             Log::error($exception->getMessage(), [
                 'exam-id' => $this->departmtneId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error has occurred');
+            session()->flash('error', $exception->getMessage());
 
             $this->emit('hide-delete-exam-modal');
         }
     }
     
+    /**
+     * Show modal for enrolling levels to an exam
+     * 
+     * @param Exam $exam
+     */
     public function showEnrollLevelsModal(Exam $exam)
     {
         $this->examId = $exam->id;
@@ -331,34 +385,46 @@ class Exams extends Component
         $this->shortname = $exam->shortname;
 
         foreach ($exam->levels as $level) {
-
             $this->selectedLevels[$level->id] = 'true';
-            
         }
 
         $this->emit('show-enroll-levels-modal');
     }
 
+    /**
+     * Update the enrolled levels for an exam
+     */
     public function updateExamLevels()
     {
 
-        $data = $this->validate([
-            'selectedLevels' => ['array', 'min:1']
-        ]);
-
-        $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
-            return $value == 'true';
-        }, ARRAY_FILTER_USE_BOTH);
+        $data = $this->validate(['selectedLevels' => ['array', 'min:1']]);
 
         try {
 
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            $exam->levels()->sync(array_keys($selectedLevelData));
+            $access = Gate::inspect('update', $exam);
 
-            $this->emit('hide-enroll-levels-modal');
+            if ($access->allowed()) {
 
+                $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
+                    return $value == 'true';
+                }, ARRAY_FILTER_USE_BOTH);
+                
+                $exam->levels()->sync(array_keys($selectedLevelData));
+
+                session()->flash('status', 'Exam enrolled levels hav been successfully updated');
+
+                $this->emit('hide-enroll-levels-modal');
+
+            }else{
+
+                session()->flash('message', $access->message());
+
+                $this->emit('hide-enroll-levels-modal');
+            }
+    
 
         } catch (\Exception $exception) {
 
@@ -367,13 +433,18 @@ class Exams extends Component
                 'exam-id' => $this->examId
             ]);
 
-            session()->flash('error', 'An error occurred when enrolling levels to an exam');
+            session()->flash('error', $exception->getMessage());
 
             $this->emit('hide-enroll-levels-modal');
         }
         
     }
 
+    /**
+     * Show modal to enroll subjects to an exam
+     * 
+     * @param Exam $exam
+     */
     public function showEnrollSubjectsModal(Exam $exam)
     {
         $this->examId = $exam->id;
@@ -381,35 +452,45 @@ class Exams extends Component
         $this->shortname = $exam->shortname;
 
         foreach ($exam->subjects as $subject) {
-
             $this->selectedSubjects[$subject->id] = 'true';
-            
         }
-
 
         $this->emit('show-enroll-subjects-modal');
     }
 
+    /**
+     * Updated subjects enrolled to an exam
+     */
     public function enrollSubjects()
     {
-        $data = $this->validate([
-            'selectedSubjects' => ['bail', 'array', 'min:1']
-        ]);
-
-        $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
-            return $value == 'true';
-        }, ARRAY_FILTER_USE_BOTH);
+        $data = $this->validate(['selectedSubjects' => ['bail', 'array', 'min:1']]);
 
         try {
 
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            $exam->subjects()->sync(array_keys($selectedSubjectsData));
+            $access = Gate::inspect('update', $exam);
 
-            session()->flash('status', 'Enrolling subjects to an exams successfully completed');
+            if($access->allowed()){
 
-            $this->emit('hide-enroll-subjects-modal');
+                $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
+                    return $value == 'true';
+                }, ARRAY_FILTER_USE_BOTH);
+
+                $exam->subjects()->sync(array_keys($selectedSubjectsData));
+    
+                session()->flash('status', 'Enrolling subjects to an exams successfully completed');
+    
+                $this->emit('hide-enroll-subjects-modal');
+                
+            }else{
+
+                session()->flash('error', $access->message());
+                
+                $this->emit('hide-enroll-subjects-modal');
+            }
+
 
         } catch (\Exception $exception) {
 

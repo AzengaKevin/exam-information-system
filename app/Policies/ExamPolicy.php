@@ -51,7 +51,7 @@ class ExamPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('exams-create')
             ? Response::allow()
-            : Response::deny('You are not allowed to create an exam');
+            : Response::deny('Sorry, you are not allowed to create an exam');
     }
 
     /**
