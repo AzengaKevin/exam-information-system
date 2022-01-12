@@ -106,4 +106,17 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         $query->where('authenticatable_type', $type);
     }
+
+    /**
+     * Checks whether the user is an administrator
+     * 
+     * @return bool
+     */
+    public function isAdmin() : bool
+    {
+        /** @var Role */
+        $adminRole = Role::firstOrCreate(['name' => 'Administrator']);
+
+        return $this->role->is($adminRole);
+    }
 }

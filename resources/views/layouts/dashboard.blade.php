@@ -55,6 +55,7 @@
                 </a>
             </li>
             @endcan
+            @if (Auth::user()->isAdmin())                
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('departments.index') ? 'text-white':'text-white-50' }}"
                     href="{{route('departments.index')}}">
@@ -64,6 +65,9 @@
                     </div>
                 </a>
             </li>
+            @endif
+
+            @if (Auth::user()->isAdmin())                
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('subjects.index') ? 'text-white':'text-white-50' }}"
                     href="{{route('subjects.index')}}">
@@ -73,6 +77,7 @@
                     </div>
                 </a>
             </li>
+            @endif
             @can('viewAny', \App\Models\Student::class)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('students.index') ? 'text-white':'text-white-50' }}"
@@ -84,6 +89,7 @@
                 </a>
             </li>
             @endcan
+            @if (Auth::user()->isAdmin())                
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('teachers.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('teachers.index') }}">
@@ -93,6 +99,8 @@
                     </div>
                 </a>
             </li>
+            @endif
+            @if (Auth::user()->isAdmin())                
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('guardians.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('guardians.index') }}">
@@ -102,6 +110,7 @@
                     </div>
                 </a>
             </li>
+            @endif
             @can('viewAny', \App\Models\Exam::class)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('exams.index') ? 'text-white' : 'text-white-50' }}"
@@ -114,7 +123,7 @@
             </li>
             @endcan
 
-            @if ($systemSettings->school_level == 'secondary')
+            @if (($systemSettings->school_level == 'secondary') && Auth::user()->isAdmin())
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('gradings.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('gradings.index') }}">
@@ -134,6 +143,8 @@
                 </a>
             </li>
             @endif
+
+            @if (Auth::user()->isAdmin())               
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('responsibilities.index') ? 'text-white' : 'text-white-50' }}"
                     href="{{ route('responsibilities.index') }}">
@@ -143,7 +154,9 @@
                     </div>
                 </a>
             </li>
+            @endif
 
+            @if (Auth::user()->isAdmin())                
             @if ($systemSettings->school_has_streams)
             <li class="nav-item">
                 <a class="nav-link {{ request()->routeIs('level-units.index') ? 'text-white' : 'text-white-50' }}"
@@ -165,6 +178,7 @@
                 </a>
             </li>
             @endif
+            @endif
 
             @if ($systemSettings->boarding_school)
             <li class="nav-item">
@@ -177,6 +191,7 @@
                 </a>
             </li>
             @endif
+            @if (Auth::user()->isAdmin())                
             <li class="nav-item">
                 <a class="nav-link {{request()->routeIs('settings.index') ? 'text-white':'text-white-50' }}"
                     href="{{ route('settings.index') }}">
@@ -186,6 +201,7 @@
                     </div>
                 </a>
             </li>
+            @endif
         </ul>
     </div>
     <div id="content" class="vh-100 col-md-9 col-lg-10 d-flex flex-column">
