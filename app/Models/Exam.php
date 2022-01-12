@@ -168,4 +168,14 @@ class Exam extends Model
             ->withTimestamps();
     }
 
+    /**
+     * Get all LevelUnits for an exam
+     * 
+     * @return Collection
+     */
+    public function getAllLevelUnits()
+    {
+        return LevelUnit::whereIn('level_id', $this->levels->pluck('id')->all())->get();
+    }
+
 }

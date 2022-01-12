@@ -163,6 +163,8 @@ class ExamsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Update']));
+
         $levelsIds = Level::factory(2)->create()->pluck('id')->toArray();
 
         /** @var Exam */
@@ -187,6 +189,8 @@ class ExamsManagementTest extends TestCase
     public function testAuthorizedUsersCanEnrollSubjectsToExam()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Update']));
 
         /** @var Exam */
         $exam = Exam::factory()->create();

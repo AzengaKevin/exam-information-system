@@ -12,7 +12,7 @@ class ExamLevels extends Component
     public $exam;
 
     /**
-     * Called when components mount on a view
+     * Called when component mounts on a view
      * 
      * @param Exam $exam
      */
@@ -35,7 +35,13 @@ class ExamLevels extends Component
 
         return $this->exam->levels()->orderByPivot($orderByColumn, 'desc')->get();
     }
-
+    
+    /**
+     * Lifecyce method that renders and re-renders the component when the state of the
+     * exam-level component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.exam-levels', [

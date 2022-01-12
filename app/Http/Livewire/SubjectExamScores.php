@@ -16,6 +16,8 @@ class SubjectExamScores extends Component
 {
     use WithPagination;
 
+    protected $paginationTheme = 'bootstrap';
+
     public Exam $exam;
     public Subject $subject;
     public $level;

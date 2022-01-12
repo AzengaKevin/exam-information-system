@@ -28,6 +28,8 @@ class ExamsScoresController extends Controller
      */
     public function index(Request $request, Exam $exam)
     {
+        $this->authorize('viewScoresPage', $exam);
+        
         /** @var User */
         $user = $request->user();
 

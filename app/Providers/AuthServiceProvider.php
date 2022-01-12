@@ -28,12 +28,6 @@ class AuthServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->registerPolicies();
-        
-        Gate::define('access-upload-scores-page', function(User $user){
-            return $user->authenticatable_type == 'teacher'
-                ? Response::allow()
-                : Response::deny('Only teachers can access the upload scores page');
-        });
 
         Gate::define('change-exam-status', function(User $user){
 
