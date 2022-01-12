@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Actions\Exam\Scores\CompleteUpload;
 use App\Models\Exam;
 use App\Models\Grading;
 use App\Models\Subject;
@@ -68,7 +69,7 @@ class SubjectExamScores extends Component
         if (!is_null($this->levelUnit)) $query->where('students.level_unit_id', $this->levelUnit->id);
             
         //return $query->orderBy('score', 'desc')->paginate(24);
-        return $query->paginate(24);
+        return $query->paginate(24)->withQueryString();
     }
 
     /** 
@@ -78,31 +79,8 @@ class SubjectExamScores extends Component
     {
         try {
     
-            $tblName = Str::slug($this->exam->shortname);
-    
-            $col = $this->subject->shortname;
-            
-            /** @var Collection */
-            $query = DB::table($tblName)->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS UNSIGNED) AS score");
-    
-            if(!is_null($this->level)) $query->where("level_id", $this->level->id);
-    
-            if(!is_null($this->levelUnit)) $query->where('level_unit_id', $this->levelUnit->id);
-    
-            /** @var Collection */
-            $data = $query->orderBy("score", 'desc')->get();
-    
-            // Get the total records count
-            $total = $data->count();
-    
-            $data->each(function($item, $key) use ($tblName, $col, $total){
+            CompleteUpload::rank($this->exam, $this->subject, $this->level, $this->levelUnit);
 
-                $rank = $key + 1;
-    
-                DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE student_id = {$item->student_id}");
-
-            });
-    
             session()->flash("status", "Students {$this->subject->name} rank successfully generated and stored");
 
             $this->emit('hide-generate-rank');
@@ -113,7 +91,7 @@ class SubjectExamScores extends Component
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal db error occurred');
+            session()->flash('error', $exception->getMessage());
 
             $this->emit('hide-generate-rank');
         }
