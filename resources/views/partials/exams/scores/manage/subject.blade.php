@@ -1,5 +1,6 @@
 <div class="container-fluid">
 
+    @if (false)        
     <div class="d-flex flex-wrap gap-2">
         <button href="#" data-bs-toggle="modal" data-bs-target="#generate-rank" 
             class="btn btn-primary text-decoration-line-through">Generate Rank</button>
@@ -8,6 +9,7 @@
             class="btn btn-primary text-decoration-line-through">Generate Total</button>
         @endif
     </div>
+    @endif
 
     <hr>
     <livewire:subject-exam-scores :exam="$exam" :subject="$subject" :level="$level" :levelUnit="$levelUnit" />
