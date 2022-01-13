@@ -2,10 +2,10 @@
 
     <div class="d-flex flex-wrap gap-2">
         <button href="#" data-bs-toggle="modal" data-bs-target="#generate-rank" 
-            class="btn btn-primary">Generate Rank</button>
+            class="btn btn-primary text-decoration-line-through">Generate Rank</button>
         @if (!empty($subject->segments))            
         <button href="#" data-bs-toggle="modal" data-bs-target="#generate-totals"
-            class="btn btn-primary">Generate Total</button>
+            class="btn btn-primary text-decoration-line-through">Generate Total</button>
         @endif
     </div>
 

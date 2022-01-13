@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Grading;
 use App\Models\Level;
+use App\Settings\SystemSettings;
 
 class ExamsScoresController extends Controller
 {
@@ -27,7 +28,7 @@ class ExamsScoresController extends Controller
      * @param Request $request
      * @param Exam $exam
      */
-    public function index(Request $request, Exam $exam)
+    public function index(Request $request, Exam $exam, SystemSettings $systemSettings)
     {
         $this->authorize('viewScoresPage', $exam);
         
@@ -38,35 +39,38 @@ class ExamsScoresController extends Controller
         $teacher = $user->authenticatable;
 
         /** @var Responsibility */
-        $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
-        $classTeacherResponsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-        $levelSupervisorResponsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+        $subResp = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+        $ctResp = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+        $lsResp = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
 
-        $dosResponsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+        $dosResp = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
 
-        $responsibilities = $teacher->responsibilities()
-            ->whereIn('responsibilities.id', [
-                $responsibility->id, 
-                $classTeacherResponsibility->id, 
-                $levelSupervisorResponsibility->id
-            ])->get();
+        $responsibilities = collect([]);
 
-        $levels = collect([]);
+        if($systemSettings->school_has_streams){
 
-        $levelUnits = collect([]);
+            $responsibilities = $teacher->responsibilities()
+                ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
+                ->whereIn('responsibilities.id', [
+                    $subResp->id,
+                    $ctResp->id, 
+                    $lsResp->id
+                ])->get();
+        }else{
 
-        if ($teacher->responsibilities()->where('responsibilities.id', $dosResponsibility->id)->exists()) {
-            $levels = $exam->levels;
+            $responsibilities = $teacher->responsibilities()
+                ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                ->whereIn('responsibilities.id', [
+                    $subResp->id,
+                    $ctResp->id,
+                    $lsResp->id
+                ])->get();
 
-            $levelUnits = LevelUnit::whereIn('level_id', $exam->levels->pluck('id')->toArray())
-                ->get();
         }
-
+        
         return view('exams.scores.index', [
             'exam' => $exam,
-            'responsibilities' => $responsibilities,
-            'levels' => $levels,
-            'levelUnits' => $levelUnits,
+            'responsibilities' => $responsibilities
         ]);
         
     }
