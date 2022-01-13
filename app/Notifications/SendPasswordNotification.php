@@ -61,7 +61,7 @@ class SendPasswordNotification extends Notification
     public function toAdvanta($notifiable)
     {
         return [
-            'content' => "Hello {$notifiable->name}, your login password is, {$this->password}. Change it as soon as you login"
+            'content' => "Hi {$notifiable->name}, your login password is, {$this->password}. Change it as soon as you login, website, " . route('welcome')
         ];
     }
 

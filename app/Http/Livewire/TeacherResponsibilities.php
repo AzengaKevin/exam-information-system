@@ -231,7 +231,7 @@ class TeacherResponsibilities extends Component
 
             $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
 
-            session()->flash('status', 'Teacher successfully assigned bul subjects');
+            session()->flash('status', 'Teacher successfully assigned bulk subject responsibilities');
 
             $this->emit('hide-assign-bulk-responsibilities-modal');
     

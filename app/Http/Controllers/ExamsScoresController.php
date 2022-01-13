@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Exam\Scores\CompleteUpload;
 use App\Http\Requests\UploadScoresRequest;
 use App\Models\Exam;
 use App\Models\User;
@@ -104,7 +105,7 @@ class ExamsScoresController extends Controller
 
             if ($levelUnit) $query->where('students.level_unit_id', $levelUnit->id);
                 
-            $data = $query->get();
+            $data = $query->orderBy('students.name')->get();
 
             $title = "Upload " . (optional($level)->name ?? optional($levelUnit)->alias) . " - {$subject->name} Scores";
 
@@ -212,9 +213,15 @@ class ExamsScoresController extends Controller
                 // Process Uploading the scores
                 $this->uploadScoresWithoutSegments($data, $values, $level, $levelUnit, $exam, $subject);
 
+                CompleteUpload::rank($exam, $subject, $level, $levelUnit);
+                
             }else{
-
+                
                 $this->uploadScoresWithSegments($data, $level, $levelUnit, $exam, $subject);
+                
+                CompleteUpload::calculateTotals($exam, $subject, $level, $levelUnit);
+                
+                CompleteUpload::rank($exam, $subject, $level, $levelUnit);
 
             }
 
@@ -234,7 +241,7 @@ class ExamsScoresController extends Controller
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A db error occurred, check with admin');
+            session()->flash('error', $exception->getMessage());
 
             return back()->withInput();
             

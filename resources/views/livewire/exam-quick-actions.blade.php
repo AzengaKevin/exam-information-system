@@ -46,7 +46,6 @@
                 <i class="fa fa-poll"></i>
                 <span class="">Analysis</span>
             </a>
-
             @endif
 
             @can('viewTranscripts', $exam)
