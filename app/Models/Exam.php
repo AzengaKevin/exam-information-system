@@ -101,6 +101,9 @@ class Exam extends Model
             ->withPivot(['points', 'grade', 'average']);
     }
 
+    /**
+     * Defines exam level-unit relation
+     */
     public function levelUnits()
     {
         return $this->belongsToMany(LevelUnit::class)
