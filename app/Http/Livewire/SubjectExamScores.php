@@ -122,4 +122,35 @@ class SubjectExamScores extends Component
         }
         
     }
+
+    /** 
+     * Calculate student exam deviations and saving the deviations
+     */
+    public function calculateAndUpdateDeviations()
+    {
+        try {
+
+            $result = CompleteUpload::calculateDeviations($this->exam, $this->subject, $this->level, $this->levelUnit);
+
+            if ($result) {                
+                session()->flash("status", "Deviations successfully calculated, saved and deviation ranks generated");
+    
+                $this->exam = $this->exam->fresh();
+            }
+
+            $this->emit('hide-generate-totals');
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', $exception->getMessage());
+
+            $this->emit('hide-generate-totals');
+            
+        }
+        
+    }
 }

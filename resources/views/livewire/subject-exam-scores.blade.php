@@ -19,6 +19,7 @@
                             @endforeach
                             @endif
                             <th>% Score</th>
+                            <th>Deviation</th>
                             @if ($systemSettings->school_level == 'secondary')
                             <th>Points</th>
                             @endif
@@ -47,6 +48,7 @@
                                 <span>{{ optional($score)->grade }}</span>
                                 @endif
                             </td>
+                            <td>{{ optional($score)->dev ?? '-' }}</td>
                             @if ($systemSettings->school_level == 'secondary')
                             <td>{{ optional($score)->points }}</td>
                             @endif
@@ -121,4 +123,26 @@
             </div>
         </div>
     </div>
+
+    <!-- Calculate Deviations modal -->
+    @if ($exam->deviationExam)        
+    <div wire:ignore.self id="calculate-deviations" class="modal fade" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Calculate Deviations</h5>
+                    <button class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to calculate {{ $subject->name }} deviations, from the exam {{ $exam->deviationExam->name }}?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
+                    <button wire:click="calculateAndUpdateDeviations" type="button" data-bs-dismiss="modal"
+                        class="btn btn-outline-primary">Proceed</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 </div>
