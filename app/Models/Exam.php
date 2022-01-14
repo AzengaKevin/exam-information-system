@@ -98,6 +98,23 @@ class Exam extends Model
     }
 
     /**
+     * Exam status scope method
+     */
+    public function scopeStatus($query, string $status)
+    {
+        $query->where('status', $status);
+    }
+
+    /**
+     * Exam - Deviation Exam Relation
+     * 
+     */
+    public function deviationExam()
+    {
+        return $this->belongsTo(Exam::class, 'deviation_exam_id');
+    }
+
+    /**
      * Defines exam level relation
      */
     public function levels()
@@ -207,10 +224,10 @@ class Exam extends Model
         if(count($currentExamSubjectsIds) != count($otherExamSubjectsIds)) return false;
 
         if(count($currentExamLevelsIds) != count($otherExamLevelsIds)) return false;
-
-        if(!empty(array_diff($currentExamSubjectsIds, $otherExamSubjectsIds))) return false;
         
-        if(!empty(array_diff($currentExamLevelsIds, $otherExamSubjectsIds))) return false;
+        if(!empty(array_diff($currentExamSubjectsIds, $otherExamSubjectsIds))) return false;
+
+        if(!empty(array_diff($currentExamLevelsIds, $otherExamLevelsIds))) return false;
 
         return true;
     }

@@ -88,7 +88,8 @@
                         @if ($otherExams->count())
                         <div class="col-md-12">
                             <label for="deviation-exam" class="form-label">Deviation Exam</label>
-                            <select name="deviation_exam_id" id="deviation-exam" class="form-select">
+                            <select wire:model="deviation_exam_id" id="deviation-exam" class="form-select">
+                                <option value="">-- Select Deviation Exam --</option>
                                 @foreach ($otherExams as $exam)
                                 <option value="{{ $exam->id }}">{{ $exam->name }}</option>
                                 @endforeach

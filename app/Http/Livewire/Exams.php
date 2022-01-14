@@ -122,7 +122,7 @@ class Exams extends Component
      */
     public function getOtherExams()
     {
-        return Exam::where('id', '!=', $this->examId)
+        return Exam::status('Published')->where('id', '!=', $this->examId)
             ->latest()->limit(10)
             ->get();
     }
@@ -141,11 +141,12 @@ class Exams extends Component
         $this->term = $exam->term;
         $this->shortname = $exam->shortname;
         $this->year = $exam->year;
-        $this->start_date = $exam->start_date;
-        $this->end_date = $exam->end_date;
+        $this->start_date = optional($exam->start_date)->format('Y-m-d');
+        $this->end_date = optional($exam->end_date)->format('Y-m-d');
         $this->weight = $exam->weight;
         $this->counts = $exam->counts;
         $this->status = $exam->status;
+        $this->deviation_exam_id = $exam->deviation_exam_id;
 
         // Mark selected subjects
         foreach ($exam->subjects as $subject) {
@@ -189,7 +190,7 @@ class Exams extends Component
      */
     public function createExam()
     {
-       $data = $this->validate();
+        $data = $this->validate();
 
         try {
 
@@ -275,9 +276,14 @@ class Exams extends Component
 
             if($access->allowed()){
 
-                DB::beginTransaction();
+                /** @var Exam */
+                $deviationExam = Exam::find($data['deviation_exam_id']);
 
-                if($exam->update($data)){
+                unset($data['deviation_exam_id']);
+
+                DB::transaction(function() use($exam, $data, $deviationExam){
+
+                    $exam->update($data);
 
                     if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
 
@@ -298,14 +304,17 @@ class Exams extends Component
                         
                     }
 
-                    DB::commit();
-    
-                    $this->reset();
-    
-                    session()->flash('status', 'Exam successfully updated');
-    
-                    $this->emit('hide-upsert-exam-modal');
-                }
+                    if(!is_null($deviationExam) && $exam->matches($deviationExam)){
+                        $exam->update(['deviation_exam_id' => $deviationExam->id]);
+                    }
+                        
+                });
+                
+                $this->reset();
+
+                session()->flash('status', "The exam, {$exam->name}, has been successfully updated");
+
+                $this->emit('hide-upsert-exam-modal');
 
             }else{
 
@@ -318,8 +327,6 @@ class Exams extends Component
             
         } catch (\Exception $exception) {
 
-            DB::rollBack();
-            
             Log::error($exception->getMessage(), [
                 'exam-id' => $this->examId,
                 'action' => __METHOD__
