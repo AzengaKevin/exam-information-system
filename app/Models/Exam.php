@@ -22,12 +22,13 @@ class Exam extends Model
         'weight',
         'counts',
         'description',
-        'status'
+        'status',
+        'deviation_exam_id'
     ];
 
     protected $casts = [
-        // 'start_date' => 'date',
-        // 'end_date' => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
         'counts' => 'boolean'
     ];
 
@@ -40,6 +41,11 @@ class Exam extends Model
         return ['Term 1','Term 2','Term 3'];
     }
 
+    /**
+     * Mutator to set the exam slug name from the shortname
+     * 
+     * @param mixed $value
+     */
     public function setShortnameAttribute($value)
     {
         $this->attributes['shortname'] = $value;
@@ -179,6 +185,34 @@ class Exam extends Model
     public function getAllLevelUnits()
     {
         return LevelUnit::whereIn('level_id', $this->levels->pluck('id')->all())->get();
+    }
+
+    /**
+     * Checks whether the current exam matches the previous exam
+     * 
+     * @param Exam $exam - The other exam to compare tp
+     * 
+     * @return bool - Whether the exams match or not
+     */
+    public function matches(Exam $exam) : bool
+    {
+        $currentExamSubjectsIds = $this->subjects->pluck('id')->all();
+
+        $otherExamSubjectsIds = $exam->subjects->pluck('id')->all();
+
+        $currentExamLevelsIds = $this->levels->pluck('id')->all();
+
+        $otherExamLevelsIds = $exam->levels->pluck('id')->all();
+
+        if(count($currentExamSubjectsIds) != count($otherExamSubjectsIds)) return false;
+
+        if(count($currentExamLevelsIds) != count($otherExamLevelsIds)) return false;
+
+        if(!empty(array_diff($currentExamSubjectsIds, $otherExamSubjectsIds))) return false;
+        
+        if(!empty(array_diff($currentExamLevelsIds, $otherExamSubjectsIds))) return false;
+
+        return true;
     }
 
 }
