@@ -3,7 +3,8 @@
 'terms',
 'examStatusOptions',
 'levels' => [],
-'subjects' => []
+'subjects' => [],
+'otherExams',
 ])
 
 <div wire:ignore.self id="upsert-exam-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
@@ -83,6 +84,17 @@
                             </span>
                             @enderror
                         </div>
+
+                        @if ($otherExams->count())
+                        <div class="col-md-12">
+                            <label for="deviation-exam" class="form-label">Deviation Exam</label>
+                            <select name="deviation_exam_id" id="deviation-exam" class="form-select">
+                                @foreach ($otherExams as $exam)
+                                <option value="{{ $exam->id }}">{{ $exam->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        @endif
 
                         @if (false)
                         <div class="col-md-12">

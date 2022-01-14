@@ -88,11 +88,54 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals($payload['shortname'], $exam->shortname);
         $this->assertEquals(Str::slug($payload['shortname']), $exam->slug);
         $this->assertEquals($payload['year'], $exam->year);
-        $this->assertEquals($payload['start_date'], $exam->start_date);
-        $this->assertEquals($payload['end_date'], $exam->end_date);
+        $this->assertEquals($payload['start_date'], $exam->start_date->format('Y-m-d'));
+        $this->assertEquals($payload['end_date'], $exam->end_date->format('Y-m-d'));
         $this->assertEquals($payload['weight'], $exam->weight);
         $this->assertEquals($payload['counts'], $exam->counts);
         $this->assertEquals($payload['description'], $exam->description);
+    }
+
+    /** @group exams */
+    public function testAuthorizedUserCanCreateAnExamAndAddDeviationExamRelationAtTheSameTime()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Create']));
+
+        $payload = Exam::factory()->make([
+            'deviation_exam_id' => Exam::factory()->create()->id,
+            'status' => 'Published'
+        ])->toArray();
+
+        Livewire::test(Exams::class)
+            ->set('name', $payload['name'])
+            ->set('shortname', $payload['shortname'])
+            ->set('year', $payload['year'])
+            ->set('term', $payload['term'])
+            ->set('start_date', $payload['start_date'])
+            ->set('end_date', $payload['end_date'])
+            ->set('weight', $payload['weight'])
+            ->set('counts', $payload['counts'])
+            ->set('description', $payload['description'])
+            ->set('deviation_exam_id', $payload['deviation_exam_id'])
+            ->call('createExam');
+
+        $exam = Exam::where('shortname', $payload['shortname'])->first();
+
+        $this->assertNotNull($exam);
+
+        $this->assertEquals($payload['name'], $exam->name);
+        $this->assertEquals($payload['term'], $exam->term);
+        $this->assertEquals($payload['shortname'], $exam->shortname);
+        $this->assertEquals(Str::slug($payload['shortname']), $exam->slug);
+        $this->assertEquals($payload['year'], $exam->year);
+        $this->assertEquals($payload['start_date'], $exam->start_date->format('Y-m-d'));
+        $this->assertEquals($payload['end_date'], $exam->end_date->format('Y-m-d'));
+        $this->assertEquals($payload['weight'], $exam->weight);
+        $this->assertEquals($payload['counts'], $exam->counts);
+        $this->assertEquals($payload['description'], $exam->description);
+        $this->assertEquals($payload['deviation_exam_id'], $exam->deviation_exam_id);
+        
     }
 
     /** @group exams */
@@ -146,8 +189,8 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals($payload['shortname'], $exam->shortname);
         $this->assertEquals(Str::slug($payload['shortname']), $exam->slug);
         $this->assertEquals($payload['year'], $exam->year);
-        $this->assertEquals($payload['start_date'], $exam->start_date);
-        $this->assertEquals($payload['end_date'], $exam->end_date);
+        $this->assertEquals($payload['start_date'], $exam->start_date->format('Y-m-d'));
+        $this->assertEquals($payload['end_date'], $exam->end_date->format('Y-m-d'));
         $this->assertEquals($payload['weight'], $exam->weight);
         $this->assertEquals($payload['counts'], $exam->counts);
         $this->assertEquals($payload['description'], $exam->description);

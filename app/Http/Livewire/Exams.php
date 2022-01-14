@@ -32,6 +32,7 @@ class Exams extends Component
     public $counts;
     public $description;
     public $status;
+    public $deviation_exam_id;
 
     public $selectedLevels = [];
     public $selectedSubjects = [];
@@ -66,6 +67,7 @@ class Exams extends Component
     {
         return view('livewire.exams', [
             'exams' => $this->getPaginatedExams(),
+            'otherExams' => $this->getOtherExams(),
             'terms'=> $this->getTerms(),
             'levels' => $this->getLevels(),
             'subjects' => $this->getSubjects(),
@@ -111,6 +113,18 @@ class Exams extends Component
     public function getPaginatedExams()
     {
         return Exam::latest()->paginate(24);
+    }
+
+    /**
+     * Get the other exam from the database apart from the current one
+     * 
+     * @return Collection
+     */
+    public function getOtherExams()
+    {
+        return Exam::where('id', '!=', $this->examId)
+            ->latest()->limit(10)
+            ->get();
     }
 
     /**
@@ -165,7 +179,8 @@ class Exams extends Component
             'description' => ['nullable'],
             'status' => ['nullable'],
             'selectedLevels' => ['nullable', 'array'],
-            'selectedSubjects' => ['nullable', 'array']
+            'selectedSubjects' => ['nullable', 'array'],
+            'deviation_exam_id' => ['nullable', 'integer']
         ];
     }
 
@@ -184,11 +199,15 @@ class Exams extends Component
 
                 unset($data['status']);
 
-                DB::beginTransaction();
-    
-                $exam = Exam::create($data);
-    
-                if($exam){
+                /** @var Exam */
+                $deviationExam = Exam::find($data['deviation_exam_id']);
+
+                unset($data['deviation_exam_id']);
+
+                DB::transaction(function() use($data, $deviationExam){
+
+                    /** @var Exam */
+                    $exam = Exam::create($data);
 
                     if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
 
@@ -206,20 +225,20 @@ class Exams extends Component
                         }, ARRAY_FILTER_USE_BOTH);
 
                         $exam->levels()->sync(array_keys($selectedLevelData));
-                        
                     }
 
-                    DB::commit();
+                    if(!is_null($deviationExam) && $exam->matches($deviationExam)) 
+                        $exam->update(['deviation_exam_id' => $deviationExam->id]);
+                    
+                });
 
-                    $this->reset();
-    
-                    $this->resetPage();
-    
-                    session()->flash('status', 'Exam has been successfully created');
-    
-                    $this->emit('hide-upsert-exam-modal');
-    
-                }
+                $this->reset();
+        
+                $this->resetPage();
+
+                session()->flash('status', 'Exam has been successfully created');
+
+                $this->emit('hide-upsert-exam-modal');
 
             }else{
 
@@ -231,8 +250,6 @@ class Exams extends Component
             
         } catch (\Exception $exception) {
 
-            DB::rollBack();
-            
             Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
             session()->flash('error', $exception->getMessage());
