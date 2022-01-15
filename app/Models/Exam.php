@@ -131,7 +131,7 @@ class Exam extends Model
     {
         return $this->belongsToMany(LevelUnit::class)
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average']);
+            ->withPivot(['points', 'grade', 'average', 'points_deviation', 'average_deviation']);
     }
 
     /**
