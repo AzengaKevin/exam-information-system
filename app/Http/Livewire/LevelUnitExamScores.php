@@ -396,4 +396,31 @@ class LevelUnitExamScores extends Component
         }
         
     }
+
+    /**
+     * Publish Level Students Exam Results
+     */
+    public function publishStudentResults()
+    {
+        
+        try {
+            
+            LevelUnitActions::publishStudentResults($this->exam, $this->levelUnit);
+
+            session('status', "{$this->levelUnit->alias} students results have been published");
+
+            $this->emit('hide-publish-class-students-results-modal');
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            session()->flash('error', $exception->getMessage());
+
+            $this->emit('hide-publish-class-students-results-modal');
+
+        }
+    }    
 }
