@@ -44,7 +44,9 @@
                         @endforeach
                         @else
                         <th>% Score</th>
+                        @if ($systemSettings->school_level == 'secondary')
                         <th>Missing / Cheated</th>
+                        @endif
                         @endif
                     </tr>
                 </thead>
@@ -72,6 +74,7 @@
                                 class="form-control form-control-sm"
                                 value="{{ old("scores.{$item->stid}.score") ?? optional($score)->score }}">
                         </td>
+                        @if ($systemSettings->school_level == 'secondary')                  
                         <td>
                             <select name="scores[{{ $item->stid }}][extra]" class="form-select form-select-sm">
                                 <option value="">-- Select --</option>
@@ -79,6 +82,7 @@
                                 <option value="cheated" {{ optional($score)->grade == 'Y' }}>Cheated</option>
                             </select>
                         </td>
+                        @endif
                         @endif
                     </tr>
                     @endforeach
