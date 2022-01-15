@@ -346,4 +346,54 @@ class LevelUnitActions
         }
         
     }
+
+    /**
+     * @param Exam $exam
+     * @param LevelUnit $level
+     */
+    public static function publishStudentResults(Exam $exam, LevelUnit $levelUnit)
+    {
+        
+        try {
+            
+            $tblName = Str::slug($exam->shortname);
+
+            $aggregateColums = ["mm", "tm", "op", "mg", "mp", "tp", "sp", "mmd", "tmd", "tpd", "mpd"];
+
+            /** @var Collection */
+            $data = DB::table($tblName)->select(array_merge(["students.id"], $aggregateColums))
+                ->join("students", "{$tblName}.student_id", '=', 'students.id')
+                ->where("{$tblName}.level_unit_id", $levelUnit->id)
+                ->get();
+
+            if ($data->count()) {
+                
+                $data->each(function($item) use($exam){
+    
+                    DB::table('exam_student')
+                        ->updateOrInsert(['exam_id' => $exam->id,'student_id' => $item->id], [
+                            'mm' => $item->mm,
+                            'tm' => $item->tm,
+                            'mp' => $item->mp,
+                            'tp' => $item->tp,
+                            'mg' => $item->mg,
+                            'sp' => $item->sp ?? null,
+                            'op' => $item->op,
+                            'mmd' => $item->mmd,
+                            'tmd' => $item->tmd,
+                            'tpd' => $item->tpd,
+                            'mpd' => $item->mpd
+                        ]);
+    
+                });
+                
+            }
+
+        } catch (\Exception $exception) {
+            
+            throw $exception;
+
+        }
+        
+    }    
 }
