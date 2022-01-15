@@ -218,6 +218,8 @@ class ExamsScoresController extends Controller
                 $this->uploadScoresWithoutSegments($data, $values, $level, $levelUnit, $exam, $subject);
 
                 CompleteUpload::rank($exam, $subject, $level, $levelUnit);
+
+                CompleteUpload::calculateDeviations($exam, $subject, $level, $levelUnit);
                 
             }else{
                 
@@ -226,6 +228,8 @@ class ExamsScoresController extends Controller
                 CompleteUpload::calculateTotals($exam, $subject, $level, $levelUnit);
                 
                 CompleteUpload::rank($exam, $subject, $level, $levelUnit);
+
+                CompleteUpload::calculateDeviations($exam, $subject, $level, $levelUnit);
 
             }
 

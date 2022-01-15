@@ -5,7 +5,6 @@
             <i class="fa fa-upload"></i>
             <span>Publish</span>
         </a>
-        @if (false)            
         <a href="#" data-bs-toggle="modal" data-bs-target="#generate-scores-aggregates-modal" role="button"
             class="btn btn-primary d-inline-flex gap-2 align-items-center text-decoration-line-through">
             <i class="fa fa-calculator"></i>
@@ -26,7 +25,6 @@
             <i class="fa fa-upload"></i>
             <span>Publish Subject Perf.</span>
         </a>
-        @endif
     </div>
     <hr>
     <livewire:level-unit-exam-scores :exam="$exam" :levelUnit="$levelUnit" />

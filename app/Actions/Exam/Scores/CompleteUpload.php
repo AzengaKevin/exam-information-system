@@ -9,6 +9,7 @@ use App\Models\Subject;
 use App\Models\LevelUnit;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
 
 class CompleteUpload
 {
@@ -86,6 +87,51 @@ class CompleteUpload
             throw $exception;
 
         }        
+        
+    }
+
+    /**
+     * Calculate deviations from the related deviation exam if any
+     * @param Exam $exam - To calculate the deviation
+     * @param Subject $subject - The secified subject
+     * @param Level $level - Level to calculate the deviations for
+     * @param LevelUnit $levelUnit - LevelUnit to calculate the deviations for
+     * 
+     * @return bool - Whether the deviations have been calculated or not
+     */
+    public static function calculateDeviations(Exam $exam, Subject $subject, ?Level $level, ?LevelUnit $levelUnit) : bool
+    {
+        /** @var Exam */
+        $deviationExam = $exam->deviationExam;
+
+        if(is_null($deviationExam)) return false;
+    
+        $examTblName = Str::slug($exam->shortname);
+
+        $devExamTblName = Str::slug($deviationExam->shortname);
+    
+        $col = $subject->shortname;
+
+        $query = DB::table($examTblName, $tblName = 'cet')
+            ->selectRaw("cet.student_id, (CAST(JSON_UNQUOTE(JSON_EXTRACT(cet.$col,\"$.score\")) AS SIGNED) - CAST(JSON_UNQUOTE(JSON_EXTRACT(`$devExamTblName`.$col,\"$.score\")) AS SIGNED)) AS dev")
+            ->leftJoin($devExamTblName, 'cet.student_id', '=', "{$devExamTblName}.student_id");
+
+        if(!is_null($level)) $query->where("cet.level_id", $level->id);
+
+        if(!is_null($levelUnit)) $query->where('cet.level_unit_id', $levelUnit->id);            
+    
+        /** @var Collection */
+        $data = $query->orderBy("dev", 'desc')->get();
+
+        $data->each(function($item, $key) use ($examTblName, $col){
+            
+            $rank = $key + 1;
+
+            DB::update("UPDATE `$examTblName` SET `$col` = JSON_SET(`$col`, \"$.dev\", $item->dev, \"$.dev_rank\", $rank) WHERE student_id = {$item->student_id}");
+
+        });
+
+        return true;
         
     }
 

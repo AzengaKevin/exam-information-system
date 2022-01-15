@@ -38,11 +38,15 @@
                     </dl>
                     <dl class="col-md-6">
                         <dt>Start Date</dt>
-                        <dd>{{ $exam->start_date }}</dd>
+                        <dd>{{ optional($exam->start_date)->format('Y-m-d') }}</dd>
                     </dl>
                     <dl class="col-md-6">
                         <dt>End Date</dt>
-                        <dd>{{ $exam->end_date }}</dd>
+                        <dd>{{ optional($exam->end_date)->format('Y-m-d') }}</dd>
+                    </dl>
+                    <dl class="col-md-6">
+                        <dt>Deviation Exam</dt>
+                        <dd>{{ optional($exam->deviationExam)->name ?? 'Not Provided' }}</dd>
                     </dl>
 
                     @if (false)
