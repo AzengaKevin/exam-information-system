@@ -51,8 +51,10 @@ class ViewServiceProvider extends ServiceProvider
             'components.exams.analysis.level-subject-performance',
             'components.exams.analysis.level-unit-subject-performance',
             'components.exams.analysis.level-student-performance',
+            'components.exams.analysis.level-most-improved-students',
+            'components.exams.analysis.level-most-dropped-students',
             'components.exams.analysis.level-unit-student-performance',
-            'components.exams.analysis.level-unit-performance',
+            'components.exams.analysis.level-unit-performance'
         ], SettingsComposer::class);
     }
 }

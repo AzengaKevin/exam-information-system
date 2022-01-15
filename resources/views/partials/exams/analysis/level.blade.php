@@ -19,12 +19,18 @@
     <div class="col-md-6">
         <x-exams.analysis.level-subject-performance :exam="$exam" :level="$level" />
     </div>
-    <div class="col-md-6">
-        <x-exams.analysis.level-student-performance :exam="$exam" :level="$level" />
-    </div>
     @if ($systemSettings->school_has_streams)        
     <div class="col-md-6">
         <x-exams.analysis.level-unit-performance :exam="$exam" :level="$level" />
     </div>
     @endif
+    <div class="col-md-6">
+        <x-exams.analysis.level-student-performance :exam="$exam" :level="$level" />
+    </div>
+    <div class="col-md-6">
+        <x-exams.analysis.level-most-improved-students :exam="$exam" :level="$level" />
+    </div>
+    <div class="col-md-6">
+        <x-exams.analysis.level-most-dropped-students :exam="$exam" :level="$level" />
+    </div>
 </div>

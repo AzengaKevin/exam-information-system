@@ -171,11 +171,15 @@
                             @if ($systemSettings->school_level == 'secondary')
                             <th>MEAN POINTS</th>
                             <td>{{ $levelWithData->pivot->points }}</td>
+                            <th>DEV</th>
+                            <td>{{ $levelWithData->pivot->points_deviation}}</td>
                             <th>MEAN GRADE</th>
                             <td>{{ $levelWithData->pivot->grade }}</td>
                             @else
                             <th>AVERAGE</th>
                             <td>{{ $levelWithData->pivot->average }}</td>
+                            <th>DEV</th>
+                            <td>{{ $levelWithData->pivot->average_deviation }}</td>
                             @endif
                             <th>STUDENTS</th>
                             <td>{{ $studentsCount }}</td>
@@ -184,6 +188,11 @@
                 </table>
             </div>
         </div>
+        @if ($systemSettings->school_has_streams)
+        <div class="mt-3">
+            <x-exams.analysis.level-unit-performance :exam="$exam" :level="$level" />
+        </div>
+        @endif
         @if ($systemSettings->school_level == 'secondary')
         <div class="mt-3">
             <div class="table-responsive">
@@ -213,13 +222,11 @@
             <x-exams.analysis.level-subject-performance :exam="$exam" :level="$level" />
         </div>
         <div class="mt-3">
-            <x-exams.analysis.level-student-performance :exam="$exam" :level="$level" />
+            <x-exams.analysis.level-most-improved-students :exam="$exam" :level="$level" />
         </div>
-        @if ($systemSettings->school_has_streams)
         <div class="mt-3">
-            <x-exams.analysis.level-unit-performance :exam="$exam" :level="$level" />
+            <x-exams.analysis.level-most-dropped-students :exam="$exam" :level="$level" />
         </div>
-        @endif
     </div>
 </body>
 
