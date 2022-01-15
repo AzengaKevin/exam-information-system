@@ -112,7 +112,7 @@ class CompleteUpload
     
         $col = $subject->shortname;
 
-        $query = DB::table($examTblName, $tblName = 'cet')
+        $query = DB::table($examTblName,'cet')
             ->selectRaw("cet.student_id, (CAST(JSON_UNQUOTE(JSON_EXTRACT(cet.$col,\"$.score\")) AS SIGNED) - CAST(JSON_UNQUOTE(JSON_EXTRACT(`$devExamTblName`.$col,\"$.score\")) AS SIGNED)) AS dev")
             ->leftJoin($devExamTblName, 'cet.student_id', '=', "{$devExamTblName}.student_id");
 
@@ -127,7 +127,9 @@ class CompleteUpload
             
             $rank = $key + 1;
 
-            DB::update("UPDATE `$examTblName` SET `$col` = JSON_SET(`$col`, \"$.dev\", $item->dev, \"$.dev_rank\", $rank) WHERE student_id = {$item->student_id}");
+            $deviation = $item->dev;
+
+            DB::update("UPDATE `$examTblName` SET `$col` = JSON_SET(`$col`, \"$.dev\", $deviation, \"$.dev_rank\", $rank) WHERE student_id = {$item->student_id}");
 
         });
 
