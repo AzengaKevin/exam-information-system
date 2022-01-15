@@ -311,10 +311,16 @@ class LevelUnitActions
      * 
      * @param Exam $exam
      * @param LevelUnit $levelUnit
-     * 
      */
     public static function publishScores(Exam $exam, LevelUnit $levelUnit)
-    {        
+    {
+        /** @var Exam */
+        $deviationExam = $exam->deviationExam;
+
+        $levelUnitWithPreviousScores = $deviationExam->levelUnits()
+            ->where('level_units.id', $levelUnit->id)
+            ->first();
+
         try {
 
             $tblName = Str::slug($exam->shortname);
@@ -327,6 +333,9 @@ class LevelUnitActions
             $avgTotal = number_format($data->avg_total, 2);
             $avgPoints = number_format($data->avg_points, 4);
 
+            $previousAvgTotal = optional($levelUnitWithPreviousScores)->pivot->average;
+            $previousAvgPoints = optional($levelUnitWithPreviousScores)->pivot->points;
+
             $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
 
             $avgGrade = $pgm[intval(round($avgPoints))];
@@ -335,7 +344,9 @@ class LevelUnitActions
                 $levelUnit->id => [
                     "points" => $avgPoints,
                     "grade" => $avgGrade,
-                    "average" => $avgTotal
+                    "average" => $avgTotal,
+                    "points_deviation" => !is_null($previousAvgPoints) ? ($avgPoints - $previousAvgPoints) : 0,
+                    "average_deviation" => !is_null($previousAvgTotal) ? ($avgTotal - $previousAvgTotal) : 0
                 ]
             ]);
 
