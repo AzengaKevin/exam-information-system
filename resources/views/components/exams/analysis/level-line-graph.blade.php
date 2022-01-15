@@ -32,7 +32,13 @@
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Mean Points</h6>
                     <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->points ?? '-' }}</span>
-                    <span class="text-secondary fw-bold">0</span>
+                    @if ($levelWithData->pivot->points_deviation > 0)
+                    <span class="text-success fw-bold">0</span>
+                    @elseif($levelWithData->pivot->points_deviation < 0)
+                    <span class="text-danger fw-bold">0</span>
+                    @else
+                    <span class="text-warning fw-bold">0</span>
+                    @endif
                 </div>
             </div>
             <div class="col-md-2">
@@ -46,7 +52,13 @@
                 <div class="d-flex flex-column">
                     <h6 class="text-secondary">Average</h6>
                     <span class="text-success fw-bolder display-6">{{ $levelWithData->pivot->average ?? '-' }}</span>
-                    <span class="text-secondary fw-bold">0</span>
+                    @if ($levelWithData->pivot->average_deviation > 0)
+                    <span class="text-success fw-bold">{{ $levelWithData->pivot->average_deviation }}</span>
+                    @elseif($levelWithData->pivot->average_deviation < 0)
+                    <span class="text-danger fw-bold">{{ $levelWithData->pivot->average_deviation }}</span>
+                    @else
+                    <span class="text-warning fw-bold">{{ $levelWithData->pivot->average_deviation ?? 0 }}</span>
+                    @endif
                 </div>
             </div>
             @endif

@@ -190,7 +190,7 @@ class Exam extends Model
     public function students()
     {
         return $this->belongsToMany(Student::class)
-            ->withPivot(['mm','tm','mp','tp','mg','sp','op'])
+            ->withPivot(['mm','tm','mp','tp','mg','sp','op', 'mmd', 'tmd', 'mpd', 'tpd'])
             ->withTimestamps();
     }
 
