@@ -8,7 +8,6 @@ use App\Models\Grading;
 use App\Models\LevelUnit;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 
 class LevelUnitActions
 {
@@ -16,47 +15,120 @@ class LevelUnitActions
      * Generate exam aggregates for a level unit
      * 
      * @param Exam $exam
-     * @param LevelUNit $levelUnit
+     * @param LevelUnit $levelUnit
      * 
      */
     public static function generateAggregates(Exam $exam, LevelUnit $levelUnit)
     {
+        if ($exam->deviationExam) {
+
+            self::generateAggregatesWithDeviations($exam, $levelUnit);
+
+        }else{
+            try {
+                
+                $cols = $exam->subjects->pluck("shortname")->toArray();
+    
+                $tblName = Str::slug($exam->shortname);
+    
+                /** @var Collection */
+                $data = DB::table($tblName)
+                    ->where("level_unit_id", $levelUnit->id)
+                    ->select(array_merge(["student_id"], $cols))->get();
+    
+                $data->each(function($stuData) use($tblName, $cols){
+                    $totalScore = 0;
+                    $totalPoints = 0;
+                    $populatedCols = 0;
+    
+                    foreach ($cols as $col) {
+    
+                        if(!is_null($stuData->$col)){
+                            $populatedCols++;
+    
+                            $subData = json_decode($stuData->$col);
+    
+                            $totalScore += $subData->score ?? 0;
+                            $totalPoints += $subData->points ?? 0;
+                        }
+                    }
+    
+                    $avgPoints = round($totalPoints / $populatedCols);
+                    $avgScore = round($totalScore / $populatedCols);
+    
+                    $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+    
+                    $avgGrade = $pgm[$avgPoints];
+    
+                    DB::table($tblName)
+                    ->updateOrInsert([
+                        "student_id" => $stuData->student_id
+                    ], [
+                        "mm" => $avgScore,
+                        "mg" => $avgGrade,
+                        'mp' => $avgPoints,
+                        'tp' => $totalPoints,
+                        'tm' => $totalScore
+                    ]);
+                });
+    
+            } catch (\Exception $exception) {
+                throw $exception;
+            }        
+        }
+    }
+    /**
+     * Generate exam aggregates for a level unit
+     * 
+     * @param Exam $exam
+     * @param LevelUnit $levelUnit
+     */
+    public static function generateAggregatesWithDeviations(Exam $exam, LevelUnit $levelUnit)
+    {
         try {
+            $subjectCols = $exam->subjects->pluck("shortname")->toArray();
             
-            $cols = $exam->subjects->pluck("shortname")->toArray();
+            $examTblName = Str::slug($exam->shortname);
 
-            $tblName = Str::slug($exam->shortname);
-
+            $cols = array_map(fn($col) => "{$examTblName}.{$col}", $subjectCols);
+            
+            $devExamTblName = Str::slug($exam->deviationExam->shortname);
+    
             /** @var Collection */
-            $data = DB::table($tblName)
-                ->where("level_unit_id", $levelUnit->id)
-                ->select(array_merge(["student_id"], $cols))->get();
-
-            $data->each(function($stuData) use($tblName, $cols){
+            $data = DB::table($examTblName)
+                ->leftJoin($devExamTblName, "{$examTblName}.student_id", "=", "{$devExamTblName}.student_id")
+                ->where("$examTblName.level_unit_id", $levelUnit->id)
+                ->select(array_merge(["$examTblName.student_id"], $cols, ["$devExamTblName.mm AS prev_mm", "$devExamTblName.tm AS prev_tm", "$devExamTblName.tp AS prev_tp", "$devExamTblName.mp AS prev_mp"]))->get();
+    
+            $data->each(function($stuData) use($examTblName, $subjectCols){
+                $prevTm = $stuData->prev_tm;
+                $prevTp = $stuData->prev_tp;
+                $prevMp = $stuData->prev_mp;
+                $prevMm = $stuData->prev_mm;
                 $totalScore = 0;
                 $totalPoints = 0;
                 $populatedCols = 0;
-
-                foreach ($cols as $col) {
-
+    
+                foreach ($subjectCols as $col) {
+    
                     if(!is_null($stuData->$col)){
                         $populatedCols++;
-
+    
                         $subData = json_decode($stuData->$col);
-
+    
                         $totalScore += $subData->score ?? 0;
                         $totalPoints += $subData->points ?? 0;
                     }
                 }
-
+    
                 $avgPoints = round($totalPoints / $populatedCols);
                 $avgScore = round($totalScore / $populatedCols);
-
+    
                 $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
-
+    
                 $avgGrade = $pgm[$avgPoints];
-
-                DB::table($tblName)
+    
+                DB::table($examTblName)
                 ->updateOrInsert([
                     "student_id" => $stuData->student_id
                 ], [
@@ -64,13 +136,20 @@ class LevelUnitActions
                     "mg" => $avgGrade,
                     'mp' => $avgPoints,
                     'tp' => $totalPoints,
-                    'tm' => $totalScore
+                    'tm' => $totalScore,
+                    'mmd' => ($avgScore - $prevMm),
+                    'tmd' => ($totalScore - $prevTm),
+                    'tpd' => ($totalPoints - $prevTp),
+                    'mpd' => ($avgPoints - $prevMp)
                 ]);
             });
 
         } catch (\Exception $exception) {
+            
             throw $exception;
-        }        
+            
+        }
+        
     }
 
     /**

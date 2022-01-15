@@ -30,15 +30,15 @@ class ExamQuickActions extends Component
     }
 
     /**
-     * Drop the curent exam scores table and recreate the table to accomodate any column changes
+     * Add the columns that does not exist in the current exam scores table
      */
     public function updateScoresTable()
     {
         try {
 
-            CreateScoresTable::invoke($this->exam, true);
+            CreateScoresTable::updateScoresTable($this->exam);
             
-            session()->flash('status', "{$this->exam->name} scores table has been refreshed");
+            session()->flash('status', "{$this->exam->name} scores table has been updated");
 
             $this->emit('hide-update-scores-table-modal');
 

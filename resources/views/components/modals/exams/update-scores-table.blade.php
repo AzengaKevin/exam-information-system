@@ -9,9 +9,9 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>The operation will delete the table for the current exam, <strong>{{ $name }}</strong> and recreate a
-                    new scores table of the exam, as a result you will loose any data that was previously recorded in the
-                    table, be cautious</p>
+                <p>The operation will add missing columns to the scores table for the current exam,
+                    <strong>{{ $name }}</strong>, it will by no means delete any of you previous data, henceit is safe
+                    to run.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
