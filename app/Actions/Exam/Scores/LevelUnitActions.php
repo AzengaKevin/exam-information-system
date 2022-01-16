@@ -78,7 +78,7 @@ class LevelUnitActions
         }
     }
     /**
-     * Generate exam aggregates for a level unit
+     * Generate exam aggregates for a level unit (With deviations)
      * 
      * @param Exam $exam
      * @param LevelUnit $levelUnit
@@ -322,7 +322,7 @@ class LevelUnitActions
     }
 
     /**
-     * Publish LevelUnit Exam Scores
+     * Publish LevelUnit Exam Scores (With deviations included)
      * 
      * @param Exam $exam
      * @param LevelUnit $levelUnit
@@ -374,6 +374,8 @@ class LevelUnitActions
     }
 
     /**
+     * Publish student results at level unit group (Deviations included)
+     * 
      * @param Exam $exam
      * @param LevelUnit $level
      */

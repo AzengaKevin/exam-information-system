@@ -4,15 +4,12 @@ namespace App\Http\Livewire;
 
 use App\Actions\Exam\Scores\LevelActions;
 use App\Models\Exam;
-use App\Models\Grade;
 use App\Models\Level;
-use App\Models\Grading;
 use App\Settings\SystemSettings;
 use Illuminate\Pagination\Paginator;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Schema;
@@ -185,9 +182,7 @@ class LevelExamScores extends Component
             LevelActions::publishGradeDistribution($this->exam, $this->level);
             LevelActions::publishScores($this->exam, $this->level);
             LevelActions::publishSubjectPerformance($this->exam, $this->level);
-            LevelActions::publishStudentResults($this->exam, $this->level);
-            
-            LevelActions::publishScores($this->exam, $this->level);
+            if(!$systemSettings->school_has_streams) LevelActions::publishStudentResults($this->exam, $this->level);
 
             session()->flash('status', "Level scores have successfully published");
 
