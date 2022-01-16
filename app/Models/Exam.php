@@ -170,7 +170,7 @@ class Exam extends Model
     {
         return $this->belongsToMany(Subject::class, 'exam_level_subject_performance', 'exam_id', 'subject_id')
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average', 'level_id']);
+            ->withPivot(['points', 'points_deviation', 'grade', 'average', 'average_deviation', 'level_id']);
     }
 
     /**
@@ -181,7 +181,6 @@ class Exam extends Model
         return $this->belongsToMany(Subject::class, 'exam_level_unit_subject_performance')
             ->withTimestamps()
             ->withPivot(['points', 'grade', 'average', 'level_unit_id']);
-        
     }
 
     /**
