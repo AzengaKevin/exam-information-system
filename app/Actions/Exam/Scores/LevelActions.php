@@ -333,8 +333,8 @@ class LevelActions
                     $avgTotal = number_format($data->avg_score, 2);
                     $avgPoints = number_format($data->avg_points, 4);
 
-                    $prevAvgTotal = optional($subjectsWithPrevPerformance->where('id', $subject->id)->first())->pivot->average;
-                    $prevAvgPoints = optional($subjectsWithPrevPerformance->where('id', $subject->id)->first())->pivot->points;
+                    $prevAvgTotal = optional(optional($subjectsWithPrevPerformance->where('id', $subject->id)->first())->pivot)->average;
+                    $prevAvgPoints = optional(optional($subjectsWithPrevPerformance->where('id', $subject->id)->first())->pivot)->points;
     
                     $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
     
@@ -347,8 +347,8 @@ class LevelActions
                             'subject_id' => $subject->id
                         ], [
                             'average' => $avgTotal,
-                            'average_deviation' => !empty($prevAvgTotal) ? ($avgTotal - $prevAvgTotal) : null,
                             'points' => $avgPoints,
+                            'average_deviation' => !empty($prevAvgTotal) ? ($avgTotal - $prevAvgTotal) : null,
                             'points_deviation' => !empty($prevAvgPoints) ? ($avgPoints - $prevAvgPoints) : null,
                             'grade' => $avgGrade
                         ]);
