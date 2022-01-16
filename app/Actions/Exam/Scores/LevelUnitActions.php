@@ -332,6 +332,8 @@ class LevelUnitActions
         /** @var Exam */
         $deviationExam = $exam->deviationExam;
 
+        $levelUnitWithPreviousScores = null;
+
         if($deviationExam){
             $levelUnitWithPreviousScores = $deviationExam->levelUnits()
                 ->where('level_units.id', $levelUnit->id)
