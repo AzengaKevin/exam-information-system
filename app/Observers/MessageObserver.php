@@ -21,7 +21,7 @@ class MessageObserver
         /** @var User */
         $recipient = $message->recipient;
 
-        Log::debug($message->content);
+        // Log::debug($message->content);
 
         // Send the new notification immediately
         $recipient->notifyNow(new NewMessageNotification($message));

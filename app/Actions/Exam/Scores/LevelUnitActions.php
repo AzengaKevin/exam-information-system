@@ -78,7 +78,7 @@ class LevelUnitActions
         }
     }
     /**
-     * Generate exam aggregates for a level unit
+     * Generate exam aggregates for a level unit (With deviations)
      * 
      * @param Exam $exam
      * @param LevelUnit $levelUnit
@@ -253,6 +253,17 @@ class LevelUnitActions
 
             $tblName = Str::slug($exam->shortname);
 
+            $subjectsWithPreviousScores = collect([]);
+
+            /** @var Exam */
+            $deviationExam = $exam->deviationExam;
+
+            if ($deviationExam) {
+                $subjectsWithPreviousScores = $deviationExam->levelUnitSubjectPerformance()
+                    ->wherePivot('level_unit_id', $levelUnit->id)
+                    ->get();
+            }
+
             DB::beginTransaction();
 
             $atLeastASubjectPublished = false;
@@ -273,6 +284,8 @@ class LevelUnitActions
                     
                     $avgTotal = number_format($data->avg_score, 2);
                     $avgPoints = number_format($data->avg_points, 4);
+                    $prevAvgTotal = optional(optional($subjectsWithPreviousScores->where('id', $subject->id)->first())->pivot)->average;
+                    $prevAvgPoints = optional(optional($subjectsWithPreviousScores->where('id', $subject->id)->first())->pivot)->points;
     
                     $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
     
@@ -286,7 +299,9 @@ class LevelUnitActions
                         ], [
                             'average' => $avgTotal,
                             'points' => $avgPoints,
-                            'grade' => $avgGrade
+                            'grade' => $avgGrade,
+                            'average_deviation' => !empty($prevAvgTotal) ? ($avgTotal - $prevAvgTotal) : null,
+                            'points_deviation' => !empty($prevAvgPoints) ? ($avgPoints - $prevAvgPoints) : null,
                         ]);
                 }
 
@@ -307,7 +322,7 @@ class LevelUnitActions
     }
 
     /**
-     * Publish LevelUnit Exam Scores
+     * Publish LevelUnit Exam Scores (With deviations included)
      * 
      * @param Exam $exam
      * @param LevelUnit $levelUnit
@@ -359,6 +374,8 @@ class LevelUnitActions
     }
 
     /**
+     * Publish student results at level unit group (Deviations included)
+     * 
      * @param Exam $exam
      * @param LevelUnit $level
      */

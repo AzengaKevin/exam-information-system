@@ -262,9 +262,7 @@ class LevelUnitExamScores extends Component
 
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
             $this->reset(['student_id', 'name']);
 
@@ -292,6 +290,8 @@ class LevelUnitExamScores extends Component
             LevelUnitActions::publishSubjectPerformance($this->exam, $this->levelUnit);
 
             LevelUnitActions::publishScores($this->exam, $this->levelUnit);
+
+            LevelUnitActions::publishStudentResults($this->exam, $this->levelUnit);
 
             session()->flash('status', 'Your class scores have been successfully published, you can republish the scores incase of any changes');
 

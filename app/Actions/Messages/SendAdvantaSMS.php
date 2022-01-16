@@ -26,7 +26,7 @@ class SendAdvantaSMS
                     "mobile" => $payload['phone']
                 ]);
 
-            Log::debug($response->json());
+            //Log::debug($response->json());
 
             return $response->ok();
             

@@ -82,13 +82,15 @@ class LevelActions
     }
 
     /**
-     * Generate students aggregates with deviations
+     * Generate students aggregates (with deviations)
+     * 
      * @param Exam $exam
      * @param Level $level
      */
     public static function generateAggregatesWithDeviations(Exam $exam, Level $level)
     {
         try {
+
             $subjectCols = $exam->subjects->pluck("shortname")->toArray();
     
             $examTblName = Str::slug($exam->shortname);
@@ -188,6 +190,8 @@ class LevelActions
     }
     
     /**
+     * Compute level grade distribution and save it to the database
+     * 
      * @param Exam $exam
      * @param Level $level
      */
@@ -234,6 +238,8 @@ class LevelActions
     }
     
     /**
+     * Publish level scores for the specified exam (Deviations included)
+     * 
      * @param Exam $exam
      * @param Level $level
      */
@@ -289,6 +295,8 @@ class LevelActions
     }
     
     /**
+     * Publish level subject performance, (deviations included)
+     * 
      * @param Exam $exam
      * @param Level $level
      * 
@@ -300,6 +308,17 @@ class LevelActions
         try {
 
             $tblName = Str::slug($exam->shortname);
+
+            $subjectsWithPrevPerformance = collect([]);
+
+            /** @var Exam */
+            $deviationExam  = $exam->deviationExam;
+
+            if ($deviationExam) {
+                $subjectsWithPrevPerformance = $deviationExam->levelSubjectPerformance()
+                    ->wherePivot('level_id', $level->id)
+                    ->get();
+            }
 
             DB::beginTransaction();
 
@@ -321,6 +340,9 @@ class LevelActions
                     
                     $avgTotal = number_format($data->avg_score, 2);
                     $avgPoints = number_format($data->avg_points, 4);
+
+                    $prevAvgTotal = optional(optional($subjectsWithPrevPerformance->where('id', $subject->id)->first())->pivot)->average;
+                    $prevAvgPoints = optional(optional($subjectsWithPrevPerformance->where('id', $subject->id)->first())->pivot)->points;
     
                     $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
     
@@ -334,6 +356,8 @@ class LevelActions
                         ], [
                             'average' => $avgTotal,
                             'points' => $avgPoints,
+                            'average_deviation' => !empty($prevAvgTotal) ? ($avgTotal - $prevAvgTotal) : null,
+                            'points_deviation' => !empty($prevAvgPoints) ? ($avgPoints - $prevAvgPoints) : null,
                             'grade' => $avgGrade
                         ]);
                 }
@@ -355,6 +379,8 @@ class LevelActions
     }
     
     /**
+     * Publish students results at the level group (More appropriate if the school has no streams)
+     * 
      * @param Exam $exam
      * @param Level $level
      */
@@ -365,7 +391,7 @@ class LevelActions
             
             $tblName = Str::slug($exam->shortname);
 
-            $aggregateColums = ["mm", "tm", "op", "mg", "mp", "tp", "sp"];
+            $aggregateColums = ["mm", "tm", "op", "mg", "mp", "tp", "sp", "mmd", "tmd", "tpd", "mpd"];
 
             /** @var Collection */
             $data = DB::table($tblName)->select(array_merge(["students.id"], $aggregateColums))
@@ -388,7 +414,11 @@ class LevelActions
                             'tp' => $item->tp,
                             'mg' => $item->mg,
                             'sp' => $item->sp ?? null,
-                            'op' => $item->op
+                            'op' => $item->op,
+                            'mmd' => $item->mmd,
+                            'tmd' => $item->tmd,
+                            'tpd' => $item->tpd,
+                            'mpd' => $item->mpd
                         ]);
     
                 });
