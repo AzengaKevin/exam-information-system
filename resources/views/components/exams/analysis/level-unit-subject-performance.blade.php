@@ -12,9 +12,11 @@
 
                         @if ($systemSettings->school_level === 'secondary')
                         <th>Points</th>
+                        <th>Deviation</th>
                         <th>Grade</th>
                         @else
                         <th>Average</th>
+                        <th>Deviation</th>
                         @endif
                     </tr>
                 </thead>
@@ -26,9 +28,11 @@
                         <td>{{ $subject->name }}</td>
                         @if ($systemSettings->school_level === 'secondary')        
                         <td>{{ $subject->pivot->points }}</td>
+                        <td>{{ $subject->pivot->points_deviation ?? '-' }}</td>
                         <td>{{ $subject->pivot->grade }}</td>
                         @else
                         <td>{{ $subject->pivot->average }}</td>
+                        <td>{{ $subject->pivot->average_deviation ?? '-' }}</td>
                         @endif
                     </tr>
                     @endforeach

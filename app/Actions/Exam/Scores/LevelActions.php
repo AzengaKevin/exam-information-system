@@ -252,6 +252,8 @@ class LevelActions
         /** @var Exam */
         $deviationExam = $exam->deviationExam;
 
+        $levelWithPreviousScores = null;
+
         if ($deviationExam) {            
             $levelWithPreviousScores = $deviationExam->levels()
                 ->where('levels.id', $level->id)
