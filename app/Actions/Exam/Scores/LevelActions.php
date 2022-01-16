@@ -274,8 +274,8 @@ class LevelActions
                 $avgTotal = number_format($data->avg_total, 2);
                 $avgPoints = number_format($data->avg_points, 4);
 
-                $previousAvgTotal = optional($levelWithPreviousScores)->pivot->average;
-                $previousAvgPoints = optional($levelWithPreviousScores)->pivot->points;
+                $previousAvgTotal = optional(optional($levelWithPreviousScores)->pivot)->average;
+                $previousAvgPoints = optional(optional($levelWithPreviousScores)->pivot)->points;
     
                 $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
     
