@@ -13,6 +13,7 @@ class LevelActions
 {
     /**
      * Generate students aggregates
+     * 
      * @param Exam $exam
      * @param Level $level
      */
@@ -158,6 +159,8 @@ class LevelActions
     }
 
     /**
+     * Renerate ranks for the whole class
+     * 
      * @param Exam $exam
      * @param Level $level
      */
@@ -249,9 +252,11 @@ class LevelActions
         /** @var Exam */
         $deviationExam = $exam->deviationExam;
 
-        $levelWithPreviousScores = $deviationExam->levels()
-            ->where('levels.id', $level->id)
-            ->first();
+        if ($deviationExam) {            
+            $levelWithPreviousScores = $deviationExam->levels()
+                ->where('levels.id', $level->id)
+                ->first();
+        }
 
         try {
 
