@@ -5,6 +5,7 @@
             <i class="fa fa-upload"></i>
             <span>Publish Scores</span>
         </a>
+        @if (false)     
         @if (!$systemSettings->school_has_streams)
         <a href="#" data-bs-toggle="modal" data-bs-target="#generate-aggregates-modal" role="button"
             class="btn btn-primary d-inline-flex align-items-center gap-2 text-decoration-line-through">
@@ -33,6 +34,7 @@
             <i class="fa fa-upload"></i>
             <span>Publish Student Results</span>
         </a>
+        @endif
         @endif
     </div>
     <livewire:level-exam-scores :exam="$exam" :level="$level" />
