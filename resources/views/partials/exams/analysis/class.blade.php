@@ -13,4 +13,7 @@
     <div class="col-md-6">
         <x-exams.analysis.level-unit-most-improved-students :exam="$exam" :levelUnit="$levelUnit" />
     </div>
+    <div class="col-md-6">
+        <x-exams.analysis.level-unit-most-dropped-students :exam="$exam" :levelUnit="$levelUnit" />
+    </div>
 </div>
