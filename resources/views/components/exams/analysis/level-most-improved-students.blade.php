@@ -32,7 +32,7 @@
                         <td>{{ $student->pivot->tpd ?? 0 }}</td>
                         @else
                         <td>{{ $student->pivot->tm }}</td>
-                        <td>{{ $student->pivot->tpd ?? 0 }}</td>
+                        <td>{{ $student->pivot->tmd ?? 0 }}</td>
                         @endif
                     </tr>
                     @endforeach
