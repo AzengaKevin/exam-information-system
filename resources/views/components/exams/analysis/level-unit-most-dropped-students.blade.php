@@ -4,7 +4,7 @@
             <table class="table table-sm table-hover">
                 <thead>
                     <tr>
-                        <th colspan="5">{{ $level->name }} Most Dropped Students</th>
+                        <th colspan="5">{{ $levelUnit->alias }} Most Dropped Students</th>
                     </tr>
                     <tr>
                         <th>#</th>

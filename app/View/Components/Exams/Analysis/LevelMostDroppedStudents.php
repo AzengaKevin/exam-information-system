@@ -11,6 +11,7 @@ class LevelMostDroppedStudents extends Component
 {
     public Exam $exam;
     public Level $level;
+    
     /**
      * Create a new component instance.
      * 

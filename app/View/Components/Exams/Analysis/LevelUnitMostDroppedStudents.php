@@ -3,26 +3,27 @@
 namespace App\View\Components\Exams\Analysis;
 
 use App\Models\Exam;
-use App\Models\Level;
+use App\Models\LevelUnit;
 use Illuminate\View\Component;
 use App\Settings\SystemSettings;
 
-class LevelMostImprovedStudents extends Component
+class LevelUnitMostDroppedStudents extends Component
 {
     public Exam $exam;
-    public Level $level;
+    public LevelUnit $levelUnit;
+
     /**
      * Create a new component instance.
      * 
      * @param Exam $exam
-     * @param Level $level
+     * @param Level $exam
      *
      * @return void
      */
-    public function __construct(Exam $exam, Level $level)
+    public function __construct(Exam $exam, LevelUnit $levelUnit)
     {
         $this->exam = $exam;
-        $this->level = $level;
+        $this->levelUnit = $levelUnit;
     }
 
     /**
@@ -32,8 +33,9 @@ class LevelMostImprovedStudents extends Component
      */
     public function render()
     {
-        return view('components.exams.analysis.level-most-improved-students');
+        return view('components.exams.analysis.level-unit-most-dropped-students');
     }
+
 
     /** 
      * Get the most improved students
@@ -51,9 +53,9 @@ class LevelMostImprovedStudents extends Component
             : 'mmd';
 
         return $this->exam->students()
-            ->orderByPivot($orderByCol, 'desc')
-            ->wherePivot($orderByCol, '>', 0)
-            ->where('students.level_id', $this->level->id)
+            ->orderByPivot($orderByCol, 'asc')
+            ->wherePivot($orderByCol, '<', 0)
+            ->where('students.level_Unit_id', $this->levelUnit->id)
             ->limit(5)
             ->get();
     }

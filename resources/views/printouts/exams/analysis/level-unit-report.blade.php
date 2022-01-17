@@ -162,24 +162,24 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            <th colspan="{{ ($systemSettings->school_level == 'secondary') ? 6 : 4}}">{{ $level->name }}
-                                Exam Analysis</th>
+                            <th colspan="{{ ($systemSettings->school_level == 'secondary') ? 6 : 4}}">{{ $levelUnit->alias }}
+                                Exam Analysis Report</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
                             @if ($systemSettings->school_level == 'secondary')
                             <th>MEAN POINTS</th>
-                            <td>{{ $levelWithData->pivot->points }}</td>
+                            <td>{{ $levelUnitWithData->pivot->points }}</td>
                             <th>DEV</th>
-                            <td>{{ $levelWithData->pivot->points_deviation}}</td>
+                            <td>{{ $levelUnitWithData->pivot->points_deviation}}</td>
                             <th>MEAN GRADE</th>
-                            <td>{{ $levelWithData->pivot->grade }}</td>
+                            <td>{{ $levelUnitWithData->pivot->grade }}</td>
                             @else
                             <th>AVERAGE</th>
-                            <td>{{ $levelWithData->pivot->average }}</td>
+                            <td>{{ $levelUnitWithData->pivot->average }}</td>
                             <th>DEV</th>
-                            <td>{{ $levelWithData->pivot->average_deviation }}</td>
+                            <td>{{ $levelUnitWithData->pivot->average_deviation }}</td>
                             @endif
                             <th>STUDENTS</th>
                             <td>{{ $studentsCount }}</td>
@@ -188,11 +188,7 @@
                 </table>
             </div>
         </div>
-        @if ($systemSettings->school_has_streams)
-        <div class="mt-3">
-            <x-exams.analysis.level-unit-performance :exam="$exam" :level="$level" />
-        </div>
-        @endif
+
         @if ($systemSettings->school_level == 'secondary')
         <div class="mt-3">
             <div class="table-responsive">
@@ -219,13 +215,16 @@
         </div>
         @endif
         <div class="mt-3">
-            <x-exams.analysis.level-subject-performance :exam="$exam" :level="$level" />
+            <x-exams.analysis.level-unit-subject-performance :exam="$exam" :levelUnit="$levelUnit" />
         </div>
         <div class="mt-3">
-            <x-exams.analysis.level-most-improved-students :exam="$exam" :level="$level" />
+            <x-exams.analysis.level-student-performance :exam="$exam" :levelUnit="$levelUnit" />
         </div>
         <div class="mt-3">
-            <x-exams.analysis.level-most-dropped-students :exam="$exam" :level="$level" />
+            <x-exams.analysis.level-unit-most-improved-students :exam="$exam" :levelUnit="$levelUnit" />
+        </div>
+        <div class="mt-3">
+            <x-exams.analysis.level-unit-most-dropped-students :exam="$exam" :levelUnit="$levelUnit" />
         </div>
     </div>
 </body>

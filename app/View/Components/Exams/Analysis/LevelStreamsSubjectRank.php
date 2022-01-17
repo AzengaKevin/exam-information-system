@@ -4,25 +4,26 @@ namespace App\View\Components\Exams\Analysis;
 
 use App\Models\Exam;
 use App\Models\Level;
+use App\Models\Subject;
 use Illuminate\View\Component;
 use App\Settings\SystemSettings;
 
-class LevelMostImprovedStudents extends Component
+class LevelStreamsSubjectRank extends Component
 {
     public Exam $exam;
     public Level $level;
+    public Subject $subject;
+
     /**
      * Create a new component instance.
-     * 
-     * @param Exam $exam
-     * @param Level $level
      *
      * @return void
      */
-    public function __construct(Exam $exam, Level $level)
+    public function __construct(Exam $exam,Level $level, Subject $subject)
     {
         $this->exam = $exam;
         $this->level = $level;
+        $this->subject = $subject;
     }
 
     /**
@@ -32,30 +33,27 @@ class LevelMostImprovedStudents extends Component
      */
     public function render()
     {
-        return view('components.exams.analysis.level-most-improved-students');
+        return view('components.exams.analysis.level-streams-subject-rank');
     }
 
-    /** 
-     * Get the most improved students
+    /**
+     * Get same subjects for level units but different streams ande average ofcourse
      * 
      * @return Collection
-     * 
      */
-    public function students()
+    public function subjects()
     {
         /** @var SystemSettings */
         $systemSettings = app(SystemSettings::class);
 
         $orderByCol = ($systemSettings->school_level === 'secondary')
-            ? 'mpd'
-            : 'mmd';
+            ? 'points'
+            : 'average';
 
-        return $this->exam->students()
+        return $this->exam->levelUnitSubjectPerformance()
+            ->wherePivotIn('level_unit_id', $this->level->levelUnits->pluck('id')->all())
             ->orderByPivot($orderByCol, 'desc')
-            ->wherePivot($orderByCol, '>', 0)
-            ->where('students.level_id', $this->level->id)
-            ->limit(5)
+            ->where('subject_id', $this->subject->id)
             ->get();
     }
-
 }

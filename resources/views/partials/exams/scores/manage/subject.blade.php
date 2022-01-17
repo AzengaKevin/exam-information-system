@@ -8,13 +8,13 @@
         <button href="#" data-bs-toggle="modal" data-bs-target="#generate-totals"
             class="btn btn-primary text-decoration-line-through">Generate Total</button>
         @endif
-        @endif
         @if ($exam->deviationExam)            
         <button href="#" data-bs-toggle="modal" data-bs-target="#calculate-deviations"
             class="btn btn-primary d-inline-flex gap-2 align-items-center text-decoration-line-through">
             <i class="fa fa-calculator"></i>
             <span>Deviations</span>
         </button>
+        @endif
         @endif
     </div>
 

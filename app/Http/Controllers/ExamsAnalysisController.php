@@ -70,36 +70,17 @@ class ExamsAnalysisController extends Controller
             /** @var Level */
             $level = Level::find(intval($request->get('level')));
 
-            // Compute the proper title
-            $title = "{$exam->name} Analysis";
+            /** @var LevelUnit */
+            $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
 
-            if($level) $title = "{$exam->name} - {$level->name} - Analysis";
+            if($level){
+                return $this->downloadForLevel($exam, $level, $systemSettings, $generalSettings);
+            }elseif($levelUnit){
+                return $this->downloadForLevelUnit($exam, $levelUnit, $systemSettings, $generalSettings);
+            }else{
+                abort(404);
+            }
 
-            $levelWithData = $exam->levels()->where('exam_level.level_id', $level->id)->first();
-
-            $studentsCount = $exam->students()->where('students.level_id', $level->id)->count();
-
-            $gradeDist = DB::table('exam_level_grade_distribution')
-                ->where([['level_id', $level->id],['exam_id', $exam->id]])
-                ->select(['grade', 'grade_count'])
-                ->get(['grade', 'grade_count'])
-                ->pluck('grade_count', 'grade')
-                ->toArray();
-
-            $pdf = \PDF::loadView('printouts.exams.analysis.report', [
-                'exam' => $exam,
-                'level' => $level,
-                'levelWithData' => $levelWithData,
-                'studentsCount' => $studentsCount,
-                'gradeDist' => $gradeDist,
-                'title' => $title,
-                'systemSettings' => $systemSettings,
-                'generalSettings' => $generalSettings
-            ]);
-                
-            $filename = Str::slug("{$exam->shortname}-{$level->name}-analysis");
-
-            return $pdf->download("{$filename}.pdf");
             
         } catch (\Exception $exception) {
             
@@ -113,4 +94,101 @@ class ExamsAnalysisController extends Controller
         }
         
     }
+
+    /**
+     * Dowload analysis report for a single level
+     * 
+     * @param Exam $exam
+     * @param Level $level
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
+     * 
+     */
+    public function downloadForLevel(Exam $exam, Level $level, SystemSettings $systemSettings, GeneralSettings $generalSettings)
+    {
+        try {
+
+            $title = "{$exam->name} - {$level->name} - Analysis";
+
+            $levelWithData = $exam->levels()->where('exam_level.level_id', $level->id)->first();
+
+            $studentsCount = $exam->students()->where('students.level_id', $level->id)->count();
+
+            $gradeDist = DB::table('exam_level_grade_distribution')
+                ->where([['level_id', $level->id],['exam_id', $exam->id]])
+                ->select(['grade', 'grade_count'])
+                ->get(['grade', 'grade_count'])
+                ->pluck('grade_count', 'grade')
+                ->toArray();
+
+            $pdf = \PDF::loadView('printouts.exams.analysis.level-report', [
+                'exam' => $exam,
+                'level' => $level,
+                'levelWithData' => $levelWithData,
+                'studentsCount' => $studentsCount,
+                'gradeDist' => $gradeDist,
+                'title' => $title,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
+            ]);
+                
+            $filename = Str::slug("{$exam->shortname}-{$level->name}-analysis-report");
+
+            return $pdf->download("{$filename}.pdf");
+            
+        } catch (\Exception $exception) {
+
+            throw $exception;
+
+        }        
+    }
+
+
+    /**
+     * Dowload analysis report for a single level
+     * 
+     * @param Exam $exam
+     * @param LevelUnit $levelUnit
+     * @param SystemSettings $systemSettings
+     * @param GeneralSettings $generalSettings
+     * 
+     */
+    public function downloadForLevelUnit(Exam $exam, LevelUnit $levelUnit, SystemSettings $systemSettings, GeneralSettings $generalSettings)
+    {   
+        try {
+
+            $title = "{$exam->name} - {$levelUnit->alias} - Analysis";
+
+            $levelUnitWithData = $exam->levelUnits()->where('exam_level_unit.level_unit_id', $levelUnit->id)->first();
+
+            $studentsCount = $exam->students()->where('students.level_unit_id', $levelUnit->id)->count();
+
+            $gradeDist = DB::table('exam_level_unit_grade_distribution')
+                ->where([['level_unit_id', $levelUnit->id],['exam_id', $exam->id]])
+                ->select(['grade', 'grade_count'])
+                ->get(['grade', 'grade_count'])
+                ->pluck('grade_count', 'grade')
+                ->toArray();
+
+            $pdf = \PDF::loadView('printouts.exams.analysis.level-unit-report', [
+                'exam' => $exam,
+                'levelUnit' => $levelUnit,
+                'levelUnitWithData' => $levelUnitWithData,
+                'studentsCount' => $studentsCount,
+                'gradeDist' => $gradeDist,
+                'title' => $title,
+                'systemSettings' => $systemSettings,
+                'generalSettings' => $generalSettings
+            ]);
+                
+            $filename = Str::slug("{$exam->shortname}-{$levelUnit->alias}-analysis-report");
+
+            return $pdf->download("{$filename}.pdf");
+            
+        } catch (\Exception $exception) {
+
+            throw $exception;
+            
+        }        
+    }    
 }
