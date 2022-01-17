@@ -10,4 +10,7 @@
         <x-exams.analysis.level-unit-grade-distribution :exam="$exam" :levelUnit="$levelUnit" />
     </div>
     @endif
+    <div class="col-md-6">
+        <x-exams.analysis.level-unit-most-improved-students :exam="$exam" :levelUnit="$levelUnit" />
+    </div>
 </div>
