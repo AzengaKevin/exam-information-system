@@ -56,7 +56,8 @@ class ViewServiceProvider extends ServiceProvider
             'components.exams.analysis.level-most-dropped-students',
             'components.exams.analysis.level-unit-most-dropped-students',
             'components.exams.analysis.level-unit-student-performance',
-            'components.exams.analysis.level-unit-performance'
+            'components.exams.analysis.level-unit-performance',
+            'components.exams.analysis.level-streams-subject-rank'
         ], SettingsComposer::class);
     }
 }

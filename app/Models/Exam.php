@@ -179,6 +179,7 @@ class Exam extends Model
     public function levelUnitSubjectPerformance()
     {
         return $this->belongsToMany(Subject::class, 'exam_level_unit_subject_performance')
+            ->using(StreamSubjectPerformance::class)
             ->withTimestamps()
             ->withPivot(['points', 'grade', 'average', 'level_unit_id', 'points_deviation', 'average_deviation']);
     }
