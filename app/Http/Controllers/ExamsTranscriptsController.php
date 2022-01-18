@@ -33,7 +33,7 @@ class ExamsTranscriptsController extends Controller
 
         $levelsIds = $exam->levels->pluck('id')->toArray();
 
-        $levelUnits = LevelUnit::whereIn('level_id', $levelsIds)->get();
+        $levelUnits = $exam->getAllLevelUnits();
 
         return view('exams.transcripts.index', compact('levelUnits', 'exam'));
     }
@@ -69,7 +69,7 @@ class ExamsTranscriptsController extends Controller
 
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
 
-            $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
+            $aggregateColumns = array("mm", "mmd", "tm", "tmd", "mg", "mp", "mpd",  "tp", "tpd", "sp", "op");
 
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
@@ -78,7 +78,6 @@ class ExamsTranscriptsController extends Controller
             $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
             
             $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
-
 
             $teachersQuery = DB::table('responsibility_teacher')
                 ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
@@ -190,131 +189,6 @@ class ExamsTranscriptsController extends Controller
     }
 
     /**
-     * Show a page with a asingle student transcript
-     * 
-     * @param Request $request
-     * 
-     * @param Exam $exam
-     */
-    public function studentShow(Request $request, Exam $exam)
-    {
-        $admno = $request->get('admno');
-
-        /** @var LevelUnit */
-        $levelUnit = LevelUnit::find(intval($request->get('level-unit')));
-
-        /** @var Level */
-        $level = Level::find(intval($request->get('level')));
-
-        $outOfs = array();
-
-        if($admno){
-
-            // Get the student results
-            $examScoresTblName = Str::slug($exam->shortname);
-
-            $subjectColums = $exam->subjects->pluck("shortname")->toArray();
-
-            $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
-
-            $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
-
-            $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
-
-            $englishComments = Grade::all(['grade', 'english_comment'])->pluck('english_comment', 'grade')->toArray();
-
-            $ctComments = Grade::all(['grade', 'ct_comment'])->pluck('ct_comment', 'grade')->toArray();
-            
-            $pComments = Grade::all(['grade', 'p_comment'])->pluck('p_comment', 'grade')->toArray();
-
-            // Get subject teachers
-            $student = Student::where('adm_no', $admno)->first();
-
-            if ($student) {
-
-                $teachers = DB::table('responsibility_teacher')
-                    ->join('subjects', 'responsibility_teacher.subject_id', '=', 'subjects.id')
-                    ->join('teachers', 'responsibility_teacher.teacher_id', '=', 'teachers.id')
-                    ->join('users', function($join){
-                        $join->on('teachers.id', '=', 'users.authenticatable_id')
-                             ->where('users.authenticatable_type', 'teacher');
-                    })->select('users.name', 'subjects.shortname')
-                        ->where('responsibility_teacher.level_unit_id', $student->level_unit_id)
-                        ->get()->pluck('name', 'shortname')->toArray();
-
-                $outOfs["lsc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
-                    ->where('level_id', $student->level_id)
-                    ->count();
-
-                $outOfs["lusc"] = DB::table($examScoresTblName)
-                    ->select("admno")
-                    ->distinct("admno")
-                    ->where('level_unit_id', $student->level_unit_id)
-                    ->count();
-
-            }
-            
-            $studentScores = DB::table($examScoresTblName)
-                ->select(array_merge($subjectColums, $aggregateColumns))
-                ->addSelect(["students.name", "students.adm_no", "level_units.alias", "hostels.name AS hostel"])
-                ->join("students", "{$examScoresTblName}.admno", "=", "students.adm_no")
-                ->leftJoin("level_units", "{$examScoresTblName}.level_unit_id", "=", "level_units.id")
-                ->leftJoin("hostels", "students.hostel_id", "=", "hostels.id")
-                ->where("{$examScoresTblName}.admno", $admno)
-                ->first();
-
-            $subjectsCount = 0;
-            
-            foreach ($subjectColums as $col) {
-                if(!empty($studentScores->$col)){
-                    $subjectsCount++;
-                }
-            }
-
-            $outOfs["tm"] = $subjectsCount * 100;
-            $outOfs["tp"] = $subjectsCount * 12;
-            $outOfs["mm"] = 100;
-            $outOfs["mg"] = 'A';
-
-        }else{
-            
-            //Get the appropriate students to show transacripts
-            
-            $studentsQuery = Student::whereIn('level_id', $exam->levels->pluck('id')->toArray())
-                ->orderBy('adm_no');
-    
-            if ($level) {
-                $studentsQuery->where('level_id', $level->id);
-            }
-    
-            if($levelUnit){
-                $studentsQuery->where('level_unit_id', $levelUnit->id);
-            }
-    
-            $students = $studentsQuery->paginate(24);
-
-        }
-
-        return view('exams.transcripts.index', [
-            'exam' => $exam,
-            'students' => $students ?? null,
-            'levelUnit' => $levelUnit ?? null,
-            'level' => $level ?? null,
-            'studentScores' => $studentScores ?? null,
-            'subjectColums' => $subjectColums ?? [],
-            'subjectsMap' => $subjectsMap ?? [],
-            'swahiliComments' => $swahiliComments ?? [],
-            'englishComments' => $englishComments ?? [],
-            'ctComments' => $ctComments,
-            'pComments' => $pComments,
-            'teachers' => $teachers ?? [],
-            'outOfs' => $outOfs
-        ]);
-    }
-
-    /**
      * Print a single transcript for a single student specified by admission number
      * 
      * @param Request $request
@@ -339,8 +213,8 @@ class ExamsTranscriptsController extends Controller
             $subjectColumns = $exam->subjects->pluck("shortname")->toArray();
     
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
-    
-            $aggregateColumns = array("mm", "tm", "mg", "mp", "tp", "sp", "op");
+
+            $aggregateColumns = array("mm", "mmd", "tm", "tmd", "mg", "mp", "mpd",  "tp", "tpd", "sp", "op");
 
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 
@@ -482,7 +356,7 @@ class ExamsTranscriptsController extends Controller
 
             $subjectsMap = Subject::all(['name', 'shortname'])->pluck('name', 'shortname');
 
-            $aggregateColumns = array("mm", "tm", "mg", "mp",  "tp", "sp", "op");
+            $aggregateColumns = array("mm", "mmd", "tm", "tmd", "mg", "mp", "mpd",  "tp", "tpd", "sp", "op");
 
             $swahiliComments = Grade::all(['grade', 'swahili_comment'])->pluck('swahili_comment', 'grade')->toArray();
 

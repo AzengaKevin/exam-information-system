@@ -97,6 +97,21 @@
                         <td>{{ $studentScores->sp ?? '-' }}</td>
                         @endif
                     </tr>
+                    @if ($exam->deviationExam)
+                    <tr>
+                        <th>DEVIATION</th>
+                        <td>{{ $studentScores->tmd ?? '-' }}</td>
+                        <td>{{ $studentScores->mmd ?? '-' }}{{ ($studentScores->mm) ? "%" : "" }}</td>
+                        @if ($systemSettings->school_level == 'secondary')
+                        <td>{{ $studentScores->tpd ?? '-' }}</td>
+                        <td> - </td>
+                        @endif
+                        <td>-</td>
+                        @if ($systemSettings->school_has_streams)
+                        <td>-</td>
+                        @endif
+                    </tr>
+                    @endif
                     <tr>
                         <th>OUT OF</th>
                         <td>{{ $outOfs['tm'] ?? '-' }}</td>
@@ -125,8 +140,9 @@
                     <tr>
                         <th><span>SUBJECT</span></th>
                         <th>MARKS</th>
+                        @if ($exam->deviationExam)
                         <th><span>DEV.</span></th>
-
+                        @endif
                         @if ($systemSettings->school_level == 'secondary')
                         <th><span>GR.</span></th>
                         @endif
@@ -144,8 +160,10 @@
                         $subjectScore = json_decode($studentScores->$col);
                         @endphp
                         <td class="text-uppercase">{{ $subjectsMap[$col] ?? $col }}</td>
-                        <td>{{ $subjectScore->score }}%</td>
-                        <td>0</td>
+                        <td>{{ $subjectScore->score ?? '-' }}%</td>
+                        @if ($exam->deviationExam)
+                        <td>{{ $subjectScore->dev ?? '-' }}</td>
+                        @endif
                         @if ($systemSettings->school_level == 'secondary')
                         <td>{{ $subjectScore->grade }}</td>
                         @endif
