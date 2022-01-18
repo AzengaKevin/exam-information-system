@@ -3,10 +3,12 @@
 namespace App\Http\Livewire;
 
 use App\Actions\Exam\Scores\LevelActions;
+use App\Exceptions\InvalidConnectionDriverException;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Settings\SystemSettings;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\App;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -182,6 +184,7 @@ class LevelExamScores extends Component
             LevelActions::publishGradeDistribution($this->exam, $this->level);
             LevelActions::publishScores($this->exam, $this->level);
             LevelActions::publishSubjectPerformance($this->exam, $this->level);
+            LevelActions::publishExamTopStudentsPerSubject($this->exam, $this->level);
             if(!$systemSettings->school_has_streams) LevelActions::publishStudentResults($this->exam, $this->level);
 
             session()->flash('status', "Level scores have successfully published");
@@ -312,5 +315,44 @@ class LevelExamScores extends Component
             $this->emit('hide-publish-students-results-modal');
 
         }
+    }
+
+    /**
+     * Publish level top students for every subject
+     * 
+     */
+    public function publishTopStudentsSubjectWise()
+    {
+        try {
+            
+            LevelActions::publishExamTopStudentsPerSubject($this->exam, $this->level);
+
+            session()->flash('status', "Top students per subject successfully published for {$this->level->name}");
+
+            $this->emit('hide-publish-top-students-per-subject-modal');
+            
+        } catch (\Exception $exception) {
+
+            if($exception instanceof InvalidConnectionDriverException){
+
+                $this->addError('error', $exception->getMessage());
+
+            }else{
+
+                Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+                $message = App::environment('local')
+                    ? $exception->getMessage()
+                    : "Failed publish exam top students subject wise, contact admin";
+
+                session()->flash('error', $message);
+
+                $this->emit('hide-rank-class-modal');
+            }
+
+            $this->emit('hide-publish-top-students-per-subject-modal');
+            
+        }
+        
     }
 }

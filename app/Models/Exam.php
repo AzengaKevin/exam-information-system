@@ -232,4 +232,16 @@ class Exam extends Model
         return true;
     }
 
+    /**
+     * Exam - Student relation for top students per subject
+     * 
+     * @return Relation
+     */
+    public function levelTopSubjectStudents()
+    {
+        return $this->belongsToMany(Student::class, 'exam_level_top_students_per_subject')
+            ->withTimestamps()
+            ->withPivot(['subject_id', 'level_id', 'score', 'grade']);
+    }
+
 }
