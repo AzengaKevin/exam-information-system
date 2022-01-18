@@ -63,5 +63,8 @@
 
     livewire.on('hide-publish-top-students-per-subject-modal', () =>
         $('#publish-top-students-per-subject-modal').modal('hide'))
+
+    livewire.on('hide-publish-class-top-students-per-subject-modal', () =>
+        $('#publish-class-top-students-per-subject-modal').modal('hide'))
 </script>
 @endpush

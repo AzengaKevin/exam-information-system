@@ -476,6 +476,7 @@ class LevelActions
                     /** @var Collection */
                     $data = DB::table($examTblName)
                         ->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.score\")) AS UNSIGNED) AS score, JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.grade\")) AS grade")
+                        ->where('level_id', $level->id)
                         ->orderBy("score", 'desc')
                         ->limit($howMany)
                         ->get();
