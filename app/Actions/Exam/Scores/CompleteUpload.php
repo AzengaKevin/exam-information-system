@@ -2,6 +2,7 @@
 
 namespace App\Actions\Exam\Scores;
 
+use App\Exceptions\InvalidConnectionDriverException;
 use App\Models\Exam;
 use App\Models\Level;
 use App\Models\Grading;
@@ -105,36 +106,49 @@ class CompleteUpload
         $deviationExam = $exam->deviationExam;
 
         if(is_null($deviationExam)) return false;
-    
-        $examTblName = Str::slug($exam->shortname);
 
-        $devExamTblName = Str::slug($deviationExam->shortname);
-    
-        $col = $subject->shortname;
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
-        $query = DB::table($examTblName,'cet')
-            ->selectRaw("cet.student_id, (CAST(JSON_UNQUOTE(JSON_EXTRACT(cet.$col,\"$.score\")) AS SIGNED) - CAST(JSON_UNQUOTE(JSON_EXTRACT(`$devExamTblName`.$col,\"$.score\")) AS SIGNED)) AS dev")
-            ->leftJoin($devExamTblName, 'cet.student_id', '=', "{$devExamTblName}.student_id");
-
-        if(!is_null($level)) $query->where("cet.level_id", $level->id);
-
-        if(!is_null($levelUnit)) $query->where('cet.level_unit_id', $levelUnit->id);            
-    
-        /** @var Collection */
-        $data = $query->orderBy("dev", 'desc')->get();
-
-        $data->each(function($item, $key) use ($examTblName, $col){
-            
-            $rank = $key + 1;
-
-            $deviation = $item->dev ?? 0;
-
-            DB::update("UPDATE `$examTblName` SET `$col` = JSON_SET(`$col`, \"$.dev\", $deviation, \"$.dev_rank\", $rank) WHERE student_id = {$item->student_id}");
-
-        });
-
-        return true;
+        if ($dbDriver == 'mysql') {
         
+            $examTblName = Str::slug($exam->shortname);
+    
+            $devExamTblName = Str::slug($deviationExam->shortname);
+        
+            $col = $subject->shortname;
+    
+            $query = DB::table($examTblName,'cet')
+                ->selectRaw("cet.student_id, (CAST(JSON_UNQUOTE(JSON_EXTRACT(cet.$col,\"$.score\")) AS SIGNED) - CAST(JSON_UNQUOTE(JSON_EXTRACT(`$devExamTblName`.$col,\"$.score\")) AS SIGNED)) AS dev")
+                ->leftJoin($devExamTblName, 'cet.student_id', '=', "{$devExamTblName}.student_id");
+    
+            if(!is_null($level)) $query->where("cet.level_id", $level->id);
+    
+            if(!is_null($levelUnit)) $query->where('cet.level_unit_id', $levelUnit->id);            
+        
+            /** @var Collection */
+            $data = $query->orderBy("dev", 'desc')->get();
+
+            DB::transaction(function() use($data, $examTblName, $col){
+
+                $data->each(function($item, $key) use ($examTblName, $col){
+                    
+                    $rank = $key + 1;
+        
+                    $deviation = $item->dev ?? 0;
+        
+                    DB::update("UPDATE `$examTblName` SET `$col` = JSON_SET(`$col`, \"$.dev\", $deviation, \"$.dev_rank\", $rank) WHERE student_id = {$item->student_id}");
+        
+                });
+            });
+    
+            return true;
+            
+        }else{
+
+            throw new InvalidConnectionDriverException("Only MySQL driver works well in such case");
+        }
+        
+        return false;
     }
 
     /**
@@ -149,30 +163,41 @@ class CompleteUpload
     {
         try {
     
-            $tblName = Str::slug($exam->shortname);
+            $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+            if ($dbDriver == 'mysql') {
+
+                $tblName = Str::slug($exam->shortname);
+        
+                $col = $subject->shortname;
+                
+                /** @var Collection */
+                $query = DB::table($tblName)->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS UNSIGNED) AS score");
+        
+                if(!is_null($level)) $query->where("level_id", $level->id);
+        
+                if(!is_null($levelUnit)) $query->where('level_unit_id', $levelUnit->id);
+        
+                /** @var Collection */
+                $data = $query->orderBy("score", 'desc')->get();
+        
+                // Get the total records count
+                $total = $data->count();
+        
+                $data->each(function($item, $key) use ($tblName, $col, $total){
     
-            $col = $subject->shortname;
+                    $rank = $key + 1;
+        
+                    DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE student_id = {$item->student_id}");
+    
+                });
+                
+            } else {
+
+                throw new InvalidConnectionDriverException("Only MySQL driver works well in such case");
+                
+            }
             
-            /** @var Collection */
-            $query = DB::table($tblName)->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT($col,\"$.score\")) AS UNSIGNED) AS score");
-    
-            if(!is_null($level)) $query->where("level_id", $level->id);
-    
-            if(!is_null($levelUnit)) $query->where('level_unit_id', $levelUnit->id);
-    
-            /** @var Collection */
-            $data = $query->orderBy("score", 'desc')->get();
-    
-            // Get the total records count
-            $total = $data->count();
-    
-            $data->each(function($item, $key) use ($tblName, $col, $total){
-
-                $rank = $key + 1;
-    
-                DB::update("UPDATE `$tblName` SET `$col` = JSON_SET(`$col`, \"$.rank\", $rank, \"$.total\", $total) WHERE student_id = {$item->student_id}");
-
-            });
 
         } catch (\Exception $exception) {
 

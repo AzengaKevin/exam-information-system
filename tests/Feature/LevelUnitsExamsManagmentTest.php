@@ -328,20 +328,29 @@ class LevelUnitsExamsManagmentTest extends TestCase
 
         // Acting
 
-        Livewire::test(LevelUnitExamScores::class, ['exam' =>$exam, 'levelUnit' => $levelUnit])
-            ->call('publishClassScores');
+        $response = Livewire::test(LevelUnitExamScores::class, ['exam' =>$exam, 'levelUnit' => $levelUnit])->call('publishClassScores');
 
         // Assertions
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
-        $this->assertEquals(1, $exam->levelUnits()->count());
-        
-        $levelUnitWithScore = $exam->levelUnits->first();
+        if ($dbDriver === 'mysql') {
+            
+            $this->assertEquals(1, $exam->levelUnits()->count());
+            
+            $levelUnitWithScore = $exam->levelUnits->first();
+    
+            $this->assertNotNull($levelUnitWithScore->pivot->points);
+    
+            $this->assertNotNull($levelUnitWithScore->pivot->grade);
+    
+            $this->assertNotNull($levelUnitWithScore->pivot->average);
 
-        $this->assertNotNull($levelUnitWithScore->pivot->points);
+        }else{
 
-        $this->assertNotNull($levelUnitWithScore->pivot->grade);
+            $response->assertHasErrors('error');
 
-        $this->assertNotNull($levelUnitWithScore->pivot->average);
+        }
+
     }
 
     /** @group exam-scores */

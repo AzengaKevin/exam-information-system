@@ -214,6 +214,8 @@ class ExamsScoresManagementTest extends TestCase
 
         $exam->subjects()->attach($subjects);
 
+        CreateScoresTable::invoke($exam);
+
         Livewire::test(ExamQuickActions::class, ['exam' => $exam])
             ->call('updateScoresTable');
 

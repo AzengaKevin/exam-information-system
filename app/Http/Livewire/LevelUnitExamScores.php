@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Actions\Exam\Scores\LevelUnitActions;
+use App\Exceptions\InvalidConnectionDriverException;
 use App\Models\Exam;
 use App\Models\Grade;
 use Livewire\Component;
@@ -10,6 +11,7 @@ use App\Models\LevelUnit;
 use App\Models\Student;
 use App\Settings\SystemSettings;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -293,17 +295,26 @@ class LevelUnitExamScores extends Component
 
             LevelUnitActions::publishStudentResults($this->exam, $this->levelUnit);
 
-            session()->flash('status', 'Your class scores have been successfully published, you can republish the scores incase of any changes');
+            session()->flash('status', "Class {$this->levelUnit->alias} scores have been successfully published, you can republish the scores incase of any changes");
 
             $this->emit('hide-publish-class-scores-modal');
 
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            if($exception instanceof InvalidConnectionDriverException){
 
-            session()->flash('error', 'A fatal error occurred');
+                $this->addError('error', $exception->getMessage());
+
+            }else{
+                
+                Log::error($exception->getMessage(), ['action' => __METHOD__]);
+    
+                $message = App::environment('local')
+                    ? $exception->getMessage()
+                    : "Could not publish, {$this->levelUnit->alias} scores";
+    
+                session()->flash('error', $message);
+            }
 
             $this->emit('hide-publish-class-scores-modal');
 

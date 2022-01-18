@@ -2,10 +2,12 @@
 
 namespace App\Actions\Exam\Scores;
 
+use App\Exceptions\InvalidConnectionDriverException;
 use App\Models\Exam;
 use App\Models\Grade;
 use App\Models\Grading;
 use App\Models\LevelUnit;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 
@@ -251,8 +253,6 @@ class LevelUnitActions
 
         try {
 
-            $tblName = Str::slug($exam->shortname);
-
             $subjectsWithPreviousScores = collect([]);
 
             /** @var Exam */
@@ -264,61 +264,73 @@ class LevelUnitActions
                     ->get();
             }
 
-            DB::beginTransaction();
+            $driverName = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
 
-            $atLeastASubjectPublished = false;
-
-            foreach ($exam->subjects as $subject) {
-
-                $col = $subject->shortname;
-
-                $data = DB::table($tblName)
-                    ->selectRaw("AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.points\"))) AS avg_points, AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.score\"))) AS avg_score")
-                    ->where('level_unit_id', $levelUnit->id)
-                    ->whereNotNull($col)
-                    ->first();
-
-                if (!is_null($data->avg_points) && !is_null($data->avg_score)) {
-
-                    $atLeastASubjectPublished = true;
-                    
-                    $avgTotal = number_format($data->avg_score, 2);
-                    $avgPoints = number_format($data->avg_points, 4);
-                    $prevAvgTotal = optional(optional($subjectsWithPreviousScores->where('id', $subject->id)->first())->pivot)->average;
-                    $prevAvgPoints = optional(optional($subjectsWithPreviousScores->where('id', $subject->id)->first())->pivot)->points;
+            if(strtolower($driverName) == 'mysql'){
+                DB::transaction(function()use($exam, $levelUnit, $subjectsWithPreviousScores){
     
-                    $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+                    $tblName = Str::slug($exam->shortname);
     
-                    $avgGrade = $pgm[intval(round($avgPoints))];
-    
-                    DB::table('exam_level_unit_subject_performance')
-                        ->updateOrInsert([
-                            'exam_id' => $exam->id,
-                            'level_unit_id' => $levelUnit->id,
-                            'subject_id' => $subject->id
-                        ], [
-                            'average' => $avgTotal,
-                            'points' => $avgPoints,
-                            'grade' => $avgGrade,
-                            'average_deviation' => !empty($prevAvgTotal) ? ($avgTotal - $prevAvgTotal) : null,
-                            'points_deviation' => !empty($prevAvgPoints) ? ($avgPoints - $prevAvgPoints) : null,
-                        ]);
-                }
-
-            }
-
-            DB::commit();
+                    $atLeastASubjectPublished = false;
+        
+                    foreach ($exam->subjects as $subject) {
+        
+                        $col = $subject->shortname;
+        
+                        $data = DB::table($tblName)
+                            ->selectRaw("AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.points\"))) AS avg_points, AVG(JSON_UNQUOTE(JSON_EXTRACT($col, \"$.score\"))) AS avg_score")
+                            ->where('level_unit_id', $levelUnit->id)
+                            ->whereNotNull($col)
+                            ->first();
+        
+                        if (!is_null($data->avg_points) && !is_null($data->avg_score)) {
+        
+                            $atLeastASubjectPublished = true;
+                            
+                            $avgTotal = number_format($data->avg_score, 2);
+                            $avgPoints = number_format($data->avg_points, 4);
+                            $prevAvgTotal = optional(optional($subjectsWithPreviousScores->where('id', $subject->id)->first())->pivot)->average;
+                            $prevAvgPoints = optional(optional($subjectsWithPreviousScores->where('id', $subject->id)->first())->pivot)->points;
             
-            return $atLeastASubjectPublished;
+                            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+            
+                            $avgGrade = $pgm[intval(round($avgPoints))];
+            
+                            DB::table('exam_level_unit_subject_performance')
+                                ->updateOrInsert([
+                                    'exam_id' => $exam->id,
+                                    'level_unit_id' => $levelUnit->id,
+                                    'subject_id' => $subject->id
+                                ], [
+                                    'average' => $avgTotal,
+                                    'points' => $avgPoints,
+                                    'grade' => $avgGrade,
+                                    'average_deviation' => !empty($prevAvgTotal) ? ($avgTotal - $prevAvgTotal) : null,
+                                    'points_deviation' => !empty($prevAvgPoints) ? ($avgPoints - $prevAvgPoints) : null,
+                                ]);
+                        }
+        
+                    }
+    
+                    return $atLeastASubjectPublished;
+    
+                });
+
+            }else{
+
+                throw new InvalidConnectionDriverException(
+                    "Not sure whether your db driver connection can handle this"
+                );
+                
+            }
             
         } catch (\Exception $exception) {
 
-            DB::rollBack();
-            
             throw $exception;
-            
+
         }
         
+        return false;
     }
 
     /**
