@@ -60,5 +60,6 @@
     <x-modals.exams.scores.levels.publish-grade-distribution :level="$level" />
     <x-modals.exams.scores.levels.publish-subject-performance :level="$level" />
     <x-modals.exams.scores.levels.publish-students-results :level="$level" />
+    <x-modals.exams.scores.levels.publish-top-students-per-subject :level="$level" />
 
 </div>

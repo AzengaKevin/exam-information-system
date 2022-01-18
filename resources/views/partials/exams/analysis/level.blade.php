@@ -33,11 +33,19 @@
     <div class="col-md-6">
         <x-exams.analysis.level-most-dropped-students :exam="$exam" :level="$level" />
     </div>
-
     @if ($systemSettings->school_has_streams)
+    <hr>
     @foreach ($exam->subjects as $subject)
     <div class="col-md-6">
         <x-exams.analysis.level-streams-subject-rank :exam="$exam" :level="$level" :subject="$subject" />
+    </div>
+    @endforeach
+    @endif
+    @if ($exam->levelTopSubjectStudents()->count())        
+    <hr>
+    @foreach($exam->subjects as $subject)
+    <div class="col-md-4">
+        <x-exams.analysis.level-top-students-in-subject :exam="$exam" :level="$level" :subject="$subject" />
     </div>
     @endforeach
     @endif

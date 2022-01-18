@@ -25,4 +25,13 @@
     <div class="col-md-6">
         <x-exams.analysis.level-unit-most-dropped-students :exam="$exam" :levelUnit="$levelUnit" />
     </div>
+
+    @if ($exam->levelUnitTopSubjectStudents()->count())        
+    <hr>
+    @foreach($exam->subjects as $subject)
+    <div class="col-md-4">
+        <x-exams.analysis.level-unit-top-students-in-subject :exam="$exam" :levelUnit="$levelUnit" :subject="$subject" />
+    </div>
+    @endforeach
+    @endif
 </div>

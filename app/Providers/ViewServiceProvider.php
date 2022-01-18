@@ -48,16 +48,7 @@ class ViewServiceProvider extends ServiceProvider
             'exams.scores.upload',
             'exams.scores.manage',
             'components.modals.students.add',
-            'components.exams.analysis.level-subject-performance',
-            'components.exams.analysis.level-unit-subject-performance',
-            'components.exams.analysis.level-student-performance',
-            'components.exams.analysis.level-most-improved-students',
-            'components.exams.analysis.level-unit-most-improved-students',
-            'components.exams.analysis.level-most-dropped-students',
-            'components.exams.analysis.level-unit-most-dropped-students',
-            'components.exams.analysis.level-unit-student-performance',
-            'components.exams.analysis.level-unit-performance',
-            'components.exams.analysis.level-streams-subject-rank'
+            'components.exams.analysis.*'
         ], SettingsComposer::class);
     }
 }

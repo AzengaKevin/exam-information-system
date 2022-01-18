@@ -433,5 +433,43 @@ class LevelUnitExamScores extends Component
             $this->emit('hide-publish-class-students-results-modal');
 
         }
+    }
+
+
+    /**
+     * Publish level-unit top students for every subject
+     */
+    public function publishTopStudentsSubjectWise()
+    {
+        try {
+            
+            LevelUnitActions::publishExamTopStudentsPerSubject($this->exam, $this->levelUnit);
+
+            session()->flash('status', "Top students per subject successfully published for {$this->levelUnit->alias}");
+
+            $this->emit('hide-publish-class-top-students-per-subject-modal');
+            
+        } catch (\Exception $exception) {
+
+            if($exception instanceof InvalidConnectionDriverException){
+
+                $this->addError('error', $exception->getMessage());
+
+            }else{
+
+                Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+                $message = App::environment('local')
+                    ? $exception->getMessage()
+                    : "Failed publish exam top students subject wise, contact admin";
+
+                session()->flash('error', $message);
+
+            }
+
+            $this->emit('hide-publish-class-top-students-per-subject-modal');
+            
+        }
+        
     }    
 }

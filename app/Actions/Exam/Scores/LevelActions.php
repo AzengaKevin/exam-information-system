@@ -8,6 +8,8 @@ use App\Models\Level;
 use App\Models\Grading;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Collection;
+use App\Exceptions\InvalidConnectionDriverException;
 
 class LevelActions
 {
@@ -435,6 +437,70 @@ class LevelActions
         } catch (\Exception $exception) {
             
             throw $exception;
+
+        }
+        
+    }
+
+    /**
+     * Publishing exam top students per subject
+     * 
+     * @param Exam $exam - the exam to publish
+     * @param Level $level
+     * @param int $howMany
+     */
+    public static function publishExamTopStudentsPerSubject(Exam $exam, Level $level, int $howMany = 3)
+    {
+        // Check the database driver
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        if(strtolower($dbDriver) == 'mysql'){
+            
+            DB::transaction(function() use($exam, $level, $howMany){
+
+                $examTblName = Str::slug($exam->shortname);
+
+                $exam->subjects->each(function($subject) use($exam, $examTblName, $howMany, $level){
+    
+                    $subjectCol = $subject->shortname;
+                    $subjectId = $subject->id;
+
+                    DB::table('exam_level_top_students_per_subject')
+                        ->where([
+                            ['exam_id' , $exam->id],
+                            ['level_id' , $level->id],
+                            ['subject_id' , $subjectId]
+                        ])->delete();
+
+    
+                    /** @var Collection */
+                    $data = DB::table($examTblName)
+                        ->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.score\")) AS UNSIGNED) AS score, JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.grade\")) AS grade")
+                        ->where('level_id', $level->id)
+                        ->orderBy("score", 'desc')
+                        ->limit($howMany)
+                        ->get();
+    
+                    $data->each(function($item) use($exam, $level, $subjectId){
+                        DB::table('exam_level_top_students_per_subject')
+                            ->updateOrInsert([
+                                'exam_id' => $exam->id,
+                                'level_id' => $level->id,
+                                'subject_id' => $subjectId,
+                                'student_id' => $item->student_id
+                            ],[
+                                'score' => $item->score,
+                                'grade' => $item->grade
+                            ]);
+                    });
+                });
+
+            });
+
+            
+        }else{
+
+            throw new InvalidConnectionDriverException("MySQL, will the best companion in this");
 
         }
         

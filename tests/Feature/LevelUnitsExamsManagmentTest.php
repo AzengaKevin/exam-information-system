@@ -710,4 +710,124 @@ class LevelUnitsExamsManagmentTest extends TestCase
     
     }
 
+    /** @group exam-scores */
+    public function testAuthorizedUserCanPublishTopSubjectStudents()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->artisan('db:seed --class=GradingSeeder');
+        $this->artisan('db:seed --class=GradeSeeder');
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        // Create the Level Unit
+        /** @var LevelUnit */
+        $levelUnit = LevelUnit::factory()->create();
+
+        $students = Student::factory(2)->create([
+            'admission_level_id' => $levelUnit->level->id,
+            'level_id' => $levelUnit->level->id,
+            'stream_id' => $levelUnit->stream->id,
+            'level_unit_id' => $levelUnit->id
+        ]);
+
+        // Create the Subject
+        $subjects = Subject::limit(2)->get();
+
+        // Create Responsibility for the current teacher
+        $classTeacherResponsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+
+        // Associate Teacher and Responsibility
+        $this->teacher->responsibilities()->attach($classTeacherResponsibility, [
+            'level_unit_id' => $levelUnit->id,
+        ]);        
+
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->levels()->attach($levelUnit->level);
+
+        $exam->subjects()->attach($subjects);
+
+        // Create Scores Table
+        CreateScoresTable::invoke($exam, true);
+
+        // Adding scores for the students
+        foreach ($students as $student) {
+
+            foreach ($subjects as $subject) {
+
+                DB::table(Str::slug($exam->shortname))
+                    ->updateOrInsert(["student_id" => $student->id], [
+                        $subject->shortname => json_encode([
+                            'score' => $this->faker->numberBetween(0, 100),
+                            'grade' => $grade = $this->faker->randomElement(Grading::gradeOptions()),
+                            'points' => $this->faker->numberBetween(0, 12),
+                        ]),
+                        'level_id' => $levelUnit->level->id,
+                        'level_unit_id' => $levelUnit->id
+                    ]);
+    
+            }
+
+        }
+
+        // Calculating and recording aggregates
+
+        $cols = $exam->subjects->pluck("shortname")->toArray();
+
+        $tblName = Str::slug($exam->shortname);
+
+        /** @var Collection */
+        $data = DB::table($tblName)
+            ->where("level_unit_id", $levelUnit->id)
+            ->select(array_merge(["student_id"], $cols))->get();
+
+        $data->each(function($stuData) use($tblName, $cols){
+
+            $totalScore = 0;
+            $totalPoints = 0;
+            $populatedCols = 0;
+
+            foreach ($cols as $col) {
+
+                if(!is_null($stuData->$col)){
+                    $populatedCols++;
+
+                    $subData = json_decode($stuData->$col);
+
+                    $totalScore += $subData->score ?? 0;
+                    $totalPoints += $subData->points ?? 0;
+                }
+            }
+
+            $avgPoints = round($totalPoints / $populatedCols);
+            $avgScore = round($totalScore / $populatedCols);
+
+            $pgm = Grade::all(['points', 'grade'])->pluck('grade', 'points');
+
+            $avgGrade = $pgm[$avgPoints];
+
+            DB::table($tblName)
+                ->updateOrInsert(["student_id" => $stuData->student_id], [
+                    "mm" => $avgScore,
+                    "mg" => $avgGrade,
+                    'mp' => $avgPoints,
+                    "tp" => $totalPoints,
+                    'tm' => $totalScore
+                ]);
+        });
+
+        // Act
+        $response = Livewire::test(LevelUnitExamScores::class, ['exam' => $exam, 'levelUnit' => $levelUnit])
+            ->call('publishTopStudentsSubjectWise');
+
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        if ($dbDriver == 'mysql') {
+            $this->assertTrue(DB::table('exam_level_unit_top_students_per_subject')->count() > 0);
+        } else {
+            $response->assertHasErrors(['error']);
+        } 
+    }
+
 }
