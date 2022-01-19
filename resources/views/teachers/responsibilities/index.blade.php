@@ -14,12 +14,11 @@
         </ol>
     </nav>
 
-    <div class="d-inline-flex gap-2">
+    <div class="d-inline-flex flex-wrap gap-2 align-items-md-center">
         <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
             class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
             <i class="fa fa-plus"></i>
         </button>
-
 
         <button data-bs-toggle="modal" data-bs-target="#assign-teacher-responsibility-modal"
             class="d-none d-md-inline-flex btn btn-sm btn-outline-primary gap-2 align-items-center">
@@ -27,7 +26,6 @@
             <span>Responsibility</span>
         </button>
 
-        @if ($systemSettings->school_has_streams)
         <button data-bs-toggle="modal" data-bs-target="#assign-bulk-responsibilities-modal"
             class="btn btn-sm btn-outline-primary rounded-circle d-md-none">
             <i class="fa fa-plus"></i>
@@ -37,7 +35,6 @@
             <i class="fa fa-plus"></i>
             <span>Bulk Responsibilities</span>
         </button>
-        @endif
     </div>
 </div>
 <hr>

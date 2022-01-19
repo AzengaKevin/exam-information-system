@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Models\ResponsibilityTeacher;
+use App\Settings\SystemSettings;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -46,6 +47,8 @@ class TeacherResponsibilities extends Component
 
     public $allLevelUnitsMissingTeacherForThatSubject;
 
+    public $allLevelsMissingTeacherForTheSubject;
+
     public Responsibility $teacherResponsibility;
 
     /**
@@ -64,6 +67,8 @@ class TeacherResponsibilities extends Component
         $this->levelUnits = $this->getLevelUnits();
 
         $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
+
+        $this->allLevelsMissingTeacherForTheSubject = collect([]);
 
         $this->teacherResponsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
     }
@@ -95,69 +100,123 @@ class TeacherResponsibilities extends Component
     /**
      * Hook method to select all classes
      * 
-     * @param bool - true|false variant
+     * @param string - true|false variant
      */
     public function updatedSelectAllClasses($value)
     {
         $value = boolval($value);
-        
-        if($value){
-            
-            foreach ($this->allLevelUnitsMissingTeacherForThatSubject as $leveUnit) {
 
-                $this->selectedClasses[$leveUnit->id] = 'true';
-                
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        if($systemSettings->school_has_streams){
+            if($value){
+                $this->selectedClasses = array_fill_keys($this->allLevelUnitsMissingTeacherForThatSubject->pluck('id')->all(), 'true');
+            }else{
+                $this->selectedClasses = array_fill_keys($this->allLevelUnitsMissingTeacherForThatSubject->pluck('id')->all(), null);
             }
-
         }else{
-            
-            foreach ($this->allLevelUnitsMissingTeacherForThatSubject as $leveUnit) {
-
-                $this->selectedClasses[$leveUnit->id] = null;
-                
+            if($value){
+                $this->selectedClasses = array_fill_keys($this->allLevelsMissingTeacherForTheSubject->pluck('id')->all(), 'true');
+            }else{
+                $this->selectedClasses = array_fill_keys($this->allLevelsMissingTeacherForTheSubject->pluck('id')->all(), null);
             }
-
         }
+        
     }
 
+    /**
+     * Hook method called when subject teacher id is selected
+     * 
+     * @param string $value
+     */
     public function updatedTeacherSubjectId($value)
     {
 
-        $leveUnitIds = DB::table('responsibility_teacher')->select(['level_unit_id'])
-            ->where([
-                ['subject_id', $value],
-                ['responsibility_id', $this->teacherResponsibility->id]
-            ])->pluck('level_unit_id')->toArray();
-        
-        $this->allLevelUnitsMissingTeacherForThatSubject = LevelUnit::whereNotIn('id', $leveUnitIds)->get();
-        
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        if ($systemSettings->school_has_streams) {
+
+            $leveUnitIds = DB::table('responsibility_teacher')
+                ->select(['level_unit_id'])
+                ->distinct('level_unit_id')
+                ->where([
+                    ['subject_id', $value],
+                    ['responsibility_id', $this->teacherResponsibility->id]
+                ])->pluck('level_unit_id')->all();
+            
+            $this->allLevelUnitsMissingTeacherForThatSubject = LevelUnit::whereNotIn('id', $leveUnitIds)->get();
+
+        }else{
+
+            $levelIds = DB::table('responsibility_teacher')
+                ->select(['level_id'])
+                ->distinct('level_id')
+                ->where([
+                    ['subject_id', $value],
+                    ['responsibility_id', $this->teacherResponsibility->id]
+                ])->pluck('level_id')->all();
+
+            $this->allLevelsMissingTeacherForTheSubject = Level::whereNotIn('id', $levelIds)->get();
+        }
     }
 
+    /**
+     * Get all responsibilities from the database
+     * 
+     * @return Collection
+     */
     public function getResponsibilities()
     {
         return Responsibility::all();
     }
 
+    /**
+     * Get all levels from the database
+     * 
+     * @return Collection
+     */
     public function getLevels()
     {
         return Level::all(['id', 'name']);
     }
 
+    /**
+     * Get all subjects from the database
+     * 
+     * @return Collection
+     */
     public function getSubjects()
     {
         return $this->teacher->subjects;
     }
 
+    /**
+     * Get all Level Units from the database
+     * 
+     * @return Collection
+     */
     public function getLevelUnits()
     {
         return LevelUnit::all(['id', 'alias']);
     }
 
+    /**
+     * Get all departments from he database
+     * 
+     * @return Collection
+     */
     public function getDepartments()
     {
         return Department::all(['id', 'name']);
     }
 
+    /**
+     * Get all current teacher assigned responsibilities
+     * 
+     * @return Collection
+     */
     public function getTeacherResponsibilities()
     {
         return $this->teacher->fresh()->responsibilities;
@@ -263,21 +322,43 @@ class TeacherResponsibilities extends Component
     
             $classes = array_filter($data['selectedClasses'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);
 
-            foreach ($classes as $key => $value) {
-                
-                DB::table('responsibility_teacher')
-                    ->insertOrIgnore([
-                        'teacher_id' => $this->teacher->id,
-                        'responsibility_id' => $this->teacherResponsibility->id,
-                        'level_unit_id' => $key,
-                        'subject_id' => $data['teacher_subject_id']
-                    ]);
+            /** @var SystemSettings */
+            $systemSettings = app(SystemSettings::class);
+
+            if($systemSettings->school_has_streams){
+
+                foreach ($classes as $key => $value) {
+                    
+                    DB::table('responsibility_teacher')
+                        ->insertOrIgnore([
+                            'teacher_id' => $this->teacher->id,
+                            'responsibility_id' => $this->teacherResponsibility->id,
+                            'level_unit_id' => $key,
+                            'subject_id' => $data['teacher_subject_id']
+                        ]);
+    
+                }
+
+            }else{
+
+                foreach ($classes as $key => $value) {
+                    
+                    DB::table('responsibility_teacher')
+                        ->insertOrIgnore([
+                            'teacher_id' => $this->teacher->id,
+                            'responsibility_id' => $this->teacherResponsibility->id,
+                            'level_id' => $key,
+                            'subject_id' => $data['teacher_subject_id']
+                        ]);
+                }
 
             }
 
             $this->reset(['selectAllClasses', 'teacher_subject_id', 'selectedClasses']);
 
             $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
+
+            $this->allLevelsMissingTeacherForTheSubject = collect([]);
 
             session()->flash('status', 'Teacher successfully assigned bulk subject responsibilities');
 

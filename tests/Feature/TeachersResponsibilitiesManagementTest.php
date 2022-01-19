@@ -3,21 +3,22 @@
 namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\Role;
 use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\LevelUnit;
+use App\Models\Permission;
 use App\Models\Responsibility;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Http\Livewire\TeacherResponsibilities;
-use App\Models\Permission;
-use App\Models\Role;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 
 class TeachersResponsibilitiesManagementTest extends TestCase
 {
@@ -141,6 +142,13 @@ class TeachersResponsibilitiesManagementTest extends TestCase
         $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Teachers Manage Responsibilities']));
 
         $this->artisan('db:seed --class=SubjectsSeeder');
+
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        $systemSettings->school_has_streams = true;
+
+        $systemSettings->save();
 
         /** @var Teacher */
         $teacher1 = Teacher::factory()->create();
