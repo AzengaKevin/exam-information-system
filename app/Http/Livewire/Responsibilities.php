@@ -21,6 +21,7 @@ class Responsibilities extends Component
     public $responsibilityId;
 
     public $name;
+    public $how_many;
     public $requirements = [];
     public $description;
 
@@ -54,6 +55,8 @@ class Responsibilities extends Component
 
         $this->name = $responsibility->name;
 
+        $this->how_many = $responsibility->how_many;
+
         $this->requirements = $responsibility->requirements;
 
         $this->description = $responsibility->description;
@@ -70,6 +73,7 @@ class Responsibilities extends Component
     {
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('responsibilities')->ignore($this->responsibilityId)],
+            'how_many' => ['bail', 'nullable', 'integer'],
             'requirements' => ['nullable', 'array', Rule::in(Responsibility::requirementOptions())],
             'description' => ['bail', 'nullable']
         ];

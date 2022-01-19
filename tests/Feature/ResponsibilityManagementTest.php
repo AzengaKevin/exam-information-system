@@ -83,16 +83,20 @@ class ResponsibilityManagementTest extends TestCase
         /** @var Responsibility */
         $responsibility = Responsibility::factory()->create();
 
-        $payload = Responsibility::factory()->make()->toArray();
+        $payload = Responsibility::factory()->make([
+            'how_many' => 2
+        ])->toArray();
 
         Livewire::test(Responsibilities::class)
             ->call('editResponsibility', $responsibility)
             ->set('name', $payload['name'])
+            ->set('how_many', $payload['how_many'])
             ->set('description', $payload['description'])
             ->set('requirements', $payload['requirements'])
             ->call('updateResponsibility');
         
         $this->assertEquals($payload['name'], $responsibility->fresh()->name);
+        $this->assertEquals($payload['how_many'], $responsibility->fresh()->how_many);
         $this->assertEquals($payload['requirements'], $responsibility->fresh()->requirements);
         $this->assertEquals($payload['description'], $responsibility->fresh()->description);
 
