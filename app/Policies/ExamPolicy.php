@@ -120,18 +120,16 @@ class ExamPolicy
     {
         $isTeacher = $user->authenticatable_type == 'teacher';
 
-        $isDos = false;
+        $isExamanager = false;
 
         /** @var Teacher */
         $teacher = $user->authenticatable;
 
-        $responsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+        if($isTeacher) $isExamanager = $teacher->isExamManager();
 
-        if($isTeacher) $isDos = $teacher->responsibilities->contains($responsibility);
-
-        return $isDos && Schema::hasTable(Str::slug($exam->shortname))
+        return $isExamanager && Schema::hasTable(Str::slug($exam->shortname))
             ? Response::allow()
-            : Response::deny('Only DOS can perform this action, after the table is already create');
+            : Response::deny("Only nn Exam Manager can perform this action after, {$exam->name}, scores table is created");
     }
 
     /**
@@ -149,7 +147,7 @@ class ExamPolicy
 
         $isTeacher = $user->authenticatable_type == 'teacher';
 
-        $isDos = false;
+        $isExamManager = false;
         $isLsInCurrExam = false;
         $isCtInCurrExam = false;
         $isStInCurrExam = false;
@@ -157,11 +155,9 @@ class ExamPolicy
         /** @var Teacher */
         $teacher = $user->authenticatable;
 
-        $dosRes = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
-    
-        if($isTeacher) $isDos = $teacher->responsibilities->contains($dosRes);
+        if($isTeacher) $isExamManager = $teacher->isExamManager();
 
-        if($isDos){
+        if($isExamManager){
 
             return Response::allow();
 
@@ -245,18 +241,16 @@ class ExamPolicy
 
         $isTeacher = $user->authenticatable_type == 'teacher';
 
-        $isDos = false;
+        $isExamManager = false;
         $isLsInCurrExam = false;
         $isCtInCurrExam = false;
     
         /** @var Teacher */
         $teacher = $user->authenticatable;
-
-        $dosRes = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
     
-        if($isTeacher) $isDos = $teacher->responsibilities->contains($dosRes);
+        if($isTeacher) $isExamManager = $teacher->isExamManager();
 
-        if($isDos){
+        if($isExamManager){
 
             return Response::allow();
 

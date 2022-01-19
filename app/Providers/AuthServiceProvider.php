@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Models\User;
 use App\Models\Teacher;
-use App\Models\Responsibility;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
@@ -33,19 +32,16 @@ class AuthServiceProvider extends ServiceProvider
 
             $isTeacher = $user->authenticatable_type == 'teacher';
 
-            $isDos = false;
+            $isExamManager = false;
 
             /** @var Teacher */
             $teacher = $user->authenticatable;
 
-            $responsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+            if($isTeacher) $isExamManager = $teacher->isExamManager();
 
-            if($isTeacher) $isDos = $teacher->responsibilities->contains($responsibility);
-
-
-            return $isDos
+            return $isExamManager
                 ? Response::allow()
-                : Response::deny('Only DOS can perform this action');
+                : Response::deny('Only an Exam Manager can perform this action');
 
         });
     }
