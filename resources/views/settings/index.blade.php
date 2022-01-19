@@ -203,6 +203,42 @@
                                 @enderror
                             </div>
                         </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="general[school_manager_responsibility_id]"
+                                    id="school-manager-responsibility"
+                                    class="form-select @error('general.school_manager_responsibility_id') is-invalid @enderror">
+                                    @foreach ($responsibilities as $responsibility)
+                                        <option value="{{ $responsibility->id }}" {{ (old('general.school_manager_responsibility_id') ?? $generalSettings->school_manager_responsibility_id == $responsibility->id) ? 'selected' : '' }}>{{ $responsibility->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="school-manager-responsibility">School Head</label>
+                                @error('general.school_manager_responsibility_id')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="general[exam_manager_responsibility_id]"
+                                    id="school-manager-responsibility"
+                                    class="form-select @error('general.exam_manager_responsibility_id') is-invalid @enderror">
+                                    @foreach ($responsibilities as $responsibility)
+                                        <option value="{{ $responsibility->id }}" {{ (old('general.exam_manager_responsibility_id') ?? $generalSettings->exam_manager_responsibility_id == $responsibility->id) ? 'selected' : '' }}>{{ $responsibility->name }}</option>
+                                    @endforeach
+                                </select>
+                                <label for="school-manager-responsibility">Exam Manager</label>
+                                @error('general.exam_manager_responsibility_id')
+                                <span class="invalid-feedback">
+                                    <strong>{{ $message }}</strong>
+                                </span>
+                                @enderror
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

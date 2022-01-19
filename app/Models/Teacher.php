@@ -61,4 +61,22 @@ class Teacher extends Model
 
         return $this->responsibilities->contains($dosRes);
     }
+
+    /**
+     * Check if a teacher is the exam manager
+     * 
+     * @return bool
+     */
+    public function isExamManager() : bool
+    {
+        return false;
+    }
+
+    /**
+     * Check if a teacher is the school manager
+     */
+    public function isSchoolManager() : bool
+    {
+        return false;
+    }
 }

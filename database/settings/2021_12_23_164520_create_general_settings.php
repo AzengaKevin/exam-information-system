@@ -15,6 +15,8 @@ class CreateGeneralSettings extends SettingsMigration
             $blueprint->add('current_academic_year', intval(now()->format('Y')));
             $blueprint->add('current_term', 'Term 1');
             $blueprint->add('logo', null);
+            $blueprint->add('school_manager_responsibility_id', 1);
+            $blueprint->add('exam_manager_responsibility_id', 4);
         });
     }
 }

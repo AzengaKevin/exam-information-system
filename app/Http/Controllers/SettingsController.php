@@ -8,23 +8,27 @@ use App\Settings\GeneralSettings;
 use Illuminate\Http\UploadedFile;
 use App\Http\Requests\UpdateSettingsRequest;
 use App\Models\File;
+use App\Models\Responsibility;
 use Illuminate\Support\Facades\Log;
 
 class SettingsController extends Controller
 {
     
     /**
-     * Show a list of system and general settings
+     * Show a list of system and general settings where applicable
      * 
      * @param Request $request
      * @param SystemSettings $systemSettings
      * @param GeneralSettings $generalSettings
+     * 
      */
     public function index(Request $request, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
         $user = $request->user();
 
-        return view('settings.index', compact('systemSettings', 'generalSettings', 'user'));
+        $responsibilities = Responsibility::all(['id', 'name']);
+
+        return view('settings.index', compact('systemSettings', 'generalSettings', 'user', 'responsibilities'));
     }
 
     /**
