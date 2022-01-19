@@ -301,4 +301,17 @@ class ExamPolicy
             }
         }
     }
+
+    /**
+     * Determine whether a user can view exam results at any given time
+     * 
+     * @return Response
+     */
+    public function viewResults(User $user, Exam $exam)
+    {
+        if(!$exam->isPublished()) return Response::deny("The exam, {$exam->name}, is not published yet, stay put");
+
+        return Response::allow();
+
+    }
 }

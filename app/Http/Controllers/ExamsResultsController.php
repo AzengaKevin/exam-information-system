@@ -25,6 +25,8 @@ class ExamsResultsController extends Controller
      */
     public function index(Request $request, Exam $exam)
     {
+        $this->authorize('viewResults', $exam);
+
         try {
 
             $level = Level::find($request->get('level'));

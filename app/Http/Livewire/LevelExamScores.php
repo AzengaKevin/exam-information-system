@@ -179,15 +179,23 @@ class LevelExamScores extends Component
             /** @var SystemSettings */
             $systemSettings = app(SystemSettings::class);
 
-            if(!$systemSettings->school_has_streams) LevelActions::generateAggregates($this->exam, $this->level);
-            LevelActions::generateRanks($this->exam, $this->level);
-            LevelActions::publishGradeDistribution($this->exam, $this->level);
-            LevelActions::publishScores($this->exam, $this->level);
-            LevelActions::publishSubjectPerformance($this->exam, $this->level);
-            LevelActions::publishExamTopStudentsPerSubject($this->exam, $this->level);
-            if(!$systemSettings->school_has_streams) LevelActions::publishStudentResults($this->exam, $this->level);
+            if(!$systemSettings->school_has_streams)
+                LevelActions::generateAggregates($this->exam, $this->level);
 
-            session()->flash('status', "Level scores have successfully published");
+            LevelActions::generateRanks($this->exam, $this->level);
+
+            LevelActions::publishGradeDistribution($this->exam, $this->level);
+
+            LevelActions::publishScores($this->exam, $this->level);
+
+            LevelActions::publishSubjectPerformance($this->exam, $this->level);
+
+            LevelActions::publishExamTopStudentsPerSubject($this->exam, $this->level);
+
+            if(!$systemSettings->school_has_streams)
+                LevelActions::publishStudentResults($this->exam, $this->level);
+
+            session()->flash('status', "Level scores have successfully published for {$this->level->name}");
 
             $this->emit('hide-publish-class-scores-modal');
 

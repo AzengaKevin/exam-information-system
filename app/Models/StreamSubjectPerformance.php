@@ -10,4 +10,9 @@ class StreamSubjectPerformance extends Pivot
     {
         return $this->belongsTo(LevelUnit::class);
     }
+
+    public function getSubjectTeacher()
+    {
+        
+    }
 }

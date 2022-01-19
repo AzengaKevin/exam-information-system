@@ -49,4 +49,20 @@ class LevelUnit extends Model
             ->withTimestamps()
             ->withPivot(['teacher_id', 'subject_id']);
     }
+
+    /**
+     * Get the one who teaches the specified subject in this level-unit
+     * 
+     * @param Subject $subject
+     * 
+     * @return Teacher|null
+     */
+    public function getSubjectTeacher(Subject $subject) : ?Teacher
+    {
+        $responsibility = $this->responsibilities()
+            ->wherePivot('subject_id', $subject->id)
+            ->first();
+
+        return optional(optional($responsibility)->pivot)->teacher;
+    }
 }

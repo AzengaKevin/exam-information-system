@@ -4,7 +4,7 @@
             <table class="table table-sm table-hover">
                 <thead>
                     <tr>
-                        <th colspan="{{ $systemSettings->school_level === 'secondary' ? 5 : 4 }}">{{ $level->name }} {{ $subject->name }} Performance</th>
+                        <th colspan="{{ $systemSettings->school_level === 'secondary' ? 6 : 5 }}">{{ $level->name }} {{ $subject->name }} Performance</th>
                     </tr>
                     <tr>
                         <th>#</th>
@@ -17,6 +17,7 @@
                         <th>Average</th>
                         <th>Deviation</th>
                         @endif
+                        <th>Teacher</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -33,11 +34,12 @@
                         <td>{{ $subject->pivot->average }}</td>
                         <td>{{ $subject->pivot->average_deviation ?? '-' }}</td>
                         @endif
+                        <td>{{ optional($subject->pivot->levelUnit->getSubjectTeacher($subject))->auth->name }}</td>
                     </tr>
                     @endforeach
                     @else
                     <tr>
-                        <td colspan="{{ $systemSettings->school_level === 'secondary' ? 5 : 4 }}">
+                        <td colspan="{{ $systemSettings->school_level === 'secondary' ? 6 : 5 }}">
                             <div class="py-1 text-center">Subject Performance not Published</div>
                         </td>
                     </tr>

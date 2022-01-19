@@ -295,6 +295,8 @@ class LevelUnitExamScores extends Component
 
             LevelUnitActions::publishStudentResults($this->exam, $this->levelUnit);
 
+            LevelUnitActions::publishExamTopStudentsPerSubject($this->exam, $this->levelUnit);
+
             session()->flash('status', "Class {$this->levelUnit->alias} scores have been successfully published, you can republish the scores incase of any changes");
 
             $this->emit('hide-publish-class-scores-modal');

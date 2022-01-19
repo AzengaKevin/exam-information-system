@@ -66,8 +66,7 @@ class SubjectExamScores extends Component
 
         if (!is_null($this->levelUnit)) $query->where('students.level_unit_id', $this->levelUnit->id);
             
-        //return $query->orderBy('score', 'desc')->paginate(24);
-        return $query->paginate(24)->withQueryString();
+        return $query->orderBy('name')->paginate(24)->withQueryString();
     }
 
     /** 
