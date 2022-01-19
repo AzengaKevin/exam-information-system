@@ -265,10 +265,15 @@ class TeacherResponsibilities extends Component
 
             $this->authorize('manageTeacherResponsibilities', $this->teacher);
             
-            if(ResponsibilityTeacher::where($data)->doesntExist()){
+            $id = $data['responsibility_id'];
 
-                $id = $data['responsibility_id'];
-    
+            
+            $responsibility = Responsibility::findOrFail($id);
+            
+            $count = ResponsibilityTeacher::where($data)->count();
+            
+            if($count < $responsibility->how_many){
+
                 unset($data['responsibility_id']);
                 
                 $this->teacher->responsibilities()->attach($id, $data);
@@ -281,12 +286,11 @@ class TeacherResponsibilities extends Component
 
             }else{
 
-                session()->flash('error', 'The responsibility is already assigned to another teacher');
+                session()->flash('error', "Enough teachers already assigned the {$responsibility->name} responsibility");
     
                 $this->emit('hide-assign-teacher-responsibility-modal');
 
             }
-
 
         } catch (\Exception $exception) {
 
