@@ -51,7 +51,7 @@
     </div>
 
     <x-modals.teachers.responsibilities.assign :levels="$levels" :departments="$departments" :levelUnits="$levelUnits"
-        :responsibilityOptions="$responsibilityOptions" :subjects="$subjects" :fields="$fields" />
+        :responsibilityOptions="$allResponsibilities" :subjects="$subjects" :fields="$fields" />
 
     @include('partials.teachers.responsibilities.assign-bulk')
 </div>

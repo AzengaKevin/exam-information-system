@@ -11,7 +11,6 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Gate;
 
 class Responsibilities extends Component
 {

@@ -13,6 +13,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use App\Http\Livewire\TeacherResponsibilities;
+use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -21,12 +23,16 @@ class TeachersResponsibilitiesManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
+    private Role $role;
+
     public function setUp(): void
     {
         parent::setUp();
 
         /** @var Authenticatable */
-        $user = User::factory()->create();
+        $user = User::factory()->create([
+            'role_id' => $this->role = Role::factory()->create()
+        ]);
 
         $this->actingAs($user);
     }
@@ -35,6 +41,8 @@ class TeachersResponsibilitiesManagementTest extends TestCase
     public function testAuthorizedUserCanVisitTeacherResponsibilityManagementPage()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Teachers Manage Responsibilities']));
             
         /** @var Teacher */
         $teacher = Teacher::factory()->create();
@@ -67,6 +75,8 @@ class TeachersResponsibilitiesManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Teachers Manage Responsibilities']));
+
         /** @var Teacher */
         $teacher = Teacher::factory()->create();
 
@@ -77,9 +87,7 @@ class TeachersResponsibilitiesManagementTest extends TestCase
             'password' => Hash::make('password')
         ]);
         
-        $responsibility = Responsibility::factory()->create([
-            'requirements' => ['class']
-        ]);
+        $responsibility = Responsibility::factory()->create(['requirements' => ['class']]);
 
         $levelUnit = LevelUnit::factory()->create();
 
@@ -97,6 +105,8 @@ class TeachersResponsibilitiesManagementTest extends TestCase
     public function testAuthorizedUserCanRevokeTeacherResponsibilities()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Teachers Manage Responsibilities']));
 
         /** @var Teacher */
         $teacher = Teacher::factory()->create();
@@ -127,6 +137,8 @@ class TeachersResponsibilitiesManagementTest extends TestCase
     public function testAuthorizedUserCanAssignBulkSubjectResponsibilitiiesToTeacher()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Teachers Manage Responsibilities']));
 
         $this->artisan('db:seed --class=SubjectsSeeder');
 

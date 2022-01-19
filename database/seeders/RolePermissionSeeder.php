@@ -56,6 +56,7 @@ class RolePermissionSeeder extends Seeder
             'Teachers Create',
             'Teachers Update',
             'Teachers Delete',
+            'Teachers Manage Responsibilities',
 
             'Guardians Browse',
             'Guardians Read',

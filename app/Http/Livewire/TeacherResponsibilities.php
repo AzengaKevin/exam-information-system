@@ -2,23 +2,30 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Department;
 use App\Models\Level;
-use App\Models\LevelUnit;
-use App\Models\Responsibility;
-use App\Models\ResponsibilityTeacher;
 use App\Models\Teacher;
-use App\Settings\SystemSettings;
-use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use App\Models\LevelUnit;
+use App\Models\Department;
+use App\Models\Responsibility;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Log;
+use App\Models\ResponsibilityTeacher;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class TeacherResponsibilities extends Component
 {
+    use AuthorizesRequests;
+
     public Teacher $teacher;
 
-    public Collection $allResponsibilities;
+    public $allResponsibilities;
+    public $levels;
+    public $subjects;
+    public $departments;
+    public $levelUnits;
 
     public $responsibility_id;
     public $level_unit_id;
@@ -26,49 +33,70 @@ class TeacherResponsibilities extends Component
     public $department_id;
     public $subject_id;
 
+    /** @var array required field resonsibilities */
     public $fields = [];
 
     public $type = null;
 
     public $selectAllClasses;
+
     public $teacher_subject_id;
 
     public $selectedClasses = [];
 
-    public Collection $allLevelUnitsMissingTeacherForThatSubject;
+    public $allLevelUnitsMissingTeacherForThatSubject;
 
     public Responsibility $teacherResponsibility;
 
+    /**
+     * Lifecycle method executed ones when the component is launching
+     * 
+     * @param Teacher $teacher
+     */
     public function mount(Teacher $teacher)
     {
         $this->teacher = $teacher;
 
         $this->allResponsibilities = $this->getResponsibilities();
+        $this->levels = $this->getLevels();
+        $this->subjects = $this->getSubjects();
+        $this->departments = $this->getDepartments();
+        $this->levelUnits = $this->getLevelUnits();
 
         $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
 
         $this->teacherResponsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
     }
 
+    /**
+     * Executes everytime the state of the component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.teacher-responsibilities', [
-            'responsibilities' => $this->getTeacherResponsibilities(),
-            'responsibilityOptions' => $this->allResponsibilities,
-            'levels' => $this->getLevels(),
-            'subjects' => $this->getSubjects(),
-            'departments' => $this->getDepartments(),
-            'levelUnits' => $this->getLevelUnits()
+            'responsibilities' => $this->getTeacherResponsibilities()
         ]);
     }
 
+    /**
+     * Hook method called everytime the responsibility_id field is updated
+     * 
+     * @param mixed
+     */
     public function updatedResponsibilityId($value)
     {
         $responsibility = $this->allResponsibilities->find($value);
 
-        $this->fields = $responsibility->requirements;
+        $this->fields = $responsibility->requirements ?? [];
     }
 
+    /**
+     * Hook method to select all classes
+     * 
+     * @param bool - true|false variant
+     */
     public function updatedSelectAllClasses($value)
     {
         $value = boolval($value);
@@ -135,31 +163,39 @@ class TeacherResponsibilities extends Component
         return $this->teacher->fresh()->responsibilities;
     }
 
+    /**
+     * Dynamic validation rules based on the responsibility selected requirements
+     * 
+     * @return array
+     */
     public function rules()
     {
         $dynamicRules = array();
 
         if (in_array('level', $this->fields)) {
-            $dynamicRules['level_id'] = ['required', 'integer'];
+            $dynamicRules['level_id'] = ['bail', 'required', 'integer'];
         }
 
         if (in_array('department', $this->fields)) {
-            $dynamicRules['department_id'] = ['required', 'integer'];
+            $dynamicRules['department_id'] = ['bail', 'required', 'integer'];
         }
 
         if (in_array('class', $this->fields)) {
-            $dynamicRules['level_unit_id'] = ['required', 'integer'];
+            $dynamicRules['level_unit_id'] = ['bail', 'required', 'integer'];
         }
 
         if (in_array('subject', $this->fields)) {
-            $dynamicRules['subject_id'] = ['required', 'integer'];
+            $dynamicRules['subject_id'] = ['bail', 'required', 'integer'];
         }
 
         return array_merge($dynamicRules, [
-            'responsibility_id' => ['bail', 'required', 'integer']
+            'responsibility_id' => ['bail', 'bail', 'required', 'integer']
         ]);
     }
 
+    /**
+     * Assign a teacher single responsibility
+     */
     public function assignResponsibility()
     {
         $data = $this->validate();
@@ -167,6 +203,8 @@ class TeacherResponsibilities extends Component
         $data = array_filter($data, fn($value, $key) => !empty($value), ARRAY_FILTER_USE_BOTH);
 
         try {
+
+            $this->authorize('manageTeacherResponsibilities', $this->teacher);
             
             if(ResponsibilityTeacher::where($data)->doesntExist()){
 
@@ -192,10 +230,18 @@ class TeacherResponsibilities extends Component
 
 
         } catch (\Exception $exception) {
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'teacher' => $this->teacher->id,
-            ]);
+
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to assign the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+            $this->emit('hide-upsert-responsibility-modal');
         }
         
     }
@@ -205,13 +251,15 @@ class TeacherResponsibilities extends Component
      */
     public function assignBulkResponsibilities()
     {
+        
+        $data = $this->validate([
+            'teacher_subject_id' => ['bail', 'required', 'integer'],
+            'selectedClasses' => ['bail', 'array', 'required', 'min:1']
+        ]);
 
         try {
-            
-            $data = $this->validate([
-                'teacher_subject_id' => ['bail', 'required', 'integer'],
-                'selectedClasses' => ['bail', 'array', 'required', 'min:1']
-            ]);
+
+            $this->authorize('manageTeacherResponsibilities', $this->teacher);
     
             $classes = array_filter($data['selectedClasses'], fn($value, $key) => boolval($value), ARRAY_FILTER_USE_BOTH);
 
@@ -237,23 +285,31 @@ class TeacherResponsibilities extends Component
     
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'teacher' => $this->teacher->id,
-            ]);
-    
-            session()->flash('error', "A fatal DB error occurred");
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
+            $message = "Failed to assign the responsibilities";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
             $this->emit('hide-assign-bulk-responsibilities-modal');
             
         }
         
     }
 
+    /**
+     * Remove the current teacher responsibility
+     */
     public function removeResponsibility(ResponsibilityTeacher $responsibilityTeacher)
     {
 
         try {
+
+            $this->authorize('manageTeacherResponsibilities', $this->teacher);
             
             if($responsibilityTeacher->delete()){
 
@@ -263,12 +319,15 @@ class TeacherResponsibilities extends Component
     
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'teacher' => $this->teacher->id,
-            ]);
-    
-            session()->flash('error', "No such responsibility for {$this->teacher->auth->name}");
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to revoke the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
             
         }
     }
