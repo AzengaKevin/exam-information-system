@@ -23,18 +23,29 @@
                     <td>{{ $responsibility->teachers->count() }}</td>
                     <td>{{ $responsibility->created_at->format('d/m/Y') }}</td>
                     <td>
-                        <div class="hstack gap-2 align-items-center">
-                            <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                        <div class="d-inline-flex gap-2 align-items-center">
+                            <button class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
                                 <i class="fa fa-eye"></i>
                                 <span>Details</span>
                             </button>
                             <button wire:click="editResponsibility({{ $responsibility }})"
-                                class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                                class="btn btn-sm btn-outline-info d-inline-flex gap-1 align-items-center">
                                 <i class="fa fa-edit"></i>
                                 <span>Edit</span>
                             </button>
+                            @can('updateLocked', $responsibility)            
+                            <button wire:click="toggleResponsibilityLock({{ $responsibility }})"
+                                class="btn btn-sm {{ $responsibility->locked ? 'btn-warning' : 'btn-outline-warning' }} d-inline-flex gap-1 align-items-center">
+                                <i class="fa fa-edit"></i>
+                                @if ($responsibility->locked)
+                                <span>Unlock</span>
+                                @else
+                                <span>Lock</span>
+                                @endif
+                            </button>
+                            @endcan
                             <button wire:click="showDeleteResponsibilityModal({{ $responsibility }})"
-                                class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
+                                class="btn btn-sm btn-outline-danger d-inline-flex gap-2 align-items-center">
                                 <i class="fa fa-trash" aria-hidden="true"></i>
                                 <span>Delete</span>
                             </button>

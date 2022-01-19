@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use App\Actions\Exam\CreateScoresTable;
 use App\Http\Livewire\ExamQuickActions;
+use App\Settings\GeneralSettings;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -101,7 +102,7 @@ class ExamsScoresManagementTest extends TestCase
     }
 
     /** @group exam-scores */
-    public function testDosCanVisitExamScoresPageWhenApplicable()
+    public function testExamManagerCanVisitExamScoresPageWhenApplicable()
     {
         $this->withoutExceptionHandling();
 
@@ -120,6 +121,13 @@ class ExamsScoresManagementTest extends TestCase
 
         // Create Responsibility for the current teacher
         $responsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+
+        /** @var GeneralSettings */
+        $generalSettings = app(GeneralSettings::class);
+
+        $generalSettings->exam_manager_responsibility_id = $responsibility->id;
+
+        $generalSettings->save();
 
         // Associate Teacher and Responsibility
         $this->teacher->responsibilities()->attach($responsibility);

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Settings\GeneralSettings;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -16,10 +17,7 @@ class Teacher extends Model
 
     public static function employerOptions()
     {
-        return [
-            'TSC',
-            'BOM'
-        ];
+        return ['TSC','BOM'];
     }
 
     /**
@@ -60,5 +58,37 @@ class Teacher extends Model
         $dosRes = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
 
         return $this->responsibilities->contains($dosRes);
+    }
+
+    /**
+     * Check if a teacher is the exam manager
+     * 
+     * @return bool
+     */
+    public function isExamManager() : bool
+    {
+        /** @var GeneralSettings */
+        $generalSettings = app(GeneralSettings::class);
+
+        $examManagerResp = Responsibility::find($generalSettings->exam_manager_responsibility_id);
+
+        if (is_null($examManagerResp)) $examManagerResp = Responsibility::firstOrCreate(['name' => "Exam Manager"]);
+
+        return $this->responsibilities->contains($examManagerResp);
+    }
+
+    /**
+     * Check if a teacher is the school manager
+     */
+    public function isSchoolManager() : bool
+    {
+        /** @var GeneralSettings */
+        $generalSettings = app(GeneralSettings::class);
+
+        $schoolManagerResp = Responsibility::find($generalSettings->exam_manager_responsibility_id);
+
+        if (is_null($schoolManagerResp)) $schoolManagerResp = Responsibility::firstOrCreate(['name' => "Principal"]);
+
+        return $this->responsibilities->contains($schoolManagerResp);
     }
 }

@@ -98,6 +98,8 @@ class ExamsResultsManagementTest extends TestCase
         // Generate Aggregates for exam scores
         $this->generateAggregatesForExamScores($exam, $levelUnit);
 
+        $exam->update(['status' => 'Published']);
+
         $response = $this->get(route('exams.results.index', $exam));
 
         $response->assertOk();
@@ -156,6 +158,8 @@ class ExamsResultsManagementTest extends TestCase
 
         // Generate Aggregates for exam scores
         $this->generateAggregatesForExamScores($exam, $levelUnit);
+
+        $exam->update(['status' => 'Published']);
 
         $response = $this->get(route('exams.results.index', [
             'exam' => $exam,

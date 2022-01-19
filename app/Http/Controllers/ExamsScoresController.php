@@ -43,8 +43,6 @@ class ExamsScoresController extends Controller
         $ctResp = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
         $lsResp = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
 
-        $dosResp = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
-
         $responsibilities = collect([]);
 
         if($systemSettings->school_has_streams){
