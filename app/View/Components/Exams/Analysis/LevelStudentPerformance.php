@@ -48,8 +48,8 @@ class LevelStudentPerformance extends Component
         $systemSettings = app(SystemSettings::class);
 
         $orderByCol = ($systemSettings->school_level === 'secondary')
-            ? 'mp'
-            : 'mm';
+            ? 'tp'
+            : 'tm';
 
         return $this->exam->students()
             ->orderByPivot($orderByCol, 'desc')

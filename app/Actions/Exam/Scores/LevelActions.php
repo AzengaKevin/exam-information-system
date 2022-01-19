@@ -145,11 +145,11 @@ class LevelActions
                     'mp' => $avgPoints,
                     'tp' => $totalPoints,
                     'tm' => $totalScore,
-                    'mmd' => ($avgScore - $prevMm),
-                    'tmd' => ($totalScore - $prevTm),
-                    'tpd' => ($totalPoints - $prevTp),
-                    'mpd' => ($avgPoints - $prevMp),
-                    'mpd' => ($prevMp - $avgPoints)
+                    'mmd' => is_null($prevMm) ? 0 : ($avgScore - $prevMm),
+                    'tmd' => is_null($prevTm) ? 0 : ($totalScore - $prevTm),
+                    'tpd' => is_null($prevTp) ? 0 : ($totalPoints - $prevTp),
+                    'mpd' => is_null($prevMp) ? 0 : ($avgPoints - $prevMp),
+                    'mpd' => is_null($prevMp) ? 0 : ($avgPoints - $prevMp)
                 ]);
             });
 

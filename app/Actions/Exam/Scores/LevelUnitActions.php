@@ -139,10 +139,11 @@ class LevelUnitActions
                     'mp' => $avgPoints,
                     'tp' => $totalPoints,
                     'tm' => $totalScore,
-                    'mmd' => ($avgScore - $prevMm),
-                    'tmd' => ($totalScore - $prevTm),
-                    'tpd' => ($totalPoints - $prevTp),
-                    'mpd' => ($avgPoints - $prevMp)
+                    'mmd' => is_null($prevMm) ? 0 : ($avgScore - $prevMm),
+                    'tmd' => is_null($prevTm) ? 0 : ($totalScore - $prevTm),
+                    'tpd' => is_null($prevTp) ? 0 : ($totalPoints - $prevTp),
+                    'mpd' => is_null($prevMp) ? 0 : ($avgPoints - $prevMp),
+                    'mpd' => is_null($prevMp) ? 0 : ($avgPoints - $prevMp)
                 ]);
             });
 
@@ -167,7 +168,7 @@ class LevelUnitActions
 
             $tblName = Str::slug($exam->shortname);
 
-            // Get order records from the databas with the admno number as the primary key
+            // Get order records from the database with the admno number as the primary key
             /** @var Collection */
             $data = DB::table($tblName)
                 ->select(['student_id', $col])
