@@ -2,29 +2,9 @@
     <x-feedback />
 
     <div class="d-inline-flex flex-wrap gap-2">
-        <button data-bs-toggle="modal" data-bs-target="#filter-level-{{ $level->id }}-exam-results-modal"
-            class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
-            <i class="fa fa-filter"></i>
-            <span>Filter Results</span>
-        </button>
-        <button data-bs-toggle="modal" data-bs-target="#order-level-{{ $level->id }}-exam-results-modal"
-            class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
-            <i class="fa fa-sort"></i>
-            <span>Order Results</span>
-        </button>
-
-        @if ($systemSettings->school_has_streams)           
-        <a href="{{ route('exams.results.index', [
-            'exam' => $exam,
-            'level' => $level->id
-        ]) }}" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
-            <i class="fa fa-eye"></i>
-            <span>Details</span>
-        </a>
-        @endif
         <a href="{{ route('exams.merit-list.download', [
             'exam' => $exam,
-            'level' => $level->id
+            'level-unit' => $levelUnit->id
         ]) }}" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center" download>
             <i class="fa fa-print"></i>
             <span>Print List</span>
@@ -35,7 +15,7 @@
         <table class="table table-hover">
             <thead class="text-uppercase">
                 <tr class="text-center">
-                    <th colspan="{{ count($cols) }}">{{ $level->name }} - {{ $exam->name }} Results</th>
+                    <th colspan="{{ count($cols) }}">{{ $levelUnit->alias }} - {{ $exam->name }} Results</th>
                 </tr>
                 <tr>
                     @foreach ($cols as $col)
@@ -83,9 +63,5 @@
             </tfoot>
         </table>
     </div>
-
-    @include('partials.exams.results.levels.modal.filter')
-
-    @include('partials.exams.results.levels.modal.order')
 
 </div>
