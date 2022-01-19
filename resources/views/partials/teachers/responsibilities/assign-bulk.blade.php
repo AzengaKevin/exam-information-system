@@ -24,6 +24,7 @@
                     @enderror
                 </div>
 
+                @if ($systemSettings->school_has_streams)                    
                 @if ($allLevelUnitsMissingTeacherForThatSubject->count())
                 <div class="mt-3">
                     <label for="classes" class="form-label">Classes</label>
@@ -47,6 +48,32 @@
                         @endforeach
                     </fieldset>
                 </div>
+                @endif
+                @else                    
+                @if ($allLevelsMissingTeacherForTheSubject->count())
+                <div class="mt-3">
+                    <label for="classes" class="form-label">Levels</label>
+                    <fieldset id="classes" class="row g-3">
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                <input type="checkbox" wire:model="selectAllClasses" id="select-all-classes"
+                                    class="form-check-input">
+                                <label for="select-all-classes"> {{ $selectAllClasses ? "Deselect All" : "Select All" }}</label>
+                            </div>
+                        </div>
+
+                        @foreach ($allLevelsMissingTeacherForTheSubject as $level)
+                        <div class="col-md-4">
+                            <div class="form-check">
+                                <input type="checkbox" wire:model="selectedClasses.{{ $level->id }}"
+                                    id="selected-class-{{ $loop->iteration }}" class="form-check-input">
+                                <label for="selected-class-{{ $loop->iteration }}">{{ $level->name }}</label>
+                            </div>
+                        </div>
+                        @endforeach
+                    </fieldset>
+                </div>
+                @endif
                 @endif
             </div>
             <div class="modal-footer">

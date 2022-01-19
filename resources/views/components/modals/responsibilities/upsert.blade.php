@@ -26,6 +26,16 @@
                     </span>
                     @enderror
                 </div>
+                <div class="mt-3">
+                    <label for="how_many" class="form-label">Hom Many</label>
+                    <input type="number" wire:model.lazy="how_many" id="how_many"
+                        class="form-control @error('how_many') is-invalid @enderror">
+                    @error('how_many')
+                    <span class="invalid-feedback">
+                        <strong>{{ $message }}</strong>
+                    </span>
+                    @enderror
+                </div>
 
                 <div class="mt-3">
                     <label for="requirements" class="form-label">Requirement(s)</label>
