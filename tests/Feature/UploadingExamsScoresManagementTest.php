@@ -175,11 +175,16 @@ class UploadingExamsScoresManagementTest extends TestCase
             $this->assertNotNull($item->$subCol);
         });
 
-        $response->assertRedirect(route('exams.scores.manage', [
-            'exam' => $exam,
-            'subject' => $subject->id,
-            'level' => $level->id
-        ]));
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        if ($dbDriver == 'mysql') {            
+            $response->assertRedirect(route('exams.scores.manage', [
+                'exam' => $exam,
+                'subject' => $subject->id,
+                'level' => $level->id
+            ]));
+        }
+
         
     }
 
@@ -256,11 +261,16 @@ class UploadingExamsScoresManagementTest extends TestCase
             $this->assertNotNull($item->$subCol);
         });
 
-        $response->assertRedirect(route('exams.scores.manage', [
-            'exam' => $exam,
-            'subject' => $subject->id,
-            'level' => $level->id
-        ]));
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        if($dbDriver == 'mysql'){
+            $response->assertRedirect(route('exams.scores.manage', [
+                'exam' => $exam,
+                'subject' => $subject->id,
+                'level' => $level->id
+            ]));
+        }
+
         
     }
     

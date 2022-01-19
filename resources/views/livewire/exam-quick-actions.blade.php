@@ -4,13 +4,13 @@
         <hr>
         <x-feedback />
         <div class="d-flex gap-3 flex-wrap">
-
+            @if (false)                
             <a href="#" class="btn btn-outline-primary gap-2 align-items-center disabled">
                 <i class="fa fa-table"></i>
                 <span class="">Exam Timetable</span>
             </a>
+            @endif
 
-            @if (false)                
             @can('updateScoresTable', $exam)
             <button data-bs-toggle="modal" data-bs-target="#update-scores-table-modal"
                 class="btn btn-primary hstack gap-2">
@@ -18,7 +18,6 @@
                 <span>Scores Table</span>
             </button>
             @endcan
-            @endif
 
             @can('change-exam-status')
             <button data-bs-toggle="modal" data-bs-target="#change-status-exam-modal"
@@ -46,7 +45,6 @@
                 <i class="fa fa-poll"></i>
                 <span class="">Analysis</span>
             </a>
-
             @endif
 
             @can('viewTranscripts', $exam)

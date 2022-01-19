@@ -14,7 +14,10 @@
         </button>
 
         @if ($systemSettings->school_has_streams)           
-        <a href="#" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+        <a href="{{ route('exams.results.index', [
+            'exam' => $exam,
+            'level' => $level->id
+        ]) }}" class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
             <i class="fa fa-eye"></i>
             <span>Details</span>
         </a>

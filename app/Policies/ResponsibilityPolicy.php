@@ -44,7 +44,9 @@ class ResponsibilityPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-create')
+            ? Response::allow()
+            : Response::deny('You are not allowed to create a responsibility');
     }
 
     /**
@@ -56,7 +58,23 @@ class ResponsibilityPolicy
      */
     public function update(User $user, Responsibility $responsibility)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-update')
+            ? Response::allow()
+            : Response::deny('You are not allowed to update the responsibility');
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Responsibility  $responsibility
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function updateLocked(User $user, Responsibility $responsibility)
+    {
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-update-locked')
+            ? Response::allow()
+            : Response::deny("The responsibility, {$responsibility->name} is locked, you can't update it");
     }
 
     /**
@@ -67,6 +85,18 @@ class ResponsibilityPolicy
      * @return \Illuminate\Auth\Access\Response|bool
      */
     public function delete(User $user, Responsibility $responsibility)
+    {
+        //
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Responsibility  $responsibility
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function deleteLocked(User $user, Responsibility $responsibility)
     {
         //
     }

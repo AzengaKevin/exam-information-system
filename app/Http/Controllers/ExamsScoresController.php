@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\Exam\Scores\CompleteUpload;
 use App\Http\Requests\UploadScoresRequest;
 use App\Models\Exam;
 use App\Models\User;
@@ -15,6 +16,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use App\Models\Grading;
 use App\Models\Level;
+use App\Settings\SystemSettings;
 
 class ExamsScoresController extends Controller
 {
@@ -26,7 +28,7 @@ class ExamsScoresController extends Controller
      * @param Request $request
      * @param Exam $exam
      */
-    public function index(Request $request, Exam $exam)
+    public function index(Request $request, Exam $exam, SystemSettings $systemSettings)
     {
         $this->authorize('viewScoresPage', $exam);
         
@@ -37,35 +39,36 @@ class ExamsScoresController extends Controller
         $teacher = $user->authenticatable;
 
         /** @var Responsibility */
-        $responsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
-        $classTeacherResponsibility = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-        $levelSupervisorResponsibility = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+        $subResp = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+        $ctResp = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+        $lsResp = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
 
-        $dosResponsibility = Responsibility::firstOrCreate(['name' => 'Director of Studies']);
+        $responsibilities = collect([]);
 
-        $responsibilities = $teacher->responsibilities()
-            ->whereIn('responsibilities.id', [
-                $responsibility->id, 
-                $classTeacherResponsibility->id, 
-                $levelSupervisorResponsibility->id
-            ])->get();
+        if($systemSettings->school_has_streams){
 
-        $levels = collect([]);
+            $responsibilities = $teacher->responsibilities()
+                ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
+                ->whereIn('responsibilities.id', [
+                    $subResp->id,
+                    $ctResp->id, 
+                    $lsResp->id
+                ])->get();
+        }else{
 
-        $levelUnits = collect([]);
+            $responsibilities = $teacher->responsibilities()
+                ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                ->whereIn('responsibilities.id', [
+                    $subResp->id,
+                    $ctResp->id,
+                    $lsResp->id
+                ])->get();
 
-        if ($teacher->responsibilities()->where('responsibilities.id', $dosResponsibility->id)->exists()) {
-            $levels = $exam->levels;
-
-            $levelUnits = LevelUnit::whereIn('level_id', $exam->levels->pluck('id')->toArray())
-                ->get();
         }
-
+        
         return view('exams.scores.index', [
             'exam' => $exam,
-            'responsibilities' => $responsibilities,
-            'levels' => $levels,
-            'levelUnits' => $levelUnits,
+            'responsibilities' => $responsibilities
         ]);
         
     }
@@ -104,7 +107,7 @@ class ExamsScoresController extends Controller
 
             if ($levelUnit) $query->where('students.level_unit_id', $levelUnit->id);
                 
-            $data = $query->get();
+            $data = $query->orderBy('students.name')->get();
 
             $title = "Upload " . (optional($level)->name ?? optional($levelUnit)->alias) . " - {$subject->name} Scores";
 
@@ -212,9 +215,19 @@ class ExamsScoresController extends Controller
                 // Process Uploading the scores
                 $this->uploadScoresWithoutSegments($data, $values, $level, $levelUnit, $exam, $subject);
 
-            }else{
+                CompleteUpload::rank($exam, $subject, $level, $levelUnit);
 
+                CompleteUpload::calculateDeviations($exam, $subject, $level, $levelUnit);
+                
+            }else{
+                
                 $this->uploadScoresWithSegments($data, $level, $levelUnit, $exam, $subject);
+                
+                CompleteUpload::calculateTotals($exam, $subject, $level, $levelUnit);
+                
+                CompleteUpload::rank($exam, $subject, $level, $levelUnit);
+
+                CompleteUpload::calculateDeviations($exam, $subject, $level, $levelUnit);
 
             }
 
@@ -234,7 +247,7 @@ class ExamsScoresController extends Controller
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A db error occurred, check with admin');
+            session()->flash('error', $exception->getMessage());
 
             return back()->withInput();
             

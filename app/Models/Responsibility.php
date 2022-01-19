@@ -16,9 +16,14 @@ class Responsibility extends Model
         'slug',
         'requirements',
         'description',
+        'locked',
+        'how_many'
     ];
 
-    protected $casts = ['requirements' => 'array'];
+    protected $casts = [
+        'requirements' => 'array',
+        'locked' => 'boolean'
+    ];
 
     public function setNameAttribute($value)
     {
@@ -27,7 +32,17 @@ class Responsibility extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
+
     /**
+     * Hooking the loccked attribute to change to proper format
+     */
+    public function setLockedAttribute($value)
+    {
+        $this->attributes['locked'] = boolval($value);
+    }
+
+    /**
+     *soft-deletes-everywhere
      * Responsibility - Teacher relation
      */
     public function teachers()

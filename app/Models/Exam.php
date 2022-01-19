@@ -22,12 +22,13 @@ class Exam extends Model
         'weight',
         'counts',
         'description',
-        'status'
+        'status',
+        'deviation_exam_id'
     ];
 
     protected $casts = [
-        // 'start_date' => 'date',
-        // 'end_date' => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
         'counts' => 'boolean'
     ];
 
@@ -40,6 +41,11 @@ class Exam extends Model
         return ['Term 1','Term 2','Term 3'];
     }
 
+    /**
+     * Mutator to set the exam slug name from the shortname
+     * 
+     * @param mixed $value
+     */
     public function setShortnameAttribute($value)
     {
         $this->attributes['shortname'] = $value;
@@ -92,20 +98,40 @@ class Exam extends Model
     }
 
     /**
+     * Exam status scope method
+     */
+    public function scopeStatus($query, string $status)
+    {
+        $query->where('status', $status);
+    }
+
+    /**
+     * Exam - Deviation Exam Relation
+     * 
+     */
+    public function deviationExam()
+    {
+        return $this->belongsTo(Exam::class, 'deviation_exam_id');
+    }
+
+    /**
      * Defines exam level relation
      */
     public function levels()
     {
         return $this->belongsToMany(Level::class)
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average']);
+            ->withPivot(['points', 'grade', 'average', 'points_deviation', 'average_deviation']);
     }
 
+    /**
+     * Defines exam level-unit relation
+     */
     public function levelUnits()
     {
         return $this->belongsToMany(LevelUnit::class)
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average']);
+            ->withPivot(['points', 'grade', 'average', 'points_deviation', 'average_deviation']);
     }
 
     /**
@@ -144,7 +170,7 @@ class Exam extends Model
     {
         return $this->belongsToMany(Subject::class, 'exam_level_subject_performance', 'exam_id', 'subject_id')
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average', 'level_id']);
+            ->withPivot(['points', 'points_deviation', 'grade', 'average', 'average_deviation', 'level_id']);
     }
 
     /**
@@ -153,9 +179,9 @@ class Exam extends Model
     public function levelUnitSubjectPerformance()
     {
         return $this->belongsToMany(Subject::class, 'exam_level_unit_subject_performance')
+            ->using(StreamSubjectPerformance::class)
             ->withTimestamps()
-            ->withPivot(['points', 'grade', 'average', 'level_unit_id']);
-        
+            ->withPivot(['points', 'grade', 'average', 'level_unit_id', 'points_deviation', 'average_deviation']);
     }
 
     /**
@@ -164,7 +190,7 @@ class Exam extends Model
     public function students()
     {
         return $this->belongsToMany(Student::class)
-            ->withPivot(['mm','tm','mp','tp','mg','sp','op'])
+            ->withPivot(['mm','tm','mp','tp','mg','sp','op', 'mmd', 'tmd', 'mpd', 'tpd'])
             ->withTimestamps();
     }
 
@@ -176,6 +202,58 @@ class Exam extends Model
     public function getAllLevelUnits()
     {
         return LevelUnit::whereIn('level_id', $this->levels->pluck('id')->all())->get();
+    }
+
+    /**
+     * Checks whether the current exam matches the previous exam
+     * 
+     * @param Exam $exam - The other exam to compare tp
+     * 
+     * @return bool - Whether the exams match or not
+     */
+    public function matches(Exam $exam) : bool
+    {
+        $currentExamSubjectsIds = $this->subjects->pluck('id')->all();
+
+        $otherExamSubjectsIds = $exam->subjects->pluck('id')->all();
+
+        $currentExamLevelsIds = $this->levels->pluck('id')->all();
+
+        $otherExamLevelsIds = $exam->levels->pluck('id')->all();
+
+        if(count($currentExamSubjectsIds) != count($otherExamSubjectsIds)) return false;
+
+        if(count($currentExamLevelsIds) != count($otherExamLevelsIds)) return false;
+        
+        if(!empty(array_diff($currentExamSubjectsIds, $otherExamSubjectsIds))) return false;
+
+        if(!empty(array_diff($currentExamLevelsIds, $otherExamLevelsIds))) return false;
+
+        return true;
+    }
+
+    /**
+     * Exam - Student relation for top students per subject (level)
+     * 
+     * @return Relation
+     */
+    public function levelTopSubjectStudents()
+    {
+        return $this->belongsToMany(Student::class, 'exam_level_top_students_per_subject')
+            ->withTimestamps()
+            ->withPivot(['subject_id', 'level_id', 'score', 'grade']);
+    }
+
+    /**
+     * Exam - Student relation for top students per subject (level-unit)
+     * 
+     * @return Relation
+     */
+    public function levelUnitTopSubjectStudents()
+    {
+        return $this->belongsToMany(Student::class, 'exam_level_unit_top_students_per_subject')
+            ->withTimestamps()
+            ->withPivot(['subject_id', 'level_unit_id', 'score', 'grade']);
     }
 
 }

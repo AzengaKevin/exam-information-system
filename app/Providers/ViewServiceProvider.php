@@ -30,13 +30,7 @@ class ViewServiceProvider extends ServiceProvider
             'layouts.dashboard',
             'dashboard',
             'levels.index',
-            'livewire.students',
-            'livewire.teacher-responsibilities',
-            'livewire.subject-exam-scores',
-            'livewire.exam-levels',
-            'livewire.level-exam-results',
-            'livewire.level-exam-scores',
-            'livewire.level-unit-exam-scores',
+            'livewire.*',
             'students.index',
             'teachers.responsibilities.index',
             'teachers.show',
@@ -48,11 +42,7 @@ class ViewServiceProvider extends ServiceProvider
             'exams.scores.upload',
             'exams.scores.manage',
             'components.modals.students.add',
-            'components.exams.analysis.level-subject-performance',
-            'components.exams.analysis.level-unit-subject-performance',
-            'components.exams.analysis.level-student-performance',
-            'components.exams.analysis.level-unit-student-performance',
-            'components.exams.analysis.level-unit-performance',
+            'components.exams.analysis.*'
         ], SettingsComposer::class);
     }
 }

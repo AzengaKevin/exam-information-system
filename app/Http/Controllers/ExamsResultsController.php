@@ -10,19 +10,50 @@ use App\Settings\SystemSettings;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
 class ExamsResultsController extends Controller
 {
 
+    /**
+     * Show the merit list for the students in the specified levl or leve-unit using parameters
+     * 
+     * @param Request $request
+     * @param Exam $exam
+     */
     public function index(Request $request, Exam $exam)
     {
-        return view('exams.results.index', compact('exam'));
+        $this->authorize('viewResults', $exam);
+
+        try {
+
+            $level = Level::find($request->get('level'));
+            $levelUnit = LevelUnit::find($request->get('level-unit'));
+            
+            return view('exams.results.index', compact('exam', 'level', 'levelUnit'));
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = App::environment('local')
+                ? $exception->getMessage()
+                : "Something aweful occurred";
+
+            session()->flash('error', $message);
+
+            return back();
+        }
     }
 
     /**
-     * Send messages to student guardians
+     * Send students results message to guardians where applicable
+     * 
+     * @param Request $request
+     * @param Exam $exam
+     * @param SystemSettings $systemSettings
      */
     public function sendMessage(Request $request, Exam $exam, SystemSettings $systemSettings)
     {

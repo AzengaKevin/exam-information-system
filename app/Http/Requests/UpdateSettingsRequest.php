@@ -37,6 +37,8 @@ class UpdateSettingsRequest extends FormRequest
             'general.school_telephone_number' => ['bail', 'required', 'string'],
             'general.school_email_address' => ['bail', 'required', 'string'],
             'general.current_academic_year' => ['bail', 'required', 'int'],
+            'general.school_manager_responsibility_id' => ['bail', 'required', 'int'],
+            'general.exam_manager_responsibility_id' => ['bail', 'required', 'int'],
             'general.current_term' => ['bail', 'required', 'string', Rule::in(Exam::termOptions())],
 
             'raw.logo' => ['nullable', 'image', 'max:96']

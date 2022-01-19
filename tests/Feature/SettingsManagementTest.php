@@ -3,9 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\Exam;
+use App\Models\Responsibility;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
+use App\Settings\GeneralSettings;
+use App\Settings\SystemSettings;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -39,7 +42,7 @@ class SettingsManagementTest extends TestCase
 
         $response->assertViewIs('settings.index');
 
-        $response->assertViewHasAll(['systemSettings', 'generalSettings']);
+        $response->assertViewHasAll(['systemSettings', 'generalSettings', 'responsibilities']);
         
     }
 
@@ -47,6 +50,8 @@ class SettingsManagementTest extends TestCase
     public function testAuthorizedUsersCanUpdateSettings()
     {
         $this->withoutExceptionHandling();
+
+        Responsibility::factory(2)->create();
 
         $response = $this->patch(route('settings.update'), [
             'system' => [
@@ -62,8 +67,30 @@ class SettingsManagementTest extends TestCase
                 'school_email_address' => $schoolEmailAddress = $this->faker->safeEmail(),
                 'current_academic_year' => $currentAcademicYear = $this->faker->year(),
                 'current_term' => $currentTerm = $this->faker->randomElement(Exam::termOptions()),
+                'school_manager_responsibility_id' => Responsibility::first()->id,
+                'exam_manager_responsibility_id' => Responsibility::latest()->first()->id,
             ]
         ]);
+
+        /** @var SystemSettings */
+        $systemSettings = app(SystemSettings::class);
+
+        /** @var GeneralSettings */
+        $generalSettings = app(GeneralSettings::class);
+
+        $this->assertEquals($schoolName, $systemSettings->school_name);
+        $this->assertEquals($schoolType, $systemSettings->school_type);
+        $this->assertEquals($schoolLevel, $systemSettings->school_level);
+        $this->assertEquals($schoolHasStreams, $systemSettings->school_has_streams);
+
+        $this->assertEquals($schoolWebsite, $generalSettings->school_website);
+        $this->assertEquals($schoolAddress, $generalSettings->school_address);
+        $this->assertEquals($schoolTelephone, $generalSettings->school_telephone_number);
+        $this->assertEquals($schoolEmailAddress, $generalSettings->school_email_address);
+        $this->assertEquals($currentAcademicYear, $generalSettings->current_academic_year);
+        $this->assertEquals($currentTerm, $generalSettings->current_term);
+        $this->assertEquals(Responsibility::first()->id, $generalSettings->school_manager_responsibility_id);
+        $this->assertEquals(Responsibility::latest()->first()->id, $generalSettings->exam_manager_responsibility_id);
 
         $response->assertRedirect();
         

@@ -3,22 +3,25 @@
 namespace App\Http\Livewire;
 
 use Livewire\Component;
-use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use App\Models\Responsibility;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 
 class Responsibilities extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
 
     public $responsibilityId;
 
     public $name;
-    public $slug;
+    public $how_many;
     public $requirements = [];
     public $description;
 
@@ -30,6 +33,11 @@ class Responsibilities extends Component
         ]);
     }
 
+    /**
+     * Get all database responsibilities (with teachers loaded)
+     * 
+     * @return Collection
+     */
     public function getResponsibilities()
     {
         return Responsibility::with('teachers')->get();
@@ -47,6 +55,8 @@ class Responsibilities extends Component
 
         $this->name = $responsibility->name;
 
+        $this->how_many = $responsibility->how_many;
+
         $this->requirements = $responsibility->requirements;
 
         $this->description = $responsibility->description;
@@ -54,45 +64,72 @@ class Responsibilities extends Component
         $this->emit('show-upsert-responsibility-modal');
     }
 
+    /**
+     * Resonsibilities properties validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('responsibilities')->ignore($this->responsibilityId)],
+            'how_many' => ['bail', 'nullable', 'integer'],
             'requirements' => ['nullable', 'array', Rule::in(Responsibility::requirementOptions())],
             'description' => ['bail', 'nullable']
         ];
     }
 
-    function createResponsibility()
+    /**
+     * Persists a new responsibility to the database
+     */
+    public function createResponsibility()
     {
         $data = $this->validate();
         
         try {
 
-            Responsibility::create($data);
+            $this->authorize('create', Responsibility::class);
 
-            session()->flash('status', 'Responsibility successfully created');
+            $responsibility = Responsibility::create($data);
 
+            $this->reset(['name', 'requirements', 'description']);
+
+            session()->flash('status', "Responsibility, {$responsibility->name} successfully created");
+
+            $this->emit('hide-upsert-responsibility-modal');
             
         } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to create the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
             
-            Log::error($exception->getMessage(), [
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            $this->emit('hide-upsert-responsibility-modal');
 
         }
-        $this->emit('hide-upsert-responsibility-modal');
     }
 
-
+    /**
+     * Update a database responsibility enrty
+     */
     public function updateResponsibility()
     {
         $data = $this->validate();
 
         try {
 
-            /** @var User */
+            /** @var Responsibility */
             $responsibility = Responsibility::findOrFail($this->responsibilityId);
+
+            $this->authorize('update', $responsibility);
+
+            if ($responsibility->locked) $this->authorize('updateLocked', $responsibility);
 
             if($responsibility->update($data)){
 
@@ -102,13 +139,50 @@ class Responsibilities extends Component
             }
             
         } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to update the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
             
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->responsibilityId,
-                'action' => __METHOD__
-            ]);
+            $this->emit('hide-upsert-responsibility-modal');
 
         }
+    }
+
+    /**
+     * Toggle the responsibility Locked Status
+     * 
+     * @param Responsiblity $responsibility
+     */
+    public function toggleResponsibilityLock(Responsibility $responsibility)
+    {
+        try {
+
+            $this->authorize('updateLocked', $responsibility);
+
+            $responsibility->update(['locked' => !$responsibility->locked]);
+            
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to update the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+                        
+        }
+        
     }
 
     public function showDeleteResponsibilityModal(Responsibility $responsibility)
@@ -140,7 +214,7 @@ class Responsibilities extends Component
             
             Log::error($exception->getMessage(), [
                 'responsibility-id' => $this->departmentId,
-                'action' => __CLASS__ . '@' . __METHOD__
+                'action' => __METHOD__
             ]);
 
             session()->flash('error', 'A fatal error has occurred');

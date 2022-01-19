@@ -94,4 +94,18 @@ class TeacherPolicy
     {
         //
     }
+
+    /**
+     * Browse, Assign and Revoke teachers responsibilities
+     * 
+     * @param User $user
+     * @param Teacher $teacher
+     * 
+     */
+    public function manageTeacherResponsibilities(User $user, Teacher $teacher)
+    {
+        return $user->role->permissions->pluck('slug')->contains('teachers-manage-responsibilities')
+            ? Response::allow()
+            : Response::deny('Woops you are not allowed to manage teachers responsibilities');
+    }
 }

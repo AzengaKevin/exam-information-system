@@ -26,7 +26,7 @@
                     <td>{{ $levelUnit->responsibilities->count() }}</td>
                     <td>
                         <div class="hstack gap-2 align-items-center justify-content-center">
-                            <a href="{{route('level-units.show',$levelUnit)}}"  class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                            <a href="{{route('level-units.show',$levelUnit)}}"  class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
                                 
                                 <span>Details</span>
                             </a>

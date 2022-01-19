@@ -13,6 +13,8 @@ class GeneralSettings extends Settings
     public int $current_academic_year;
     public string $current_term;
     public ?string $logo;
+    public ?int $school_manager_responsibility_id;
+    public ?int $exam_manager_responsibility_id;
 
     public static function group() : string
     {

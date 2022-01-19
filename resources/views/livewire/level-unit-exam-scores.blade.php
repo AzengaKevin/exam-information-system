@@ -66,5 +66,7 @@
     <x-modals.exams.scores.level-units.publish-grade-distribution :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.publish-subject-performance :levelUnit="$levelUnit" />
     <x-modals.exams.scores.level-units.rank :columns="$rankCols" />
+    <x-modals.exams.scores.level-units.publish-students-results :levelUnit="$levelUnit" />
+    <x-modals.exams.scores.level-units.publish-top-students-per-subject :levelUnit="$levelUnit" />
 
 </div>

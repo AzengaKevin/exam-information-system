@@ -14,8 +14,11 @@
                         <th>Grade</th>
                         @else
                         <th>Average</th>
+                        <th>Deviation</th>
                         @endif
+                        @if (request()->routeIs('exams.analysis.index'))
                         <th class="d-print-none">Action</th>
+                        @endif
                     </tr>
                 </thead>
                 <tbody>
@@ -29,7 +32,15 @@
                         <td>{{ $levelUnit->pivot->grade }}</td>
                         @else
                         <td>{{ $levelUnit->pivot->average }}</td>
+                        @if ($levelUnit->pivot->average_deviation > 0)
+                        <td class="text-success">{{ $levelUnit->pivot->average_deviation ?? 0 }}</td>
+                        @elseif($levelUnit->pivot->average_deviation < 0)
+                        <td class="text-danger">{{ $levelUnit->pivot->average_deviation ?? 0 }}</td>
+                        @else
+                        <td class="text-warning">{{ $levelUnit->pivot->average_deviation ?? 0 }}</td>
                         @endif
+                        @endif
+                        @if (request()->routeIs('exams.analysis.index'))                           
                         <th class="d-print-none">
                             <a href="{{ route('exams.analysis.index', [
                                 'exam' => $exam,
@@ -39,6 +50,7 @@
                                 <span>Details</span>
                             </a>
                         </th>
+                        @endif
                     </tr>
                     @endforeach
                     @else

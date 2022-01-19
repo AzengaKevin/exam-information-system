@@ -107,44 +107,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th colspan="3">All Classes</th>
-                            </tr>
-                            <tr>
-                                <th>#</th>
-                                <th>Class</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @if ($levelUnits->count())
-                            @foreach ($levelUnits as $levelUnit)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $levelUnit->alias }}</td>
-                                <td>
-                                    <div class="d-inline-flex gap-2 align-items-center">
-                                        <a href="{{ route('exams.scores.manage', [
-                                            'exam' => $exam,
-                                            'level-unit' => $levelUnit->id
-                                        ]) }}"
-                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
-                                            <i class="fa fa-cog"></i>
-                                            <span>Manage Class</span>
-                                        </a>
-                                    </div>
-                                </td>
-                            </tr>
-                            @endforeach
-                            @else
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
+                <x-exams.scores.level-unit-scores :exam="$exam" />
             </div>
         </div>
     </div>
@@ -152,47 +115,7 @@
     <div class="col-md-6">
         <div class="card">
             <div class="card-body">
-
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead>
-                            <tr>
-                                <th colspan="3">All Levels</th>
-                            </tr>
-                            <tr>
-                                <th>#</th>
-                                <th>Level</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            @if ($levels->count())
-                            @foreach ($levels as $level)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $level->name }}</td>
-                                <td>
-                                    <div class="d-inline-flex gap-2 align-items-center">
-
-                                        <a href="{{ route('exams.scores.manage', [
-                                            'exam' => $exam,
-                                            'level' => $level->id
-                                        ]) }}"
-                                            class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
-                                            <i class="fa fa-cog"></i>
-                                            <span>Manage Level</span>
-                                        </a>
-                                    </div>
-
-                                </td>
-                            </tr>
-                            @endforeach
-                            @else
-                            @endif
-                        </tbody>
-                    </table>
-                </div>
+                <x-exams.scores.level-scores :exam="$exam" />
             </div>
         </div>
     </div>
