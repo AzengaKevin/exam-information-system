@@ -17,8 +17,11 @@
 
 <hr>
 
-{{-- <livewire:exam-results :exam="$exam" /> --}}
+@if (!is_null($levelUnit))
 
+@elseif(!is_null($level))
+@include('partials.exams.results.level')
+@else
 <div class="row g-4">
     @foreach ($exam->levels as $level)
     <div class="col-md-12">
@@ -30,10 +33,6 @@
     </div>
     @endforeach
 </div>
-
+@endif
 
 @endsection
-
-@push('scripts')
-
-@endpush

@@ -87,7 +87,7 @@ class LevelExamResults extends Component
                 $query->where('students.name', 'LIKE', "%{$this->name}%");
             }
 
-            return $query->paginate(24, ['*'], Str::slug($this->level->name));
+            return $query->paginate(24, ['*'], Str::slug($this->level->name))->withQueryString();
 
         }else{
             return new Paginator([], 24);

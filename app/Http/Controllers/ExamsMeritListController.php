@@ -21,10 +21,14 @@ class ExamsMeritListController extends Controller
      * @param Request $request
      * @param Exam $exam
      */
-    public function download(Request $request, Exam $exam, SystemSettings $systemSettings,
-     GeneralSettings $generalSettings)
+    public function download(
+        Request $request, 
+        Exam $exam, SystemSettings $systemSettings,
+        GeneralSettings $generalSettings
+    )
     {
         $levelId = $request->get('level');
+        
         $levelUnitId = $request->get('level-unit');
 
         try {
