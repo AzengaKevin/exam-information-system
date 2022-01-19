@@ -18,7 +18,8 @@ class CreateTeachersTable extends Migration
             $table->id();
             $table->enum('employer', Teacher::employerOptions());
             $table->string('tsc_number')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

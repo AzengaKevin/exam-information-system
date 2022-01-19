@@ -22,7 +22,8 @@ class CreateFilesTable extends Migration
             $table->string('thumbpath')->unique()->nullable();
             $table->string('type')->nullable();
             $table->string('extension')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

@@ -29,7 +29,8 @@ class CreateStudentsTable extends Migration
             $table->unsignedBigInteger('hostel_id')->nullable();
             $table->foreignId('admission_level_id')->nullable()->constrained('levels');
             $table->mediumText('description')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

@@ -17,7 +17,8 @@ class CreateGradingsTable extends Migration
             $table->id();
             $table->string('name')->unique();
             $table->jsonb('values');
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

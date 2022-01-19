@@ -22,7 +22,8 @@ class CreateGradesTable extends Migration
             $table->mediumText('english_comment');
             $table->mediumText('ct_comment');
             $table->mediumText('p_comment');
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

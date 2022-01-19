@@ -133,7 +133,6 @@ class ProfileManagementTest extends TestCase
      */
     private function login() : User
     {
-
         /** @var Authenticatable */
         $user = User::factory()->create();
 

@@ -19,8 +19,8 @@ class CreateStreamsTable extends Migration
             $table->string('alias')->nullable();
             $table->string('slug')->nullable();
             $table->string('description')->nullable();
+            $table->timestampsTz();
             $table->softDeletesTz();
-            $table->timestamps();
         });
     }
 

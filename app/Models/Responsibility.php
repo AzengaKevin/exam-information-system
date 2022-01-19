@@ -32,6 +32,7 @@ class Responsibility extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
+
     /**
      * Hooking the loccked attribute to change to proper format
      */
@@ -40,6 +41,10 @@ class Responsibility extends Model
         $this->attributes['locked'] = boolval($value);
     }
 
+    /**
+     *soft-deletes-everywhere
+     * Responsibility - Teacher relation
+     */
     public function teachers()
     {
         return $this->belongsToMany(Teacher::class)

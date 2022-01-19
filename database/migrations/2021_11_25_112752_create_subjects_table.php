@@ -22,8 +22,8 @@ class CreateSubjectsTable extends Migration
             $table->string('description')->nullable();
             $table->string('subject_code')->nullable();
             $table->jsonb('segments')->nullable();
+            $table->timestampsTz();
             $table->softDeletesTz();
-            $table->timestamps();
         });
     }
 

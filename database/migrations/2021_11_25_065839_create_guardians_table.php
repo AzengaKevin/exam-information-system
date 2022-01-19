@@ -17,7 +17,8 @@ class CreateGuardiansTable extends Migration
             $table->id();
             $table->string('location')->nullable();
             $table->string('profession')->nullable();
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 

@@ -20,10 +20,10 @@ class CreateMessagesTable extends Migration
             $table->foreignId('recipient_id')->constrained('users')->onDelete('cascade');
             $table->enum('type', Message::typeOptions())->default('direct')->nullable();
             $table->foreignId('exam_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('content', 160);
+            $table->longText('content');
             $table->dateTime('read_at')->nullable();
+            $table->timestampsTz();
             $table->softDeletesTz();
-            $table->timestamps();
         });
     }
 

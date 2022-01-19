@@ -18,8 +18,8 @@ class CreateHostelsTable extends Migration
             $table->string('name')->unique();
             $table->string('slug')->nullable();
             $table->string('description')->nullable();
+            $table->timestampsTz();
             $table->softDeletesTz();
-            $table->timestamps();
         });
     }
 

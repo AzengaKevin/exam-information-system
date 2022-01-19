@@ -19,8 +19,8 @@ class CreateLevelsTable extends Migration
             $table->integer('numeric')->nullable();
             $table->string('slug')->nullable();
             $table->text('description')->nullable();
-            $table->softDeletes();
-            $table->timestamps();
+            $table->timestampsTz();
+            $table->softDeletesTz();
         });
     }
 
