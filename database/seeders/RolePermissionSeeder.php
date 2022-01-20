@@ -23,6 +23,8 @@ class RolePermissionSeeder extends Seeder
             'Roles Delete',
             'Roles Restore',
             'Roles Destroy',
+            'Roles Manage Permissions',
+            'Roles View Trashed',
 
             'Permissions Browse',
             'Permissions Read',

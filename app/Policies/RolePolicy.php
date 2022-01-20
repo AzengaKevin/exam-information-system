@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class RolePolicy
 {
@@ -18,7 +19,9 @@ class RolePolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('roles-browse');
+        return $user->role->permissions->pluck('slug')->contains('roles-browse')
+            ? Response::allow()
+            : Response::deny("You are not allowed to visit the roles page");
     }
 
     /**
@@ -30,7 +33,9 @@ class RolePolicy
      */
     public function view(User $user, Role $role)
     {
-        return $user->role->permissions->pluck('slug')->contains('roles-read');
+        return $user->role->permissions->pluck('slug')->contains('roles-read')
+            ? Response::allow()
+            : Response::deny("You are not allowed to view the role, {$role->name}");
     }
 
     /**
@@ -41,7 +46,9 @@ class RolePolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('roles-create');
+        return $user->role->permissions->pluck('slug')->contains('roles-create')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to create a role");
     }
 
     /**
@@ -53,7 +60,9 @@ class RolePolicy
      */
     public function update(User $user, Role $role)
     {
-        return $user->role->permissions->pluck('slug')->contains('roles-update');
+        return $user->role->permissions->pluck('slug')->contains('roles-update')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to update the role, {$role->name}");
     }
 
     /**
@@ -65,7 +74,9 @@ class RolePolicy
      */
     public function delete(User $user, Role $role)
     {
-        return $user->role->permissions->pluck('slug')->contains('roles-delete');
+        return $user->role->permissions->pluck('slug')->contains('roles-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You're allowed to deleted the role, {$role->name}");
     }
 
     /**
@@ -77,7 +88,9 @@ class RolePolicy
      */
     public function restore(User $user, Role $role)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('roles-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You're allowed to restore the role, {$role->name}");
     }
 
     /**
@@ -89,6 +102,38 @@ class RolePolicy
      */
     public function forceDelete(User $user, Role $role)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('roles-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You're allowed to destroy the role, {$role->name}");
+    }
+
+    /**
+     * Determine whether a user can manage roles permissions
+     * 
+     * @param User $user
+     * @param Role $role
+     * 
+     * @return Response
+     */
+    public function managePermissions(User $user, Role $role)
+    {
+        return $user->role->permissions->pluck('slug')->contains('roles-manage-permissions')
+            ? Response::allow()
+            : Response::deny("You're not allowed to manage {$role->name} permissions");
+        
+    }
+
+    /**
+     * Determine whether the user can view trashed roles.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('roles-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed roles");
+        
     }
 }
