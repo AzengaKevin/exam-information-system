@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\Permissions;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
@@ -9,6 +10,7 @@ use App\Models\Permission;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
 
 class PermissionsManagmentTest extends TestCase
 {
@@ -46,7 +48,115 @@ class PermissionsManagmentTest extends TestCase
 
         $response->assertViewIs('permissions.index');
 
+        $response->assertViewHasAll(['trashed']);
+
         $response->assertSeeLivewire('permissions');
+        
+    }
+
+    /** @group permissions */
+    public function testAuthorizedUserCanCreateAPermission()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Permissions Create']));
+
+        /** @var array */
+        $payload = Permission::factory()->make()->toArray();
+
+        Livewire::test(Permissions::class)
+            ->set('name', $payload['name'])
+            ->set('description', $payload['description'])
+            ->call('createPermission');
+
+        $permission = Permission::where('name', $payload['name'])->first();
+
+        $this->assertNotNull($permission);
+
+        $this->assertEquals($payload['name'], $permission->name);
+        $this->assertEquals($payload['description'], $permission->description);
+            
+    }
+
+    /** @group permissions */
+    public function testAuthorizedUserCanUpdateAPermission()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Permissions Update']));
+
+        /** @var Permission */
+        $permission = Permission::factory()->create();
+
+        /** @var array */
+        $payload = Permission::factory()->make()->toArray();
+
+        Livewire::test(Permissions::class)
+            ->call('editPermission', $permission)
+            ->set('name', $payload['name'])
+            ->set('description', $payload['description'])
+            ->call('updatePermission');
+
+        $this->assertEquals($payload['name'], $permission->fresh()->name);
+        $this->assertEquals($payload['description'], $permission->fresh()->description);
+
+    }
+
+    /** @group permissions */
+    public function testAuthorizedUserCanDeleteAPermission()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Permissions Delete']));
+
+        /** @var Permission */
+        $permission = Permission::factory()->create();
+
+        Livewire::test(Permissions::class)
+            ->call('showDeletePermissionModal', $permission)
+            ->call('deletePermission');
+        
+        $this->assertSoftDeleted($permission);
+        
+    }
+
+    /** @group permissions */
+    public function testAuthorizedUserCanRestoreATrashedPermission()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Permissions Restore']));
+
+        /** @var Permission */
+        $permission = Permission::factory()->create();
+
+        $permission->delete();
+
+        $this->assertSoftDeleted($permission);
+
+        Livewire::test(Permissions::class)
+            ->call('restorePermission', $permission->id);
+        
+        $this->assertFalse($permission->fresh()->trashed());
+        
+    }
+
+    /** @group permissions */
+    public function testAuthorizedUserCanDestroyATrashedPermission()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Permissions Destroy']));
+
+        /** @var Permission */
+        $permission = Permission::factory()->create();
+
+        $permission->delete();
+
+        Livewire::test(Permissions::class)
+            ->call('destroyPermission', $permission->id);
+        
+        $this->assertTrue(Permission::where('id', $permission->id)->withTrashed()->doesntExist());
         
     }
 
