@@ -23,8 +23,12 @@ class RolesController extends Controller
      */
     public function index(Request $request)
     {
+        $trashed = $request->trashed;
+
+        if (boolval($trashed)) $this->authorize('viewTrashed', Role::class);
+
         return view('roles.index', [
-            'trashed' => $request->trashed
+            'trashed' => $trashed
         ]);
     }
 }

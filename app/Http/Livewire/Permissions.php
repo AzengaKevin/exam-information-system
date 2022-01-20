@@ -4,15 +4,20 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Permission;
-use Illuminate\Support\Str;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\Rule;
 
 class Permissions extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
+
+    public $trashed = false;
 
     public $permissionId;
 
@@ -20,16 +25,35 @@ class Permissions extends Component
     public $slug;
     public $description;
 
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+    }
+
+    /**
+     * Lifecycle method that renders the component when its state changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.permissions', [
-            'permissions' => $this->getPaginatedPermission()
+            'permissions' => $this->getPaginatedPermissions()
         ]);
     }
 
-    public function getPaginatedPermission()
+    /**
+     * Get paginated permissions from the database
+     * 
+     * @return Paginator
+     */
+    public function getPaginatedPermissions()
     {
-        return Permission::orderBy('name')->paginate(24);
+        $query = Permission::query();
+
+        if($this->trashed) $query->onlyTrashed();
+
+        return $query->paginate(24)->withQueryString();
     }
 
     /**
@@ -48,64 +72,103 @@ class Permissions extends Component
         $this->emit('show-upsert-permission-modal');
     }
 
+    /**
+     * Validation rule for updating or creating role fields
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
-            'name' => ['bail', 'required', 'string'],
+            'name' => ['bail', 'required', 'string', Rule::unique('permissions')->ignore($this->permissionId)],
             'description' => ['bail', 'nullable']
         ];
     }
 
+    /**
+     * Persists a permission to the database
+     */
     function createPermission()
     {
-        $this->validate();
+        $data = $this->validate();
         
         try {
 
-            Permission::create([
-                'name'=>$this->name,
-                'description'=>$this->description ,
-                'slug'=>Str::slug($this->name)
-            ]);
-            
-        } catch (\Exception $exception) {
-            
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            $this->authorize('create', Permission::class);
 
-        }
-        $this->emit('hide-upsert-permission-modal');
-    }
+            $permission = Permission::create($data);
 
+            if($permission){
 
-    public function updatePermission()
-    {
-        $data = $this->validate();
+                $this->reset(['name', 'description']);
 
-        try {
-
-            /** @var User */
-            $permission = Permission::findOrFail($this->permissionId);
-
-            if($permission->update($data)){
-
-                session()->flash('status', 'permission successfully updated');
+                session()->flash('status', "A permission, {$permission->name}, has been successfully added");
 
                 $this->emit('hide-upsert-permission-modal');
             }
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to add the permission";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+
+            $this->emit('hide-upsert-permission-modal');
 
         }
     }
 
+    /**
+     * Update permissions record in the database
+     */
+    public function updatePermission()
+    {
+        $data = $this->validate();
+
+        try {
+
+            /** @var Permission */
+            $permission = Permission::findOrFail($this->permissionId);
+
+            $this->authorize('update', $permission);
+
+            if($permission->update($data)){
+
+                $this->reset(['permissionId', 'name', 'description']);
+
+                session()->flash('status', "The permission, {$permission->name}, successfully added");
+
+                $this->emit('hide-upsert-permission-modal');
+            }
+            
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to add the permission";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+
+            $this->emit('hide-upsert-permission-modal');
+
+        }
+    }
+
+    /**
+     * Show the confirmation modal for deleting a permission
+     * 
+     * @param Permission $permission
+     */
     public function showDeletePermissionModal(Permission $permission)
     {
         $this->permissionId = $permission->id;
@@ -116,11 +179,16 @@ class Permissions extends Component
         
     }
 
-    public function deletePermission(Permission $permission)
+    /**
+     * Trash a permission
+     */
+    public function deletePermission()
     {
         try {
 
             $permission = Permission::findOrFail($this->permissionId);
+
+            $this->authorize('delete', $permission);
 
             if($permission->delete()){
 
@@ -133,14 +201,80 @@ class Permissions extends Component
 
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'permission-id' => $this->permissionId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'A fatal error has occurred');
+            $message = "Failed to add the permission";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-delete-permission-modal');
+        }
+    }
+
+    /**
+     * Restore a trashed permission
+     * 
+     * @param mixed $permissionId
+     */
+    public function restorePermission($permissionId)
+    {
+        try {
+
+            /** @var Permission */
+            $permission = Permission::where('id', $permissionId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $permission);
+
+            if($permission->restore()) session()->flash('status', "{$permission->name}, permission has been restores");
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to add the permission";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+        }
+        
+    }
+
+    /**
+     * Delete the permission entry from the database completely
+     * 
+     * @param mixed $permissionId
+     */
+    public function destroyPermission($permissionId)
+    {
+        try {
+            
+            /** @var Permission */
+            $permission = Permission::where('id', $permissionId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $permission);
+
+            if($permission->forceDelete()) session()->flash('status', "The permission, {$permission->name}, has been completely removed");
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to add the permission";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
         }
     }
 }
