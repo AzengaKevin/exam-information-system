@@ -90,6 +90,8 @@ class RolePermissionSeeder extends Seeder
             'Users Delete',
             'Users Restore',
             'Users Destroy',
+            'Users View Trashed',
+            'Users Bulk Update',
 
             'Responsibilities Browse',
             'Responsibilities Read',
