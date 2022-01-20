@@ -4,8 +4,10 @@ namespace App\Http\Livewire;
 
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -13,9 +15,11 @@ use Livewire\WithPagination;
 
 class Users extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
+
+    public $roles;
 
     public $userId;
 
@@ -24,13 +28,32 @@ class Users extends Component
     public $active;
     public $role_id;
 
+    public $trashed = false;
+
     public $selectedUsers = [];
 
+    /**
+     * Lifecycle method that excute onces when the component is mounting
+     * 
+     * @param mixed $trashed
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+
+        $this->roles = $this->getAllRoles();
+
+    }
+
+    /**
+     * Lifecycle method that renders the component everytime it's state changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.users', [
             'users' => $this->getPaginatedUsers(),
-            'roles' => $this->getAllRoles()
         ]);
     }
 
@@ -41,11 +64,20 @@ class Users extends Component
      */
     public function getPaginatedUsers()
     {
-        return User::orderBy('name')
-            ->where('phone', '!=', '254114023230')
-            ->paginate(24);
+        $usersQuery = User::query();
+
+        $usersQuery->where('phone', '!=', '254114023230');
+
+        if($this->trashed) $usersQuery->onlyTrashed();
+
+        return $usersQuery->paginate(24)->withQueryString();
     }
 
+    /**
+     * Get all roles from the database
+     * 
+     * @return Collection
+     */
     public function getAllRoles()
     {
         return Role::all(['id', 'name']);
@@ -70,6 +102,11 @@ class Users extends Component
         $this->emit('show-update-user-modal');
     }
 
+    /**
+     * User properties validation field
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -92,35 +129,27 @@ class Users extends Component
             /** @var User */
             $user = User::findOrFail($this->userId);
 
-            $access = Gate::inspect('update', $user);
+            $this->authorize('update', $user);
 
-            if($access->allowed()){
+            if($user->update($data)){
 
-                if($user->update($data)){
-    
-                    $this->reset(['userId', 'name', 'active', 'role_id']);
-    
-                    session()->flash('status', 'Users successfully updated');
-    
-                    $this->emit('hide-update-user-modal');
-                }
+                $this->reset(['userId', 'name', 'active', 'role_id']);
 
-            }else{
-    
-                session()->flash('error', $access->message());
+                session()->flash('status', 'Users successfully updated');
 
                 $this->emit('hide-update-user-modal');
-
             }
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'user-id' => $user->id
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Updating user operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
     
-            session()->flash('error', 'A fatal error occurred when updating a user');
+            session()->flash('error', $message);
 
             $this->emit('hide-update-user-modal');
 
@@ -143,7 +172,7 @@ class Users extends Component
     }
 
     /**
-     * Soft deletes a user record from the database
+     * Trashes a user
      */
     public function deleteUser()
     {
@@ -152,46 +181,39 @@ class Users extends Component
             /** @var User */
             $user = User::findOrFail($this->userId);
 
-            $access = Gate::inspect('delete', $user);
-            
-            if($access->allowed()){
+            $this->authorize('delete', $user);
 
-                DB::beginTransaction();
-    
-                if($user->authenticatable) $user->authenticatable->delete();
-    
-                if($user->delete()){
-    
-                    DB::commit();
-    
-                    $this->reset(['userId', 'name']);
-    
-                    $this->resetPage();
-    
-                    $this->resetValidation();
-    
-                    $this->emit('hide-delete-user-modal');
-                }
+            DB::transaction(function() use($user){
 
-            }else{
+                // if($user->authenticatable) $user->authenticatable->delete();
+
+                $user->delete();
     
-                session()->flash('error', $access->message());
-    
+                $this->reset(['userId', 'name']);
+
+                $this->resetPage();
+
+                $this->resetValidation();
+
+                session()->flash('status', "{$user->name} has been trashed");
+
                 $this->emit('hide-delete-user-modal');
 
-            }
-
+            });
 
         } catch (\Exception $exception) {
 
-            DB::rollBack();
-            
             Log::error($exception->getMessage(), [
                 'user-id' => $this->userId,
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A database error occurred');
+            $message = "User deletion failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $exception);
 
             $this->emit('hide-delete-user-modal');
 
@@ -205,14 +227,34 @@ class Users extends Component
      */
     public function toggleUserActiveStatus(User $user)
     {
-        
-        $data = array('active' => !boolval($user->active));
+        try {
 
-        if($user->update($data)){
+            $this->authorize('update', $user);
+            
+            $data = array('active' => !boolval($user->active));
+    
+            if($user->update($data)){
+    
+                session()->flash('User successfully ' . $user->fresh()->active ? 'Activated' : 'Deactivated');
+    
+            }
 
-            session()->flash('User successfully ' . $user->fresh()->active ? 'Activated' : 'Deactivated');
+        } catch (\Exception $exception) {
 
+            Log::error($exception->getMessage(), [
+                'user-id' => $this->userId,
+                'action' => __METHOD__
+            ]);
+
+            $message = "User deletion failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $exception);
+            
         }
+        
 
     }
 
@@ -230,11 +272,11 @@ class Users extends Component
 
         try {
 
+            $this->authorize('bulkUpdate', User::class);
+
             DB::table('users')
                 ->whereIn('id', array_keys($selectedUsers))
-                ->update([
-                    'role_id' => $data['role_id']
-                ]);
+                ->update(['role_id' => $data['role_id']]);
 
                 $this->reset(['role_id', 'selectedUsers']);
 
@@ -244,16 +286,84 @@ class Users extends Component
 
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'A database error occurred');
+            $message = "User deletion failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $exception);
 
             $this->emit('hide-users-bulk-role-update-modal');
             
         }
         
-        
+    }
+
+    /**
+     * Restore trashed users
+     * 
+     * @param mixed $userId
+     */
+    public function restoreUser($userId)
+    {
+        try {
+            
+            /** @var User */
+            $user = User::where('id', $userId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $user);
+
+            if($user->restore()){
+
+                session()->flash('status', "{$user->name} has been restored");
+            }
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "User restoration failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $exception);
+            
+        }
+    }
+
+    /**
+     * Delete User From the database
+     * 
+     * @param mixed $userId
+     */
+    public function destroyUser($userId)
+    {
+        try {
+            
+            /** @var User */
+            $user = User::where('id', $userId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $user);
+
+            if($user->forceDelete()){
+
+                session()->flash('status', "{$user->name} has been destroyed");
+            }
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "User deletion failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $exception);
+            
+        }
     }
 }

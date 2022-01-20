@@ -21,8 +21,8 @@
                 @foreach ($teachers as $teacher)
                 <tr>
                     <td>{{ $loop->iteration }}</td>
-                    <td>{{ optional($teacher->auth)->name }}</td>
-                    <td>{{ optional($teacher->auth)->phone }}</td>
+                    <td>{{ optional($teacher->auth)->name ?? '-' }}</td>
+                    <td>{{ optional($teacher->auth)->phone ?? '-' }}</td>
                     <td>{{ optional($teacher->auth)->email ?? '-' }}</td>
                     <td>{{ $teacher->responsibilities->count() }}</td>
                     <td>{{ optional($teacher->auth)->active ? 'True' : 'False' }}</td>
