@@ -75,12 +75,13 @@ class RolePermissionSeeder extends Seeder
             'Teachers View Trashed',
             'Teachers Restore',
             'Teachers Destroy',
-
+            
             'Guardians Browse',
             'Guardians Read',
             'Guardians Create',
             'Guardians Update',
             'Guardians Delete',
+            'Guardians View Trashed',
             'Guardians Restore',
             'Guardians Destroy',
 

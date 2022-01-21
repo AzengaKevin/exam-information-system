@@ -121,7 +121,6 @@ class TeacherPolicy
             : Response::deny('Woops you are not allowed to manage teachers responsibilities');
     }
 
-
     /**
      * Determine whether the user can view trashed permisions.
      *
