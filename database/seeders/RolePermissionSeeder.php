@@ -60,11 +60,14 @@ class RolePermissionSeeder extends Seeder
             'Departments Destroy',
 
             'Subjects Browse',
+            'Subjects Read',
             'Subjects Create',
             'Subjects Update',
             'Subjects Delete',
+            'Subjects View Trashed',
             'Subjects Restore',
             'Subjects Destroy',
+            'Subjects Bulk Delete',
 
             'Teachers Browse',
             'Teachers Read',
