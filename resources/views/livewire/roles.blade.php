@@ -29,7 +29,7 @@
             @if (!$trashed)
             @can('viewTrashed', \App\Models\Role::class)
             <a href="{{ route('roles.index', ['trashed' => true]) }}"
-                class="btn btn-outline-warning d-inline-flex gap-1 align-items-center">
+                class="btn btn-warning d-inline-flex gap-1 align-items-center">
                 <i class="fa fa-eye"></i>
                 <span>Trash</span>
             </a>

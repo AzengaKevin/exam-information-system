@@ -19,7 +19,7 @@
                 <span>Permission</span>
             </button>
             @if (!$trashed)
-            @can('viewTrashed', \App\Models\Permission::class)                
+            @can('viewTrashed', \App\Models\Permission::class)
             <a href="{{ route('permissions.index', ['trashed' => true]) }}"
                 class="btn btn-warning d-inline-flex flex align-items-center">
                 <i class="fa fa-eye"></i>
@@ -33,82 +33,87 @@
 
     <x-feedback />
 
-    <div class="table-responsive">
-        <table class="table table-hover">
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>Name</th>
-                    <th>Slug</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if ($permissions->count())
-                @foreach ($permissions as $permission)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $permission->name }}</td>
-                    <td>{{ $permission->slug }}</td>
-                    <td>{{ $permission->created_at->format('d/m/Y') }}</td>
-                    <td>
-                        @if (!$trashed)
-                        <div class="hstack gap-2 align-items-center">
-                            @can('update', $permission)                                
-                            <button wire:click="editPermission({{ $permission }})"
-                                class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
-                                <i class="fa fa-edit"></i>
-                                <span>Edit</span>
-                            </button>
-                            @endcan
-                            @can('delete', $permission)                                
-                            <button wire:click="showDeletePermissionModal({{ $permission }})"
-                                class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
-                                <i class="fa fa-trash" aria-hidden="true"></i>
-                                <span>Delete</span>
-                            </button>
-                            @endcan
-                        </div>
-                        @else
-                        @can('restore', $permission)                                
-                        <button wire:click="restorePermission({{ $permission }})"
-                            class="btn btn-sm btn-success d-inline-flex gap-1 align-items-center">
-                            <i class="fa fa-trash-restore-alt"></i>
-                            <span>Restore</span>
-                        </button>
-                        @endcan
-                        @can('forceDelete', $permission)                                
-                        <button wire:click="destroyPermissionModal({{ $permission }})"
-                            class="btn btn-sm btn-danger d-inline-flex gap-2 align-items-center">
-                            <i class="fa fa-trash-alt" aria-hidden="true"></i>
-                            <span>Destroy</span>
-                        </button>
-                        @endcan
-                        @endif
-                    </td>
-                </tr>
-                @endforeach
-                @else
-                <tr>
-                    <td colspan="5">
-                        <div class="py-1">No Permission created yet</div>
-                    </td>
-                </tr>
-                @endif
-            </tbody>
-            <tfoot>
-                <tr>
-                    <td colspan="5">
-                        {{ $permissions->links() }}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Slug</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
                         @if ($permissions->count())
-                        <div class="text-muted">{{ $permissions->firstItem() }} - {{ $permissions->lastItem() }} out of
-                            {{ $permissions->total() }}</div>
+                        @foreach ($permissions as $permission)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $permission->name }}</td>
+                            <td>{{ $permission->slug }}</td>
+                            <td>{{ $permission->created_at->format('d/m/Y') }}</td>
+                            <td>
+                                @if (!$trashed)
+                                <div class="hstack gap-2 align-items-center">
+                                    @can('update', $permission)
+                                    <button wire:click="editPermission({{ $permission }})"
+                                        class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                                        <i class="fa fa-edit"></i>
+                                        <span>Edit</span>
+                                    </button>
+                                    @endcan
+                                    @can('delete', $permission)
+                                    <button wire:click="showDeletePermissionModal({{ $permission }})"
+                                        class="btn btn-sm btn-outline-danger hstack gap-2 align-items-center">
+                                        <i class="fa fa-trash" aria-hidden="true"></i>
+                                        <span>Delete</span>
+                                    </button>
+                                    @endcan
+                                </div>
+                                @else
+                                @can('restore', $permission)
+                                <button wire:click="restorePermission({{ $permission }})"
+                                    class="btn btn-sm btn-success d-inline-flex gap-1 align-items-center">
+                                    <i class="fa fa-trash-restore-alt"></i>
+                                    <span>Restore</span>
+                                </button>
+                                @endcan
+                                @can('forceDelete', $permission)
+                                <button wire:click="destroyPermissionModal({{ $permission }})"
+                                    class="btn btn-sm btn-danger d-inline-flex gap-2 align-items-center">
+                                    <i class="fa fa-trash-alt" aria-hidden="true"></i>
+                                    <span>Destroy</span>
+                                </button>
+                                @endcan
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                        @else
+                        <tr>
+                            <td colspan="5">
+                                <div class="py-1">No Permission created yet</div>
+                            </td>
+                        </tr>
                         @endif
-                    </td>
-                </tr>
-            </tfoot>
-        </table>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                {{ $permissions->links() }}
+                                @if ($permissions->count())
+                                <div class="text-muted">{{ $permissions->firstItem() }} - {{ $permissions->lastItem() }}
+                                    out of
+                                    {{ $permissions->total() }}</div>
+                                @endif
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
     </div>
 
     <x-modals.permissions.upsert :permissionId="$permissionId" />
