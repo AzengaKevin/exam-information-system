@@ -33,7 +33,9 @@ class TeacherPolicy
      */
     public function view(User $user, Teacher $teacher)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('teachers-read')
+            ? Response::allow()
+            : Response::deny("You are not allowed to view teacher, {$teacher->auth->name}, details page");
     }
 
     /**
@@ -44,7 +46,9 @@ class TeacherPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('teachers-create')
+            ? Response::allow()
+            : Response::deny("You are not allowed to create a teacher");
     }
 
     /**
@@ -56,7 +60,9 @@ class TeacherPolicy
      */
     public function update(User $user, Teacher $teacher)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('teachers-update')
+            ? Response::allow()
+            : Response::deny("You are not allowed to update teacher {$teacher->auth->name} details");
     }
 
     /**
@@ -68,7 +74,9 @@ class TeacherPolicy
      */
     public function delete(User $user, Teacher $teacher)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('teachers-delete')
+            ? Response::allow()
+            : Response::deny("You are not allowed to delete teacher {$teacher->auth->name}");
     }
 
     /**
@@ -80,7 +88,9 @@ class TeacherPolicy
      */
     public function restore(User $user, Teacher $teacher)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('teachers-restore')
+            ? Response::allow()
+            : Response::deny("You are not allowed to restore teacher {$teacher->auth->name}");
     }
 
     /**
@@ -92,7 +102,9 @@ class TeacherPolicy
      */
     public function forceDelete(User $user, Teacher $teacher)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('teachers-destroy')
+            ? Response::allow()
+            : Response::deny("You are not allowed to destroy teacher {$teacher->auth->name}");
     }
 
     /**
@@ -108,4 +120,19 @@ class TeacherPolicy
             ? Response::allow()
             : Response::deny('Woops you are not allowed to manage teachers responsibilities');
     }
+
+
+    /**
+     * Determine whether the user can view trashed permisions.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('teachers-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed teachers");
+        
+    }    
 }

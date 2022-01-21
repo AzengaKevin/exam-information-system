@@ -45,7 +45,9 @@ class UserPolicy
      */
     public function create(User $user)
     {
-        return false;
+        return $user->role->permissions->pluck('slug')->contains('users-create')
+            ? Response::allow()
+            : Response::deny("You\'re not allowed to create a user");
     }
 
     /**

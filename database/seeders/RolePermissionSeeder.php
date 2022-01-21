@@ -72,6 +72,7 @@ class RolePermissionSeeder extends Seeder
             'Teachers Update',
             'Teachers Delete',
             'Teachers Manage Responsibilities',
+            'Teachers View Trashed',
             'Teachers Restore',
             'Teachers Destroy',
 
@@ -177,6 +178,6 @@ class RolePermissionSeeder extends Seeder
 
         $permissions = Permission::all(['id'])->pluck('id')->toArray();
 
-        $adminRole->permissions()->attach($permissions);
+        $adminRole->permissions()->sync($permissions);
     }
 }
