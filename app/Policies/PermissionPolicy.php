@@ -5,6 +5,7 @@ namespace App\Policies;
 use App\Models\Permission;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class PermissionPolicy
 {
@@ -18,7 +19,9 @@ class PermissionPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('permissions-browse');
+        return $user->role->permissions->pluck('slug')->contains('permissions-browse')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view the permissions list");
         
     }
 
@@ -31,7 +34,9 @@ class PermissionPolicy
      */
     public function view(User $user, Permission $permission)
     {
-        return $user->role->permissions->pluck('slug')->contains('permissions-read');
+        return $user->role->permissions->pluck('slug')->contains('permissions-read')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view the permission, {$permission->name}");
     }
 
     /**
@@ -42,7 +47,9 @@ class PermissionPolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('permissions-create');
+        return $user->role->permissions->pluck('slug')->contains('permissions-create')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to create a permission");
     }
 
     /**
@@ -54,7 +61,9 @@ class PermissionPolicy
      */
     public function update(User $user, Permission $permission)
     {
-        return $user->role->permissions->pluck('slug')->contains('permissions-update');
+        return $user->role->permissions->pluck('slug')->contains('permissions-update')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to update the permission, {$permission->name}");
     }
 
     /**
@@ -66,7 +75,9 @@ class PermissionPolicy
      */
     public function delete(User $user, Permission $permission)
     {
-        return $user->role->permissions->pluck('slug')->contains('permissions-delete');
+        return $user->role->permissions->pluck('slug')->contains('permissions-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to delete the permission, {$permission->name}");
     }
 
     /**
@@ -78,7 +89,9 @@ class PermissionPolicy
      */
     public function restore(User $user, Permission $permission)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('permissions-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to restore the permission, {$permission->name}");
     }
 
     /**
@@ -90,6 +103,22 @@ class PermissionPolicy
      */
     public function forceDelete(User $user, Permission $permission)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('permissions-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to destroy the permission, {$permission->name}");
+    }
+
+    /**
+     * Determine whether the user can view trashed permisions.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('permissions-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed permissions");
+        
     }
 }

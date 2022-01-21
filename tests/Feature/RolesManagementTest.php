@@ -18,28 +18,15 @@ class RolesManagementTest extends TestCase
     
     use RefreshDatabase, WithFaker;
 
+    private Role $role;
+
     public function setUp(): void
     {
         parent::setUp();
 
-        $permissions = [
-            'Roles Create',
-            'Roles Browse',
-            'Roles Read',
-            'Roles Update',
-            'Roles Delete'
-        ];
-
-        array_walk($permissions, function($name){Permission::create(compact('name'));});
-
-        /** @var Role */
-        $role = Role::factory()->create();
-
-        $role->permissions()->attach(Permission::all());
-
         /** @var Authenticatable */
         $user = User::factory()->create([
-            'role_id' => $role->id
+            'role_id' => $this->role = Role::factory()->create()
         ]);
 
         $this->actingAs($user);
@@ -50,6 +37,8 @@ class RolesManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Browse']));
+
         Role::factory(2)->create();
 
         $response = $this->get(route('roles.index'));
@@ -57,6 +46,8 @@ class RolesManagementTest extends TestCase
         $response->assertOk();
 
         $response->assertViewIs('roles.index');
+
+        $response->assertViewHasAll(['trashed']);
 
         $response->assertSeeLivewire('roles');
         
@@ -66,6 +57,8 @@ class RolesManagementTest extends TestCase
     public function testAuthorizedUserCanCreateARole()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Create']));
 
         $payload = Role::factory()->make()->toArray();
 
@@ -89,6 +82,8 @@ class RolesManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Update']));
+
         /** @var Role */
         $role = Role::factory()->create();
 
@@ -111,6 +106,8 @@ class RolesManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Delete']));
+
         /** @var Role */
         $role = Role::factory()->create();
 
@@ -126,6 +123,8 @@ class RolesManagementTest extends TestCase
     public function testAuthorizedUserCanAssignPerssionsToRole()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Manage Permissions']));
 
         /** @var Role */
         $role = Role::factory()->create();
@@ -144,5 +143,47 @@ class RolesManagementTest extends TestCase
             ->call('updatePermissions');
 
         $this->assertEquals(count($payload), $role->fresh()->permissions->count());
+    }
+
+    /** @group roles */
+    public function testAuthorizedCanRestoreARole()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Restore']));
+
+        /** @var Role */
+        $role = Role::factory()->create();
+
+        $role->delete();
+
+        $this->assertSoftDeleted($role);
+
+        Livewire::test(Roles::class)
+            ->call('restoreRole', $role->id);
+
+        $this->assertFalse($role->fresh()->trashed());
+        
+    }
+
+    /** @group roles */
+    public function testAuthorizedUserCanDestroyARole()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Roles Destroy']));
+
+        /** @var Role */
+        $role = Role::factory()->create();
+
+        $role->delete();
+
+        $this->assertSoftDeleted($role);
+
+        Livewire::test(Roles::class)
+            ->call('destroyRole', $role->id);
+
+        $this->assertFalse(Role::where('id', $role->id)->withTrashed()->exists());
+        
     }
 }

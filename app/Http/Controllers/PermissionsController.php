@@ -14,8 +14,18 @@ class PermissionsController extends Controller
         $this->authorizeResource(Permission::class);
     }
 
+    /**
+     * Show a list of all permissions
+     * 
+     * @param Request $request
+     * @return View
+     */
     public function index(Request $request)
     {
-        return view('permissions.index');
+        $trashed = $request->trashed;
+
+        if (boolval($trashed)) $this->authorize('viewTrashed', Permission::class);
+
+        return view('permissions.index', compact('trashed'));
     }
 }

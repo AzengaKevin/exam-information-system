@@ -32,7 +32,9 @@ class UserPolicy
      */
     public function view(User $user, User $model)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('users-read')
+            ? Response::allow()
+            : Response::deny("You\'re not allowed to view the users, {$model->name}");
     }
 
     /**
@@ -57,7 +59,7 @@ class UserPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('users-update')
             ? Response::allow()
-            : Response::deny('You\'re not allowed to edit a user');
+            : Response::deny("You\'re not allowed to update the user, {$model->name}");
     }
 
     /**
@@ -71,7 +73,7 @@ class UserPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('users-delete')
             ? Response::allow()
-            : Response::deny('You\'re not allowed to delete a user');
+            : Response::deny("You\'re not allowed to delete the user, {$model->name}");
     }
 
     /**
@@ -83,7 +85,9 @@ class UserPolicy
      */
     public function restore(User $user, User $model)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('users-restore')
+            ? Response::allow()
+            : Response::deny("You\'re not allowed to delete the user, {$model->name}");
     }
 
     /**
@@ -95,6 +99,35 @@ class UserPolicy
      */
     public function forceDelete(User $user, User $model)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('users-destroy')
+            ? Response::allow()
+            : Response::deny("You\'re not allowed to delete the user, {$model->name}");
+    }
+
+    /**
+     * Determine whether the user can view trashed permisions.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('users-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed users");
+        
+    }
+
+    /**
+     * Determine whether the user can bulk update users
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */  
+    public function bulkUpdate(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('users-bulk-update')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to bulk update users");
     }
 }

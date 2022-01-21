@@ -2,15 +2,17 @@
 
 namespace Tests\Feature;
 
-use App\Http\Livewire\Users;
-use App\Models\Permission;
-use App\Models\Role;
 use Tests\TestCase;
+use App\Models\Role;
 use App\Models\User;
+use Livewire\Livewire;
+use App\Models\Teacher;
+use App\Models\Permission;
+use App\Http\Livewire\Users;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 class UsersManagementTest extends TestCase
 {
@@ -46,6 +48,8 @@ class UsersManagementTest extends TestCase
         $response->assertOk();
 
         $response->assertViewIs('users.index');
+
+        $response->assertViewHasAll(['trashed']);
 
         $response->assertSeeLivewire('users');
         
@@ -108,19 +112,22 @@ class UsersManagementTest extends TestCase
 
         $this->role->permissions()->attach(Permission::create(['name' => 'Users Delete']));
 
+        /** @var User */
         $user = User::factory()->create();
 
         Livewire::test(Users::class)
             ->call('showDeleteUserModal', $user)
             ->call('deleteUser');
-        
-        $this->assertFalse(User::where('id', $user->id)->exists());
+            
+        $this->assertSoftDeleted($user);
     }
 
     /** @group users */
     public function testAuthorizedUserCanToggleUserActiveStatus()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Update']));
 
         $user = User::factory()->create();
 
@@ -136,6 +143,8 @@ class UsersManagementTest extends TestCase
     public function testAuthorizedUserCanPerformBulkUserRoleUpdate()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Bulk Update']));
 
         $usersIds = User::factory(5)->create()->pluck('id')->toArray();
 
@@ -156,4 +165,61 @@ class UsersManagementTest extends TestCase
         $this->assertEquals($usersIds, $role->users()->get()->pluck('id')->toArray());
         
     }
+
+    /** @group users */
+    public function testAuthorizeUserCanRestoreTrashedTeachers()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Restore']));
+            
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $user = $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
+            'password' => Hash::make('password')
+        ]);
+
+        $user->delete();
+
+        $this->assertSoftDeleted($user);
+
+        Livewire::test(Users::class)
+            ->call('restoreUser', $user->id);
+    
+        $this->assertFalse($user->fresh()->trashed());
+        
+    }
+
+
+    /** @group users */
+    public function testAuthorizeUserCanDestroyTrashedTeachers()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Destroy']));
+            
+        /** @var Teacher */
+        $teacher = Teacher::factory()->create();
+
+        $user = $teacher->auth()->create([
+            'name' => $this->faker->name(),
+            'email' => $this->faker->safeEmail(),
+            'phone' => $this->faker->randomElement(['1', '7']) . $this->faker->numberBetween(10000000, 99999999),
+            'password' => Hash::make('password')
+        ]);
+
+        $user->delete();
+
+        $this->assertSoftDeleted($user);
+
+        Livewire::test(Users::class)
+            ->call('destroyUser', $user->id);
+        
+        $this->assertTrue(User::where('id', $user->id)->withTrashed()->doesntExist());
+        
+    }    
 }

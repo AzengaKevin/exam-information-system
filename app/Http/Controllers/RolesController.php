@@ -14,8 +14,21 @@ class RolesController extends Controller
         $this->authorizeResource(Role::class);
     }
 
+    /**
+     * Show a list of all roles
+     * 
+     * @param Request $request
+     * 
+     * @return View
+     */
     public function index(Request $request)
     {
-        return view('roles.index');
+        $trashed = $request->trashed;
+
+        if (boolval($trashed)) $this->authorize('viewTrashed', Role::class);
+
+        return view('roles.index', [
+            'trashed' => $trashed
+        ]);
     }
 }

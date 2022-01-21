@@ -15,9 +15,19 @@ class UsersController extends Controller
         $this->authorizeResource(User::class);
         
     }
+
+    /**
+     * Show a list of user
+     * 
+     * @return View
+     */
     public function index(Request $request)
     {
-        return view('users.index');
+        $trashed = $request->trashed;
+
+        // if(boolval($trashed)) $this->authorize('viewTrashed', User::class);
+
+        return view('users.index', compact('trashed'));
         
     }
 }
