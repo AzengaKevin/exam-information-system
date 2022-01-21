@@ -60,11 +60,14 @@ class RolePermissionSeeder extends Seeder
             'Departments Destroy',
 
             'Subjects Browse',
+            'Subjects Read',
             'Subjects Create',
             'Subjects Update',
             'Subjects Delete',
+            'Subjects View Trashed',
             'Subjects Restore',
             'Subjects Destroy',
+            'Subjects Bulk Delete',
 
             'Teachers Browse',
             'Teachers Read',
@@ -72,14 +75,16 @@ class RolePermissionSeeder extends Seeder
             'Teachers Update',
             'Teachers Delete',
             'Teachers Manage Responsibilities',
+            'Teachers View Trashed',
             'Teachers Restore',
             'Teachers Destroy',
-
+            
             'Guardians Browse',
             'Guardians Read',
             'Guardians Create',
             'Guardians Update',
             'Guardians Delete',
+            'Guardians View Trashed',
             'Guardians Restore',
             'Guardians Destroy',
 
@@ -177,6 +182,6 @@ class RolePermissionSeeder extends Seeder
 
         $permissions = Permission::all(['id'])->pluck('id')->toArray();
 
-        $adminRole->permissions()->attach($permissions);
+        $adminRole->permissions()->sync($permissions);
     }
 }

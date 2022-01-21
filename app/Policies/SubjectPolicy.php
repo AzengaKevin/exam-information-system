@@ -21,7 +21,7 @@ class SubjectPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('subjects-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the guardians page');
+            : Response::deny('You are not allowed to browse the subjects page');
     }
 
     /**
@@ -33,7 +33,9 @@ class SubjectPolicy
      */
     public function view(User $user, Subject $subject)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('subjects-read')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view {$subject->name} details");
     }
 
     /**
@@ -44,7 +46,9 @@ class SubjectPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('subjects-create')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to create a subject");
     }
 
     /**
@@ -56,7 +60,9 @@ class SubjectPolicy
      */
     public function update(User $user, Subject $subject)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('subjects-update')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to update {$subject->name} details");
     }
 
     /**
@@ -68,7 +74,9 @@ class SubjectPolicy
      */
     public function delete(User $user, Subject $subject)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('subjects-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the subject, {$subject->name}");
     }
 
     /**
@@ -80,7 +88,9 @@ class SubjectPolicy
      */
     public function restore(User $user, Subject $subject)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('subjects-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the subject, {$subject->name}");
     }
 
     /**
@@ -92,6 +102,36 @@ class SubjectPolicy
      */
     public function forceDelete(User $user, Subject $subject)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('subjects-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to destroy the subject, {$subject->name}");
     }
+
+    /**
+     * Determine whether a user can bulk delete subjects
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function bulkDelete(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('subjects-bulk-delete')
+            ? Response::allow()
+            : Response::deny('You are not allowed to bulk delete subjects');
+        
+    }
+
+    /**
+     * Determine whether the user can view trashed permisions.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('subjects-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed subjects");
+        
+    } 
 }

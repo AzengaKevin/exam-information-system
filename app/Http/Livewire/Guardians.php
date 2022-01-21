@@ -10,15 +10,20 @@ use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use App\Rules\MustBeKenyanPhone;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 
 class Guardians extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
+
+    public $trashed = false;
 
     public $guardianId;
     public $userId;
@@ -29,6 +34,21 @@ class Guardians extends Component
     public $profession;
     public $location;
 
+    /**
+     * Lifecycle method that only executes once when the component is mounting
+     * 
+     * @param string $trashed
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+    }
+
+    /**
+     * Lifecycle method to render the component when it's state changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.guardians', [
@@ -38,23 +58,30 @@ class Guardians extends Component
 
     /**
      * Get paginated guardians from the  database
+     * 
+     * @return Paginator
      */
     public function getPaginatedGuardians()
     {
-        return Guardian::latest()->paginate(24);
+        $guardiansQuery = Guardian::query();
+
+        if($this->trashed) $guardiansQuery->onlyTrashed();
+
+        return $guardiansQuery->paginate(24);
     }
 
     /**
      * Hook method for updating the phone and making sure it starts with 254
+     * 
+     * @param mixed $value
      */
     public function updatedPhone($value)
     {
         $this->phone = Str::start($value, '254');
-        
     }
 
     /**
-     * Component fields validation
+     * Component fields validation rules
      * 
      * @return array
      */
@@ -78,48 +105,49 @@ class Guardians extends Component
 
         try {
 
-            DB::beginTransaction();
+            $this->authorize('create', Guardian::class);
+            $this->authorize('create', User::class);
 
-            /** @var Guardian */
-            $guardian = Guardian::create($data);
-
-            if($guardian){
+            DB::transaction(function() use($data){
+    
+                /** @var Guardian */
+                $guardian = Guardian::create($data);
 
                 /** @var User */
                 $user = $guardian->auth()->create(array_merge($data, [
                     'password' => Hash::make($password = Str::random(6))
                 ]));
 
-                if($user){
+                // Sending email verification link to the user
+                if(!empty($user->email)) $user->sendEmailVerificationNotification();
 
-                    // Sending email verification link to the user
-                    if(!empty($user->email)) $user->sendEmailVerificationNotification();
+                // Send the guardian a password
+                $user->notifyNow(new SendPasswordNotification($password));
 
-                    // Send the guardian a password
-                    $user->notifyNow(new SendPasswordNotification($password));
+            });
 
-                    DB::commit();
+            $this->reset(['name', 'email', 'profession', 'location']);
 
-                    $this->reset(['name', 'email', 'profession', 'location']);
+            $this->resetPage();
 
-                    $this->resetPage();
+            $this->resetValidation();
 
-                    session()->flash('status', 'A Guardian has successfully been added');
+            session()->flash('status', "A guardian, has successfully been added");
 
-                    $this->emit('hide-upsert-guardian-modal');
-                }
+            $this->emit('hide-upsert-guardian-modal');
 
-            }
-            
         } catch (\Exception $exception) {
-            
-            DB::rollBack();
 
             Log::error($exception->getMessage(), [
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred check the logs');
+            $message = "Woops! Adding guardian operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-upsert-guardian-modal');
         }
@@ -157,36 +185,36 @@ class Guardians extends Component
 
         try {
 
-            DB::beginTransaction();
-
             /** @var Guardian */
             $guardian = Guardian::findOrFail($this->guardianId);
 
-            if($guardian->update($data)){
-                
-                if($guardian->auth->update($data)){
+            $this->authorize('update', $guardian);
 
-                    DB::commit();
+            $this->authorize('update', $guardian->auth);
 
-                    $this->reset(['guardianId', 'userId', 'name', 'email', 'profession', 'location']);
+            DB::transaction(function() use($guardian, $data){
+                $guardian->update($data);
+                $guardian->auth->update($data);
+            });
 
-                    session()->flash('status', 'A guardian has successfully been updated');
+            $this->reset(['guardianId', 'userId', 'name', 'email', 'profession', 'location']);
 
-                    $this->emit('hide-upsert-guardian-modal');
+            session()->flash('status', "The guardian, {$guardian->auth->name}, has been updated, successfully");
 
-                }
-            }
+            $this->emit('hide-upsert-guardian-modal');
 
         } catch (\Exception $exception) {
-            
-            DB::rollBack();
 
             Log::error($exception->getMessage(), [
-                'guardian-id' => $this->guardianId,
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred check the logs');
+            $message = "Woops! Updating guardian operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-upsert-guardian-modal');
         }
@@ -206,6 +234,9 @@ class Guardians extends Component
         $this->emit('show-delete-guardian-modal');
     }
 
+    /**
+     * Trash a guardian
+     */
     public function deleteGuardian()
     {
         
@@ -214,35 +245,116 @@ class Guardians extends Component
             /** @var Guardian */
             $guardian = Guardian::findOrFail($this->guardianId);
 
-            DB::beginTransaction();
+            $this->authorize('delete', $guardian);
 
-            if($guardian->auth) $guardian->auth->delete();
+            DB::transaction(function() use($guardian){
 
-            if($guardian->delete()){
+                // if($guardian->auth) $guardian->auth->delete();
 
-                DB::commit();
+                $guardian->delete();
 
-                $this->reset(['name', 'guardianId']);
+            });
 
-                $this->resetPage();
+            $this->reset(['name', 'guardianId']);
 
-                session()->flash('status', 'Guardian successfully deleted');
+            $this->resetPage();
 
-                $this->emit('hide-delete-guardian-modal');
-            }
+            session()->flash('status', "The guardian, {$guardian->auth->name} , successfully deleted");
+
+            $this->emit('hide-delete-guardian-modal');
             
         } catch (\Exception $exception) {
-            
-            DB::rollBack();
 
             Log::error($exception->getMessage(), [
-                'guardian-id' => $this->guardianId,
                 'action' => __METHOD__
             ]);
 
-            session()->flash('error', 'A fatal error occurred check the logs');
+            $message = "Woops! Deleting guardian operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-delete-guardian-modal');
+        }
+        
+    }
+
+    /**
+     * Restores a soft deleted guardian
+     * 
+     * @param mixed $guardianId
+     */
+    public function restoreGuardian($guardianId)
+    {
+        try {
+
+            /** @var Guardian */
+            $guardian = Guardian::where('id', $guardianId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $guardian);
+            
+            $guardian->restore();
+
+            session()->flash('status', "Guardian has been restores");
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            $message = "Woops! Restoring guardian operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+        }
+    }
+
+    /**
+     * Deleting guardian from the system
+     * 
+     * @param mixed $guardianId
+     */
+    public function destroyGuardian($guardianId)
+    {
+        
+        try {
+
+            /** @var Guardian */
+            $guardian = Guardian::where('id', $guardianId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $guardian);
+
+            $this->authorize('forceDelete', $guardian->auth);
+
+            DB::transaction(function() use($guardian){
+
+                $guardian->forceDelete();
+
+                $guardian->auth->forceDelete();
+
+            });
+
+            session()->flash('status', "Guardian completely deleted from the system");
+            
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__
+            ]);
+
+            $message = "Woops! Deleting guardian from application operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
         }
         
     }

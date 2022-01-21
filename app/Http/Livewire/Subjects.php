@@ -6,17 +6,21 @@ use App\Models\Subject;
 use Livewire\Component;
 use App\Models\Department;
 use App\Rules\LowerAlphaOnly;
-use Illuminate\Support\Str;
+use Illuminate\Auth\Access\AuthorizationException;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 
 class Subjects extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
+    public $trashed = false;
+    public $departments;
 
     public $departmentId;
     public $subjectId;
@@ -30,21 +34,34 @@ class Subjects extends Component
 
     public $teachers;
 
-    public function mount()
+    /**
+     * Lifecycle method that executes once when the component is launching
+     * 
+     * @param string $trashed
+     */
+    public function mount(string $trashed = null)
     {
+        $this->trashed = boolval($trashed);
+
         $this->teachers = collect([]);
+
+        $this->departments = $this->getDepartments();
     }
 
+    /**
+     * Lifecyle method that renders the component everytime it's internal state changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.subjects', [
-            'departments'=>$this->getDepartments(),
             'subjects' => $this->getPaginatedSubjects()
         ]);
     }
 
     /**
-     * Get all database deparments
+     * Get all database departments
      * 
      * @return Collection
      */
@@ -60,7 +77,11 @@ class Subjects extends Component
      */
     public function getPaginatedSubjects()
     {
-        return Subject::with(['teachers'])->paginate(24);
+        $subjectsQuery = Subject::with('teachers');
+
+        if($this->trashed) $subjectsQuery->onlyTrashed();
+
+        return $subjectsQuery->paginate(24);
     }
 
     /**
@@ -92,7 +113,9 @@ class Subjects extends Component
     }
 
     /**
-     * Show a modal of teachers that teaches the subject
+     * Show a modal of teachers that teach that subject
+     * 
+     * @param Subject $subject
      */
     public function showTeachers(Subject $subject)
     {
@@ -132,8 +155,8 @@ class Subjects extends Component
         $data = $this->validate();
 
         try {
-
-            // Mutate the segments
+            
+            $this->authorize('create', Subject::class);
 
             if(isset($data['segments']) && !empty($data['segments'])){
 
@@ -154,11 +177,14 @@ class Subjects extends Component
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'Subject creation failed');
+            $message = "Creating subject operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-upsert-subject-modal');
 
@@ -171,8 +197,6 @@ class Subjects extends Component
     public function updateSubject()
     {
         $data = $this->validate();
-
-        // Mutate the segments
 
         if(isset($data['segments']) && !empty($data['segments'])){
 
@@ -188,6 +212,8 @@ class Subjects extends Component
             /** @var User */
             $subject = Subject::findOrFail($this->subjectId);
 
+            $this->authorize('update', $subject);
+
             if($subject->update($data)){
 
                 $this->reset(['subjectId', 'name','shortname','subject_code','description','department_id', 'segments']);
@@ -199,18 +225,25 @@ class Subjects extends Component
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->subjectId,
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'A fatal subject error occurred');
+            $message = "Creating subject operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-upsert-subject-modal');
 
         }
     }
 
+    /**
+     * Show the confirmation modal for deleting a subject
+     * 
+     * @param Subject $subject
+     */
     public function showDeleteSubjectModal(Subject $subject)
     {
         $this->departmtneId = $subject->id;
@@ -246,11 +279,17 @@ class Subjects extends Component
         
     }
 
-    public function deleteSubject(Subject $subject)
+    /**
+     * Trash a subject
+     */
+    public function deleteSubject()
     {
         try {
 
+            /** @var Subject */
             $subject = Subject::findOrFail($this->departmtneId);
+
+            $this->authorize('delete', $subject);
 
             if($subject->delete()){
 
@@ -263,12 +302,15 @@ class Subjects extends Component
 
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'subject-id' => $this->subjectId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'A fatal error has occurred');
+            $message = "Deleting subject operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-delete-subject-modal');
         }
@@ -281,13 +323,13 @@ class Subjects extends Component
     {
         try {
             
-            //Subject::truncate();
+            $this->authorize('bulkDelete', Subject::class);
             
             /** @var Collection */
             $subjects = Subject::all();
 
             $subjects->each(function(Subject $subject){
-                $subject->forceDelete();
+                $subject->delete();
             });
 
             session()->flash('status', 'You\'ve successfully deleted all the subjects in the application');
@@ -295,14 +337,87 @@ class Subjects extends Component
             $this->emit('hide-truncate-subjects-modal');
 
         } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            $message = "Bulk deleting subjects operation failed";
 
-            session()->flash('error', 'An error occurred while deleting subjects');
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-truncate-subjects-modal');
+            
+        }
+    }
+
+    /**
+     * Restoring a subject that has been trashed
+     * 
+     * @param mixed $subjectId
+     */
+    public function restoreSubject($subjectId)
+    {
+        try {
+
+            /** @var Subject */
+            $subject = Subject::where('id', $subjectId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $subject);
+
+            $subject->restore();
+
+            session()->flash('status', "The subject, {$subject->name}, has been restored");
+            
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Bulk deleting subjects operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+        }
+        
+    }
+    
+    /**
+     * Deleting a subject from the system
+     * 
+     * @param mixed $subjectId
+     */
+    public function destroySubject($subjectId)
+    {
+        try {
+
+            /** @var Subject */
+            $subject = Subject::where('id', $subjectId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $subject);
+
+            $subject->forceDelete();
+
+            session()->flash('status', "The subject, {$subject->name}, has been deleted from the system");
+            
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Bulk deleting subjects operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
             
         }
         

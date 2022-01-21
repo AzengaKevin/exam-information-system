@@ -33,7 +33,9 @@ class GuardianPolicy
      */
     public function view(User $user, Guardian $guardian)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('guardians-read')
+            ? Response::allow()
+            : Response::deny("You are not allowed to view the guardian details, {$guardian->auth->name}");
     }
 
     /**
@@ -44,7 +46,9 @@ class GuardianPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('guardians-create')
+            ? Response::allow()
+            : Response::deny('You are not allowed to create a guardian');
     }
 
     /**
@@ -56,7 +60,9 @@ class GuardianPolicy
      */
     public function update(User $user, Guardian $guardian)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('guardians-update')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to updae the guardian, {$guardian->auth->name}");
     }
 
     /**
@@ -68,7 +74,9 @@ class GuardianPolicy
      */
     public function delete(User $user, Guardian $guardian)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('guardians-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the guardian, {$guardian->auth->name}");
     }
 
     /**
@@ -80,7 +88,9 @@ class GuardianPolicy
      */
     public function restore(User $user, Guardian $guardian)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('guardians-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the guardian, {$guardian->auth->name}");
     }
 
     /**
@@ -92,6 +102,22 @@ class GuardianPolicy
      */
     public function forceDelete(User $user, Guardian $guardian)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('guardians-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to destroy the guardian, {$guardian->auth->name}");
     }
+
+    /**
+     * Determine whether the user can view trashed permisions.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('guardians-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed guardians");
+        
+    }  
 }

@@ -11,15 +11,21 @@ use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use App\Rules\MustBeKenyanPhone;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
 
 class Teachers extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
+
+    public $trashed = false;
+    public $subjects;
 
     public $teacherId;
     public $userId;
@@ -32,33 +38,70 @@ class Teachers extends Component
 
     public $selectedSubjects = [];
 
+    /**
+     * Lifecycle method, that executes onces when the component is mounting
+     * 
+     * @param string $trashed
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+
+        $this->subjects = $this->getAllSubjects();
+    }
+
+    /**
+     * Lifecycle method that renders the component every time it's state changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.teachers', [
             'teachers' => $this->getPaginatedTeachers(),
-            'employers' => Teacher::employerOptions(),
-            'subjects' => $this->getAllSubjects()
+            'employers' => Teacher::employerOptions()
         ]);
     }
 
     /**
      * Ensures that the phone number is prefixed with 254 when entered
+     * 
+     * @param mixed $value
      */
     public function updatedPhone($value)
     {
         $this->phone = Str::start($value, "254");
     }
 
+    /**
+     * Get paginated teachers from the database
+     * 
+     * @return Collection
+     */
     public function getPaginatedTeachers()
     {
-        return Teacher::with(['responsibilities'])->latest()->paginate(24);
+        $teacherQuery = Teacher::with(['responsibilities']);
+
+        if ($this->trashed) $teacherQuery->onlyTrashed();
+        
+        return $teacherQuery->latest()->paginate(24);
     }
 
+    /**
+     * Get all subjects from the database
+     * 
+     * @return Collection
+     */
     public function getAllSubjects()
     {
         return Subject::all(['id', 'name']);
     }
 
+    /**
+     * Teacher field validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -80,12 +123,13 @@ class Teachers extends Component
 
         try {
 
-            DB::beginTransaction();
+            $this->authorize('create', Teacher::class);
+            $this->authorize('create', User::class);
 
-            /** @var Teacher */
-            $teacher = Teacher::create($data);
+            DB::transaction(function()use($data){
 
-            if($teacher){
+                /** @var Teacher */
+                $teacher = Teacher::create($data);
 
                 /** @var User */
                 $user = $teacher->auth()->create(array_merge($data, [
@@ -98,41 +142,36 @@ class Teachers extends Component
                 // Send the guardian a password
                 $user->notifyNow(new SendPasswordNotification($password));
 
-                if($user){
+                if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
 
-                    if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
+                    $payload = array_filter($data['selectedSubjects'], fn($value, $key) => $value == 'true', ARRAY_FILTER_USE_BOTH);
 
-                        $payload = array_filter($data['selectedSubjects'], function($value, $key){
-                            return $value == 'true';
-                        }, ARRAY_FILTER_USE_BOTH);
+                    $teacher->subjects()->sync(array_keys($payload));
 
-                        $teacher->subjects()->sync(array_keys($payload));
-
-                    }
-
-                    DB::commit();
-
-                    $this->reset(['name', 'email', 'phone', 'employer', 'tsc_number', 'selectedSubjects']);
-
-                    $this->resetPage();
-
-                    session()->flash('status', 'Teacher successfully created');
-
-                    $this->emit('hide-upsert-teacher-modal');
                 }
 
-            }
-            
+            });
+
+            $this->reset(['name', 'email', 'phone', 'employer', 'tsc_number', 'selectedSubjects']);
+
+            $this->resetPage();
+
+            session()->flash('status', 'Teacher successfully created');
+
+            $this->emit('hide-upsert-teacher-modal');
+
         } catch (\Exception $exception) {
 
-            DB::rollBack();
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            Log::error($exception->getMessage(), [
-                'teacher-id' => $this->teacherId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            $message = "Creating teacher operation failed";
 
-            session()->flash('error', $exception->getMessage());
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+
+            $this->emit('hide-upsert-teacher-modal');
 
         }
         
@@ -156,9 +195,7 @@ class Teachers extends Component
         $this->employer = $teacher->employer;
         $this->tsc_number = $teacher->tsc_number;
 
-        foreach ($teacher->subjects->pluck('id')->toArray() as $subject) {
-            $this->selectedSubjects[$subject] = 'true';
-        }
+        $this->selectedSubjects = array_fill_keys($teacher->subjects->pluck('id')->all(), 'true');
 
         $this->emit('show-upsert-teacher-modal');
         
@@ -176,45 +213,48 @@ class Teachers extends Component
             /** @var Teacher */
             $teacher = Teacher::findOrFail($this->teacherId);
 
-            DB::beginTransaction();
+            $this->authorize('update', $teacher);
 
-            if($teacher->update($data)){
+            $this->authorize('update', $teacher->auth);
 
-                if($teacher->auth->update($data)){
+            DB::transaction(function()use($teacher, $data){
 
-                    if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
+                // Update teacher
+                $teacher->update($data);
 
-                        $payload = array_filter($data['selectedSubjects'], function($value, $key){
-                            return $value == 'true';
-                        }, ARRAY_FILTER_USE_BOTH);
+                // Update user
+                $teacher->auth->update($data);
 
-                        $teacher->subjects()->sync(array_keys($payload));
+                if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
 
-                    }
+                    $payload = array_filter($data['selectedSubjects'], function($value, $key){
+                        return $value == 'true';
+                    }, ARRAY_FILTER_USE_BOTH);
 
-                    DB::commit();
-
-                    $this->reset(['teacherId', 'userId', 'name', 'email', 'phone', 'employer', 'tsc_number', 'selectedSubjects']);
-
-                    $this->resetPage();
-
-                    session()->flash('status', 'Teacher Successfully Updated');
-
-                    $this->emit('hide-upsert-teacher-modal');
+                    $teacher->subjects()->sync(array_keys($payload));
 
                 }
-            }
+
+            });
+
+            $this->reset(['teacherId', 'userId', 'name', 'email', 'phone', 'employer', 'tsc_number', 'selectedSubjects']);
+
+            $this->resetPage();
+
+            session()->flash('status', "The teacher, {$teacher->auth->name} Successfully Updated");
+
+            $this->emit('hide-upsert-teacher-modal');   
 
         } catch (\Exception $exception) {
 
-            DB::rollBack();
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            Log::error($exception->getMessage(), [
-                'teacher-id' => $this->teacherId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            $message = "Updating teacher operation failed";
 
-            session()->flash('error', 'A fatal error occurred check the logs');
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-upsert-teacher-modal');
             
@@ -222,6 +262,11 @@ class Teachers extends Component
         
     }
 
+    /**
+     * Show the modal for deleting a teacher confirmation
+     * 
+     * @param Teacher $teacher
+     */
     public function showDeleteTeacherModal(Teacher $teacher)
     {
 
@@ -233,6 +278,9 @@ class Teachers extends Component
         
     }
 
+    /**
+     * Trashing a teacher
+     */
     public function deleteTeacher()
     {
         try {
@@ -240,35 +288,112 @@ class Teachers extends Component
             /** @var Teacher */
             $teacher = Teacher::findOrFail($this->teacherId);
 
-            DB::beginTransaction();
+            $this->authorize('delete', $teacher);
+            
+            DB::transaction(function()use($teacher){
 
-            if($teacher->auth) $teacher->auth->delete();
+                // if($teacher->auth) $teacher->auth->delete();
 
-            if($teacher->delete()){
+                $teacher->delete();
+            });
 
-                DB::commit();
+            $this->reset(['teacherId', 'name']);
 
-                $this->reset(['teacherId', 'name']);
+            $this->resetPage();
 
-                $this->resetPage();
+            session()->flash('status', "Teacher, {$teacher->auth->name}, has been succefully deleted");
 
-                session()->flash('status', 'Teacher has been succefully deleted');
+            $this->emit('hide-delete-teacher-modal');
 
-                $this->emit('hide-delete-teacher-modal');
-            }
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Deleting teacher operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+
+            $this->emit('hide-delete-teacher-modal');
+            
+        }
+        
+    }
+
+    /**
+     * Restore a trashed teacher
+     * 
+     * @return mixed $teacherId
+     */
+    public function restoreTeacher($teacherId)
+    {
+
+        try {
+            
+            /** @var Teacher */
+            $teacher = Teacher::where('id', $teacherId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $teacher);
+
+            $teacher->restore();
+
+            session()->flash('status', "Teacher {$teacher->auth->name}, has been restored");
+
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Restoring teacher operation failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+        }
+        
+    }
+
+    /**
+     * Destroy a trashed teacher and remove them from the database
+     * 
+     * @param mixed $teacherId
+     */
+    public function destroyTeacher($teacherId)
+    {
+
+        try {
+            
+            /** @var Teacher */
+            $teacher = Teacher::where('id', $teacherId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $teacher);
+
+            $this->authorize('forceDelete', $teacher->auth);
+
+            DB::transaction(function() use($teacher){
+
+                $teacher->auth->forceDelete();
+
+                $teacher->forceDelete();
+
+            });
+
+            session()->flash('status', "The teacher has been deleted from the system");
             
         } catch (\Exception $exception) {
 
-            DB::rollBack();
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            Log::error($exception->getMessage(), [
-                'teacher-id' => $this->teacherId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            $message = "Restoring teacher operation failed";
 
-            session()->flash('error', 'A fatal error occurred check the logs');
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
 
-            $this->emit('hide-delete-teacher-modal');
+            session()->flash('error', $message);
             
         }
         
