@@ -2,17 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Stream;
 use Illuminate\Http\Request;
 
 class StreamsController extends Controller
 {
+    /**
+     * Create a StreamsController instance
+     */
     public function __construct()
     {
-        return $this->middleware(['auth']);
+        $this->middleware(['auth']);
+
+        $this->authorizeResource(Stream::class);
     }
 
-    public function index()
+    /**
+     * Show a list of all streams
+     * 
+     * @param Request $request
+     * @return View
+     */
+    public function index(Request $request)
     {
-        return view('streams.index');
+        $trashed = $request->trashed;
+
+        if(boolval($trashed)) $this->authorize('bulkDelete', Stream::class);
+
+        return view('streams.index', compact('trashed'));
     }
 }
