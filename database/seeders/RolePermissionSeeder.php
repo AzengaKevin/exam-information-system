@@ -34,7 +34,7 @@ class RolePermissionSeeder extends Seeder
             'Permissions Restore',
             'Permissions Destroy',
             'Permissions View Trashed',
-
+            
             'Levels Browse',
             'Levels Read',
             'Levels Create',
@@ -42,6 +42,8 @@ class RolePermissionSeeder extends Seeder
             'Levels Delete',
             'Levels Restore',
             'Levels Destroy',
+            'Levels View Trashed',
+            'Levels Bulk Delete',
 
             'Streams Browse',
             'Streams Read',

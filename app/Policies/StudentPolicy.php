@@ -109,6 +109,9 @@ class StudentPolicy
 
     /**
      * Determine whether a user allowed to view trashed students
+     * 
+     * @param User $user
+     * @return Response
      */
     public function viewTrashed(User $user)
     {
