@@ -10,11 +10,13 @@ class LevelsController extends Controller
 {
     public function __construct()
     {
-        return $this->middleware(['auth']);
+        $this->middleware(['auth']);
+
+        $this->authorizeResource(Level::class);
     }
 
     /**
-     * Show a list view of all available levels on the applicarion
+     * Show a list view of all available levels on the application
      * 
      * @param Request $request
      * 
@@ -22,7 +24,11 @@ class LevelsController extends Controller
      */
     public function index(Request $request)
     {
-        return view('levels.index');
+        $trashed = $request->trashed;
+
+        if(boolval($trashed)) $this->authorize('viewTrashed', Level::class);
+
+        return view('levels.index', compact('trashed'));
     }
 
     /**
