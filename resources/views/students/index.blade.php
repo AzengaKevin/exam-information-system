@@ -4,42 +4,7 @@
 
 @section('content')
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-md-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Students</li>
-        </ol>
-    </nav>
-    <div class="hstack flex-wrap gap-2">
-        <button data-bs-toggle="modal" data-bs-target="#import-student-spreadsheet-modal"
-            class="btn btn-outline-primary hstack gap-2 align-items-center">
-            <i class="fa fa-file-upload"></i>
-            <span>Import</span>
-        </button>
-        
-        <button data-bs-toggle="modal" data-bs-target="#export-student-spreadsheet-modal"
-            class="btn btn-outline-primary hstack gap-2 align-items-center">
-            <i class="fa fa-file-excel"></i>
-            <span>Download</span>
-        </button>
-
-        <button data-bs-toggle="modal" data-bs-target="#upsert-student-modal"
-            class="btn btn-outline-primary hstack gap-2 align-items-center">
-            <i class="fa fa-plus"></i>
-            <span>Student</span>
-        </button>
-
-        <button data-bs-toggle="modal" data-bs-target="#add-student-modal"
-            class="btn btn-outline-primary hstack gap-2 align-items-center">
-            <i class="fa fa-plus"></i>
-            <span>New Student</span>
-        </button>
-    </div>
-</div>
-<hr>
-
-<livewire:students />
+<livewire:students :trashed="$trashed" />
 
 <livewire:add-student-guardians />
 

@@ -40,8 +40,12 @@ class ImprovedStudentManagementTest extends TestCase
     public function testAStudentWithASingleGuardianCanBePersistedToTheSystem()
     {
         $this->withExceptionHandling();
+
+        Notification::fake();
         
         $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Create']));
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Guardians Create']));
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Users Create']));
 
         /** @var Level */
         $level = Level::factory()->create();
@@ -113,6 +117,8 @@ class ImprovedStudentManagementTest extends TestCase
         Notification::fake();
         
         $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Create']));
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Guardians Create']));
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Users Create']));
 
         /** @var Level */
         $level = Level::factory()->create();

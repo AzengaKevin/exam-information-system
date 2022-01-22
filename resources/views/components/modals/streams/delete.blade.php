@@ -13,7 +13,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                <button type="submit" wire:click="deleteLevel" class="btn btn-outline-danger">Confirm</button>
+                <button type="submit" wire:click="deleteStream" class="btn btn-outline-danger">Confirm</button>
             </div>
         </div>
     </div>

@@ -33,7 +33,9 @@ class DepartmentPolicy
      */
     public function view(User $user, Department $department)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('departments-read')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view the department, {$department->name}, details page");
     }
 
     /**
@@ -44,8 +46,9 @@ class DepartmentPolicy
      */
     public function create(User $user)
     {
-        $user->role->permission->pluck('slug')->contains('Departments Create');
-            
+        return $user->role->permissions->pluck('slug')->contains('departments-create')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to create a department");
     }
 
     /**
@@ -57,9 +60,9 @@ class DepartmentPolicy
      */
     public function update(User $user, Department $department)
     {
-        $user->role->permission->pluck('slug')->contains('Departments Update')
+        return $user->role->permissions->pluck('slug')->contains('departments-update')
             ? Response::allow()
-            : Response::deny('You\'re not allowed to edit a department');
+            : Response::deny("Woops! You are not allowed to update the department, {$department->name}");
     }
 
     /**
@@ -71,7 +74,9 @@ class DepartmentPolicy
      */
     public function delete(User $user, Department $department)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('departments-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the department, {$department->name}");
     }
 
     /**
@@ -83,7 +88,9 @@ class DepartmentPolicy
      */
     public function restore(User $user, Department $department)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('departments-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the department, {$department->name}");
     }
 
     /**
@@ -95,6 +102,22 @@ class DepartmentPolicy
      */
     public function forceDelete(User $user, Department $department)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('departments-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to completely delete the department, {$department->name}");
     }
+
+    /**
+     * Determine whether the user can view trashed departments.
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */    
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('departments-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You're not allowed to view trashed departments");
+        
+    }     
 }

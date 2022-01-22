@@ -26,4 +26,14 @@ class Stream extends Model
         
     }
 
+    /** 
+     * Stream Student Relation
+     * 
+     * @return Relation
+     */
+    public function students()
+    {
+        return $this->hasMany(Student::class);
+    }
+
 }

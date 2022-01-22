@@ -34,7 +34,7 @@ class RolePermissionSeeder extends Seeder
             'Permissions Restore',
             'Permissions Destroy',
             'Permissions View Trashed',
-
+            
             'Levels Browse',
             'Levels Read',
             'Levels Create',
@@ -42,6 +42,8 @@ class RolePermissionSeeder extends Seeder
             'Levels Delete',
             'Levels Restore',
             'Levels Destroy',
+            'Levels View Trashed',
+            'Levels Bulk Delete',
 
             'Streams Browse',
             'Streams Read',
@@ -50,6 +52,8 @@ class RolePermissionSeeder extends Seeder
             'Streams Delete',
             'Streams Restore',
             'Streams Destroy',
+            'Streams View Trashed',
+            'Streams Bulk Delete',
 
             'Departments Browse',
             'Departments Read',
@@ -58,6 +62,7 @@ class RolePermissionSeeder extends Seeder
             'Departments Delete',
             'Departments Restore',
             'Departments Destroy',
+            'Departments View Trashed',
 
             'Subjects Browse',
             'Subjects Read',
@@ -123,14 +128,17 @@ class RolePermissionSeeder extends Seeder
             'Students Delete',
             'Students Restore',
             'Students Destroy',
+            'Students View Trashed',
 
-            'LevelUnits Browse',
-            'LevelUnits Read',
-            'LevelUnits Create',
-            'LevelUnits Update',
-            'LevelUnits Delete',
-            'LevelUnits Restore',
-            'LevelUnits Destroy',
+            'Level Units Browse',
+            'Level Units Read',
+            'Level Units Create',
+            'Level Units Update',
+            'Level Units Delete',
+            'Level Units Restore',
+            'Level Units Destroy',
+            'Level Units View Trashed',
+            'Level Units Bulk Delete',
 
             'Hostels Browse',
             'Hostels Read',

@@ -21,7 +21,7 @@ class LevelPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('levels-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the classes page');
+            : Response::deny("Woops! You are not allowed to browse the classes page");
     }
 
     /**
@@ -33,7 +33,9 @@ class LevelPolicy
      */
     public function view(User $user, Level $level)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('levels-read')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view details of the class {$level->name}");
     }
 
     /**
@@ -44,7 +46,9 @@ class LevelPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('levels-create')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to create a level");
     }
 
     /**
@@ -56,7 +60,9 @@ class LevelPolicy
      */
     public function update(User $user, Level $level)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('levels-update')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to update the class, {$level->name}");
     }
 
     /**
@@ -68,7 +74,9 @@ class LevelPolicy
      */
     public function delete(User $user, Level $level)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('levels-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the level, {$level->name}");
     }
 
     /**
@@ -80,7 +88,9 @@ class LevelPolicy
      */
     public function restore(User $user, Level $level)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('levels-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the level, {$level->name}");
     }
 
     /**
@@ -92,6 +102,35 @@ class LevelPolicy
      */
     public function forceDelete(User $user, Level $level)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('levels-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to permanently the level, {$level->name}");
+    }
+
+    /**
+     * Determine whether a user allowed to view trashed levels
+     * 
+     * @param User $user
+     * @return Response
+     */
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('levels-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view trashed levels");
+    }
+
+    /**
+     * Determine whether a user can bulk delete levels
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function bulkDelete(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('levels-bulk-delete')
+            ? Response::allow()
+            : Response::deny('Woops! You are not allowed to bulk delete levels');
+        
     }
 }

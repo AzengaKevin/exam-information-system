@@ -52,6 +52,8 @@ class StudentsManagementTest extends TestCase
 
         $response->assertViewIs('students.index');
 
+        $response->assertViewHasAll(['trashed']);
+
         $response->assertSeeLivewire('students');
         
     }
@@ -213,8 +215,8 @@ class StudentsManagementTest extends TestCase
         Livewire::test(Students::class)
             ->call('showDeleteStudentModal', $student)
             ->call('deleteStudent');
-
-        $this->assertFalse(Student::where('id', $student->id)->exists());
+            
+        $this->assertSoftDeleted($student);
         
     }
 
@@ -273,6 +275,46 @@ class StudentsManagementTest extends TestCase
         $response->assertViewIs('students.show');
 
         $response->assertViewHasAll(['student', 'systemSettings']);
+        
+    }
+
+    /** @group students */
+    public function testAuthorizedUserCanRestoreAStudent()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Restore']));
+
+        /** @var Student */
+        $student = Student::factory()->create();
+
+        $student->delete();
+
+        $this->assertSoftDeleted($student);
+
+        Livewire::test(Students::class)->call('restoreStudent', $student->id);
+
+        $this->assertFalse($student->fresh()->trashed());
+        
+    }
+
+    /** @group students */
+    public function testAuthorizedUserCanDestroyAStudent()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Destroy']));
+
+        /** @var Student */
+        $student = Student::factory()->create();
+
+        $student->delete();
+
+        $this->assertSoftDeleted($student);
+
+        Livewire::test(Students::class)->call('destroyStudent', $student->id);
+
+        $this->assertTrue(Student::where('id', $student->id)->withTrashed()->doesntExist());
         
     }
 }

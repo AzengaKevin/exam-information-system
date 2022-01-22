@@ -21,7 +21,7 @@ class StudentPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('students-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the students page');
+            : Response::deny('Woops! You are not allowed to browse the students page');
     }
 
     /**
@@ -35,7 +35,7 @@ class StudentPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('students-read')
             ? Response::allow()
-            : Response::deny('You are not allowed to view students');
+            : Response::deny("Woops! You are not allowed to view student, {$student->name}, details page");
     }
 
     /**
@@ -48,7 +48,7 @@ class StudentPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('students-create')
             ? Response::allow()
-            : Response::deny('You are not allowed to create a student');
+            : Response::deny('Woops! You are not allowed to create a student');
     }
 
     /**
@@ -62,7 +62,7 @@ class StudentPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('students-update')
             ? Response::allow()
-            : Response::deny('You are not allowed to update a student');
+            : Response::deny("Woops! You are not allowed to update the student, {$student->name}, details");
     }
 
     /**
@@ -76,7 +76,7 @@ class StudentPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('students-delete')
             ? Response::allow()
-            : Response::deny('You are not allowed to delete a student');
+            : Response::deny("Woops! You are not allowed to delete the student, {$student->name}");
     }
 
     /**
@@ -88,7 +88,9 @@ class StudentPolicy
      */
     public function restore(User $user, Student $student)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('students-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the student, {$student->name}");
     }
 
     /**
@@ -100,6 +102,21 @@ class StudentPolicy
      */
     public function forceDelete(User $user, Student $student)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('students-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to completely delete the student, {$student->name}, from the application");
+    }
+
+    /**
+     * Determine whether a user allowed to view trashed students
+     * 
+     * @param User $user
+     * @return Response
+     */
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('students-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view trashed students");
     }
 }

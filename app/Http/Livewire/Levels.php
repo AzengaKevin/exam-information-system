@@ -7,12 +7,15 @@ use Livewire\Component;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Levels extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -23,11 +26,26 @@ class Levels extends Component
     public $slug;
     public $description;
 
+    public $trashed = false;
+
+    /**
+     * Lifecycle method that gets called onces when the component is mountint
+     * 
+     * @param string $trashed
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+    }
+
+    /**
+     * Lifecycle method the renders the component everytime the state of the component changes
+     * 
+     * @return View
+     */
     public function render()
     {
-        return view('livewire.levels', [
-            'levels' => $this->getPaginatedLevels()
-        ]);
+        return view('livewire.levels', ['levels' => $this->getPaginatedLevels()]);
     }
 
     /**
@@ -35,15 +53,18 @@ class Levels extends Component
      */
     public function getPaginatedLevels()
     {
-        return Level::paginate(24);
-    }
+        $levelsQuery = Level::with(['students']);
 
+        if($this->trashed) $levelsQuery->onlyTrashed();
+
+        return $levelsQuery->paginate(24)->withQueryString();
+    }
     
    
     /**
      * Show upsert user modal for editing and updating user
      * 
-     * @param User $user
+     * @param Level $level
      */
     public function editLevel(Level $level)
     {
@@ -57,6 +78,11 @@ class Levels extends Component
         $this->emit('show-upsert-level-modal');
     }
 
+    /**
+     * Define the component fields validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -71,16 +97,13 @@ class Levels extends Component
      */
     public function createLevel()
     {
-        $this->validate();
+        $data = $this->validate();
         
         try {
 
-            $level = Level::create([
-                'name'=>$this->name,
-                'numeric'=> $this->numeric,
-                'description'=>$this->description,
-                'slug'=>Str::slug($this->name)
-            ]);
+            $this->authorize('create', Level::class);
+
+            $level = Level::create($data);
 
             if($level){
 
@@ -94,17 +117,32 @@ class Levels extends Component
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
-
-            session()->flash('error', 'Level addition failed');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Level addition action failed");
         
             $this->emit('hide-upsert-level-modal');
 
         }
     }
 
+    /**
+     * Set appropriate error based on the type of the error and the environment
+     * 
+     * @param \Exception $exception
+     * @param string $message
+     */
+    private function setError(\Exception $exception, string $message)
+    {
+
+        if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+        else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+        session()->flash('error', $message);
+
+    }
+    
     /**
      * Updating the current database level record
      */
@@ -114,8 +152,10 @@ class Levels extends Component
 
         try {
 
-            /** @var User */
+            /** @var Level */
             $level = Level::findOrFail($this->levelId);
+
+            $this->authorize('update', $level);
 
             if($level->update($data)){
 
@@ -128,16 +168,18 @@ class Levels extends Component
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Level updating action failed");
+        
+            $this->emit('hide-upsert-level-modal');
 
         }
     }
 
     /**
      * Shows the modal for deleting a specified level
+     * 
      * @param Level $level
      */
     public function showDeleteLevelModal(Level $level)
@@ -151,31 +193,31 @@ class Levels extends Component
     }
 
     /**
-     * Deletes a level record from the database
+     * Trash a level
      */
     public function deleteLevel()
     {
         try {
 
+            /** @var Level */
             $level = Level::findOrFail($this->levelId);
+
+            $this->authorize('delete', $level);
 
             if($level->delete()){
 
                 $this->reset(['levelId', 'name']);
 
-                session()->flash('status', 'The level has been successfully deleted');
+                session()->flash('status', "The level, {$level->name}, has been successfully deleted");
 
                 $this->emit('hide-delete-level-modal');
             }
 
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'level-id' => $this->levelId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
-
-            session()->flash('error', 'A fatal error has occurred');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Level addition action failed");
 
             $this->emit('hide-delete-level-modal');
         }
@@ -188,13 +230,13 @@ class Levels extends Component
     {
         try {
 
-            // Level::truncate();
+            $this->authorize('bulkDelete', Level::class);
 
             /** @var Collection */
             $levels = Level::all();
 
             $levels->each(function(Level $level){
-                $level->forceDelete();
+                $level->delete();
             });
 
             session()->flash('status', 'All system levels have been deleted');
@@ -203,13 +245,66 @@ class Levels extends Component
             
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
             
-            session()->flash('error', 'An error occurred while deleting systems levels');
+            $this->setError($exception, "Sorry! Level truncation action failed");
 
             $this->emit('hide-truncate-levels-modal');
+        }
+    }
+
+    /**
+     * Restore a trashed level
+     * 
+     * @param mixed $levelId
+     * 
+     */
+    public function restoreLevel($levelId)
+    {
+        try {
+            
+            /** @var Level */
+            $level = Level::where('id', $levelId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $level);
+
+            $level->restore();
+
+            session()->flash('status', "The level, {$level->name}, has been restored");
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Level restoring action failed");
+            
+        }
+    }
+
+    /**
+     * Completely delete a level from the database
+     * 
+     * @param mixed $levelId
+     */
+    public function destroyLevel($levelId)
+    {
+        try {
+            
+            /** @var Level */
+            $level = Level::where('id', $levelId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $level);
+
+            $level->forceDelete();
+
+            session()->flash('status', "The level, {$level->name}, has been completely deleted from the system");
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Level destroying action failed");
+            
         }
     }
 }
