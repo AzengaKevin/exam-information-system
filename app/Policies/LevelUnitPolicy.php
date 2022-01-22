@@ -19,9 +19,9 @@ class LevelUnitPolicy
      */
     public function viewAny(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('levelunits-browse')
+        return $user->role->permissions->pluck('slug')->contains('level-units-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the classes page');
+            : Response::deny("Woops! You are not allowed to browse the classes page");
     }
 
     /**
@@ -33,7 +33,9 @@ class LevelUnitPolicy
      */
     public function view(User $user, LevelUnit $levelUnit)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('level-units-read')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to the class, {$levelUnit->name}, details page");
     }
 
     /**
@@ -44,9 +46,9 @@ class LevelUnitPolicy
      */
     public function create(User $user)
     {
-        return $user->role->permissions->pluck('slug')->contains('levelunits-create')
+        return $user->role->permissions->pluck('slug')->contains('level-units-create')
             ? Response::allow()
-            : Response::deny('You are not allowed to create a class');
+            : Response::deny('Woops! You are not allowed to create a class');
         
     }
 
@@ -59,7 +61,9 @@ class LevelUnitPolicy
      */
     public function update(User $user, LevelUnit $levelUnit)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('level-units-update')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to update the class {$levelUnit->name}");
     }
 
     /**
@@ -71,7 +75,9 @@ class LevelUnitPolicy
      */
     public function delete(User $user, LevelUnit $levelUnit)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('level-units-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the class {$levelUnit->name}");
     }
 
     /**
@@ -83,7 +89,9 @@ class LevelUnitPolicy
      */
     public function restore(User $user, LevelUnit $levelUnit)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('level-units-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the class {$levelUnit->name}");
     }
 
     /**
@@ -95,6 +103,35 @@ class LevelUnitPolicy
      */
     public function forceDelete(User $user, LevelUnit $levelUnit)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('level-units-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to completely delete the class {$levelUnit->name}");
     }
+
+    /**
+     * Determine whether a user is allowed to view trashed level units
+     * 
+     * @param User $user
+     * @return Response
+     */
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('level-units-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view trashed level units");
+    }
+
+    /**
+     * Determine whether a user can bulk delete level units
+     *
+     * @param  \App\Models\User  $user
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function bulkDelete(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('level-units-bulk-delete')
+            ? Response::allow()
+            : Response::deny('Woops! You are not allowed to bulk delete level units');
+        
+    }      
 }
