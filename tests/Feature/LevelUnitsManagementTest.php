@@ -19,8 +19,7 @@ class LevelUnitsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /** @var Role */
-    private $role;
+    private Role $role;
 
     public function setUp(): void
     {
@@ -40,6 +39,8 @@ class LevelUnitsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Browse']));
+
         LevelUnit::factory(2)->create();
 
         $response = $this->get(route('level-units.index'));
@@ -57,11 +58,14 @@ class LevelUnitsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Create']));
+
         $payload = LevelUnit::factory()->make()->toArray();
 
         Livewire::test(LevelUnits::class)
             ->set('level_id', $payload['level_id'])
             ->set('stream_id', $payload['stream_id'])
+            ->set('alias', $payload['alias'])
             ->set('description', $payload['description'])
             ->call('addLevelUnit');
 
@@ -72,6 +76,7 @@ class LevelUnitsManagementTest extends TestCase
 
         $this->assertEquals($payload['level_id'], $levelUnit->level_id);
         $this->assertEquals($payload['stream_id'], $levelUnit->stream_id);
+        $this->assertNotNull($levelUnit->alias);
         $this->assertEquals($payload['description'], $levelUnit->description);
         
     }
@@ -80,6 +85,8 @@ class LevelUnitsManagementTest extends TestCase
     public function testAuthorizedUserCanUpdateLevelUnit()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Update']));
 
         $levelUnit = LevelUnit::factory()->create();
 
@@ -105,13 +112,15 @@ class LevelUnitsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Delete']));
+
         $levelUnit = LevelUnit::factory()->create();
 
         Livewire::test(LevelUnits::class)
             ->call('showDeleteLevelUnitModal', $levelUnit)
             ->call('deleteLevelUnit');
 
-        $this->assertFalse(LevelUnit::where('id', $levelUnit->id)->exists());
+        $this->assertSoftDeleted($levelUnit);
         
     }
 
@@ -121,7 +130,7 @@ class LevelUnitsManagementTest extends TestCase
         
         $this->withoutExceptionHandling();
 
-        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'LevelUnits Create']));
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Create']));
 
         $streamsPayload = [
             [
@@ -131,10 +140,6 @@ class LevelUnitsManagementTest extends TestCase
             [
                 'name' => 'Green',
                 'alias' => 'G'
-            ],
-            [
-                'name' => 'Red',
-                'alias' => 'R'
             ]
         ];
 
@@ -154,7 +159,7 @@ class LevelUnitsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
-        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'LevelUnits Read']));
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Read']));
 
         $levelUnit = LevelUnit::factory()->create();
 
@@ -170,5 +175,44 @@ class LevelUnitsManagementTest extends TestCase
 
         $response->assertSeeLivewire('level-unit-responsibilities');
         
+    }
+
+    /** @group level-units */
+    public function testAuthorizedUserCanRestoreADeleteLevelUnit()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Restore']));
+
+        /** @var LevelUnit */
+        $levelUnit = LevelUnit::factory()->create();
+
+        $levelUnit->delete();
+
+        $this->assertSoftDeleted($levelUnit);
+
+        Livewire::test(LevelUnits::class)->call('restoreLevelUnit', $levelUnit->id);
+
+        $this->assertFalse($levelUnit->fresh()->trashed());
+        
+    }
+
+    /** @group level-units */
+    public function testAuthorizedUserCanCompletelyDeleteALevelUnit()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Level Units Destroy']));
+
+        /** @var LevelUnit */
+        $levelUnit = LevelUnit::factory()->create();
+
+        $levelUnit->delete();
+
+        $this->assertSoftDeleted($levelUnit);
+
+        Livewire::test(LevelUnits::class)->call('destroyLevelUnit', $levelUnit->id);
+
+        $this->assertTrue(LevelUnit::where('id', $levelUnit->id)->withTrashed()->doesntExist());
     }
 }
