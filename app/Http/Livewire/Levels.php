@@ -142,6 +142,7 @@ class Levels extends Component
         session()->flash('error', $message);
 
     }
+    
     /**
      * Updating the current database level record
      */

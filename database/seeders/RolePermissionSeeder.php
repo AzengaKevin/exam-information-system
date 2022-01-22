@@ -52,6 +52,8 @@ class RolePermissionSeeder extends Seeder
             'Streams Delete',
             'Streams Restore',
             'Streams Destroy',
+            'Streams View Trashed',
+            'Streams Bulk Delete',
 
             'Departments Browse',
             'Departments Read',
