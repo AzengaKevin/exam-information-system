@@ -4,13 +4,15 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Department;
-use Illuminate\Support\Str;
-use Livewire\WithPagination;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\Log;
 
 class Departments extends Component
 {
+    use AuthorizesRequests;
 
     public $departmentId;
 
@@ -18,26 +20,49 @@ class Departments extends Component
     public $slug;
     public $description;
 
-    public function render()
+    public $trashed = false;
+
+    /**
+     * Lifecycle method that executes only once when the component is mounting
+     * 
+     * @param string trashed
+     */
+    public function mount(string $trashed = null)
     {
-        return view('livewire.departments', [
-            'departments' => $this->getPaginatedDepartments()
-        ]);
+        $this->trashed = boolval($trashed);
     }
 
-    public function getPaginatedDepartments()
+    /**
+     * Lifecycle method that renders the component when the state of the component changes
+     * 
+     * @return View
+     */
+    public function render()
     {
-        return Department::with(['subjects'])->get();
+        return view('livewire.departments', ['departments' => $this->getAppropriateDepartments()]);
+    }
+
+    /**
+     * Get paginated departments from the database
+     * 
+     * @return Collection
+     */
+    public function getAppropriateDepartments()
+    {
+        $deparmentQuery = Department::with(['subjects']);
+
+        if($this->trashed) $deparmentQuery->onlyTrashed();
+
+        return $deparmentQuery->get();
     }
 
     /**
      * Show upsert user modal for editing and updating user
      * 
-     * @param User $user
+     * @param Department $department
      */
     public function editDepartment(Department $department)
     {
-        
         $this->departmentId = $department->id;
 
         $this->name = $department->name;
@@ -46,6 +71,11 @@ class Departments extends Component
         $this->emit('show-upsert-department-modal');
     }
 
+    /**
+     * Departments fields validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -54,30 +84,55 @@ class Departments extends Component
         ];
     }
 
-    function createDepartment()
+    /**
+     * Create a department enrty to the database
+     */
+    public function createDepartment()
     {
-        $this->validate();
+        $data = $this->validate();
         
         try {
 
-            Department::create([
-                'name'=>$this->name,
-                'description'=>$this->description ,
-                'slug'=>Str::slug($this->name)
-            ]);
+            $this->authorize('create', Department::class);
+
+            $department = Department::create($data);
+
+            session()->flash('status', "The department, {$department->name}, successfully created");
+
+            $this->emit('hide-upsert-department-modal');
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->userId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $this->setError($exception, "Sorry! Department creation failed, if it persists consult the admin");
+
+            $this->emit('hide-upsert-department-modal');
 
         }
-        $this->emit('hide-upsert-department-modal');
+
+    }
+
+    /**
+     * Set appropriate error based on the type of the erro and the environment
+     * @param \Exception $exception
+     * @param string $message
+     */
+    private function setError(\Exception $exception, string $message)
+    {
+
+        if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+        else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+        session()->flash('error', $message);
+
     }
 
 
+    /**
+     * Update a department database entry
+     */
     public function updateDepartment()
     {
         $data = $this->validate();
@@ -87,23 +142,31 @@ class Departments extends Component
             /** @var User */
             $department = Department::findOrFail($this->departmentId);
 
+            $this->authorize('update', $department);
+
             if($department->update($data)){
 
-                session()->flash('status', 'department successfully updated');
+                session()->flash('status', "Department, {$department->fresh()->name} successfully updated");
 
                 $this->emit('hide-upsert-department-modal');
             }
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'user-id' => $this->departmentId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $this->setError($exception, "Sorry! Upaditing department action failed");
+
+            $this->emit('hide-upsert-department-modal');
 
         }
     }
 
+    /**
+     * Show confirmation modal for deleting a department
+     * 
+     * @param Department $department
+     */
     public function showDeleteDepartmentModal(Department $department)
     {
         $this->departmtneId = $department->id;
@@ -114,11 +177,17 @@ class Departments extends Component
         
     }
 
-    public function deleteDepartment(Department $department)
+    /**
+     * Trash a department entry
+     */
+    public function deleteDepartment()
     {
         try {
 
+            /** @var Department */
             $department = Department::findOrFail($this->departmtneId);
+
+            $this->authorize('delete', $department);
 
             if($department->delete()){
 
@@ -131,14 +200,69 @@ class Departments extends Component
 
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'department-id' => $this->departmtneId,
-                'action' => __CLASS__ . '@' . __METHOD__
-            ]);
-
-            session()->flash('error', 'A fatal error has occurred');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! The deleting department action failed");
 
             $this->emit('hide-delete-department-modal');
         }
+    }
+
+    /**
+     * Restore a trashed department
+     * 
+     * @param mixed $departmentId
+     */
+    public function restoreDepartment($departmentId)
+    {
+        try {
+
+            /** @var Department */
+            $department = Department::where('id', $departmentId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $department);
+
+            $department->restore();
+
+            session()->flash('status', "The department, {$department->name}, has been restored");
+
+            
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! The restoring department action failed");
+            
+        }
+        
+    }
+
+    /**
+     * Completely delete a department from the database
+     * 
+     * @param mixed $departmentId
+     */
+    public function destroyDepartment($departmentId)
+    {
+        try {
+
+            /** @var Department */
+            $department = Department::where('id', $departmentId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $department);
+
+            $department->forceDelete();
+
+            session()->flash('status', "The department, {$department->name}, has been deleted from the system");
+
+            
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! The destroying department action failed");
+            
+        }
+        
     }
 }
