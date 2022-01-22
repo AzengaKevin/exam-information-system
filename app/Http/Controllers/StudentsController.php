@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Gate;
 class StudentsController extends Controller
 {
 
+    /**
+     * Creates a StudentsController instance
+     */
     public function __construct() {
 
         $this->middleware('auth');
@@ -18,20 +21,28 @@ class StudentsController extends Controller
         
     }
     
+    /**
+     * Show a list of all students in the application
+     * 
+     * @param Request $request
+     */
     public function index(Request $request)
     {
-        return view('students.index');
+        $trashed = $request->trashed;
+        
+        if(boolval($trashed)) $this->authorize('viewTrashed', Student::class);
+
+        return view('students.index', compact('trashed'));
     }
 
-
+    /**
+     * Show student details page
+     * 
+     * @param Student $student
+     * @param SystemSettings $systemSettings
+     */
     public function show(Student $student, SystemSettings $systemSettings)
     {
-        $access = Gate::inspect('view',$student);
-
-        if($access->allowed()){
-            return view('students.show',compact('student', 'systemSettings'));
-        }else{
-            session()->flash('error', $access->message());
-        }
+        return view('students.show',compact('student', 'systemSettings'));
     }
 }

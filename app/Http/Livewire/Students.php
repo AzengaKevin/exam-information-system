@@ -20,6 +20,7 @@ use App\Rules\MustBeKenyanPhone;
 use App\Settings\SystemSettings;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
@@ -27,10 +28,13 @@ use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Pagination\Paginator;
 use App\Notifications\SendPasswordNotification;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Students extends Component
 {
-    use WithPagination, WithFileUploads;
+    use WithPagination, WithFileUploads, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -76,15 +80,37 @@ class Students extends Component
 
     public $studentsFile;
 
+    public $levels;
+    public $streams;
+    public $hostels;
+
+    public $trashed = false;
+
+    /**
+     * Lifecycle methd that executes once when the component is mounting
+     * 
+     * @param string $trashed
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->levels = $this->getAllLevels();
+        $this->streams = $this->getAllStreams();
+        $this->hostels = $this->getAllHostels();
+
+        $this->trashed = boolval($trashed);
+    }
+
+    /**
+     * Lifecycle method that reanders the component when the state of the component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.students',[
             'students' => $this->getPaginatedStudents(),
-            'levels' => $this->getAllLevels(),
-            'streams' => $this->getAllStreams(),
             'genderOptions' => User::genderOptions(),
-            'kcpeGradeOptions' => Student::kcpeGradeOptions(),
-            'hostels' => $this->getAllHostels()
+            'kcpeGradeOptions' => Student::kcpeGradeOptions()
         ]);
     }
 
@@ -95,9 +121,11 @@ class Students extends Component
      */
     public function getPaginatedStudents()
     {
-        return Student::with(['level','levelUnit'])
-            ->latest()->paginate(24)
-            ->withQueryString();
+        $studentsQuery = Student::with(['level','levelUnit']);
+
+        if($this->trashed) $studentsQuery->onlyTrashed();
+
+        return  $studentsQuery->latest()->paginate(24)->withQueryString();
     }
 
     /**
@@ -177,48 +205,40 @@ class Students extends Component
 
         try {
 
+            $this->authorize('create', Student::class);
+
+            /** @var SystemSettings */
             $systemSettings = app(SystemSettings::class);
 
-            $access = Gate::inspect('create', Student::class);
+            if ($systemSettings->school_has_streams) {
 
-            if($access->allowed()){
+                $data['level_unit_id'] = LevelUnit::where([
+                    'level_id' => $data['admission_level_id'],
+                    'stream_id' => $data['stream_id']
+                ])->firstOrFail()->id;
+            }
+            
+            /** @var Student */
+            $student = Student::create($data);
 
-                if ($systemSettings->school_has_streams) {
-                    // Based on level and stream, get the level_unit_id and also persists
-                    $data['level_unit_id'] = LevelUnit::where([
-                        'level_id' => $data['admission_level_id'],
-                        'stream_id' => $data['stream_id']
-                    ])->firstOrFail()->id;
-                }
-                
-                $student = Student::create($data);
+            if($student){
 
-                if($student){
-    
-                    $this->reset();
-    
-                    $this->resetPage();
-    
-                    session()->flash('status', 'Student successfully added');
-    
-                    $this->emit('hide-upsert-student-modal');
-                }
+                $this->reset();
 
-            }else{
+                $this->resetPage();
 
-                session()->flash('error', $access->message());
-    
+                $this->resetValidation();
+
+                session()->flash('status', "Student, {$student->name}, has been successfully added");
+
                 $this->emit('hide-upsert-student-modal');
-
             }
 
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
-
-            session()->flash('error', 'A db/error occurred');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Failed adding the student, consult the admin if this persists");
 
             $this->emit('hide-upsert-student-modal');
         }
@@ -248,6 +268,24 @@ class Students extends Component
         $this->emit('show-upsert-student-modal');
     }
 
+
+    /**
+     * Set appropriate error based on the type of the erro and the environment
+     * @param \Exception $exception
+     * @param string $message
+     */
+    private function setError(\Exception $exception, string $message)
+    {
+        if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+        elseif($exception instanceof ModelNotFoundException) $message = 
+            "You probably are using streams, and haven't generated the yet, navigate to the classes section and generate classes from streams and levels";
+
+        else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+        session()->flash('error', $message);
+    }    
+
     /**
      * Updated a database student record
      */
@@ -262,45 +300,35 @@ class Students extends Component
             /** @var Student */
             $student = Student::findOrFail($this->studentId);
 
-            // Based on level and stream, get the level_unit_id and also persists
-            $data['level_unit_id'] = LevelUnit::where([
-                'level_id' => $data['level_id'],
-                'stream_id' => $data['stream_id']
-            ])->firstOrFail()->id;
+            $this->authorize('update', $student);
 
-            $access = Gate::inspect('update', $student);
-
-            if($access->allowed()){
+            /** @var SystemSettings */
+            $systemSettings = app(SystemSettings::class);
+            
+            if($systemSettings->school_has_streams){
+                $data['level_unit_id'] = LevelUnit::where([
+                    'level_id' => $data['level_id'],
+                    'stream_id' => $data['stream_id']
+                ])->firstOrFail()->id;
+            }
                 
-                if($student->update($data)){
-    
-                    $this->reset();
-    
-                    $this->resetValidation();
-    
-                    session()->flash('status', 'Student has been successfully updated');
-    
-                    $this->emit('hide-upsert-student-modal');
-    
-                }
+            if($student->update($data)){
 
-            }else{
+                $this->reset();
 
-                session()->flash('error', $access->message());
-    
+                $this->resetValidation();
+
+                session()->flash('status', "Student, {$student->fresh()->name}, has been successfully updated");
+
                 $this->emit('hide-upsert-student-modal');
 
             }
 
-
         } catch (\Exception $exception) {
 
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'student-id' => $this->studentId
-            ]);
-
-            session()->flash('error', 'Fatal error occurred while updating student, perhaps the result class is missing');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Updating student operation filed");
 
             $this->emit('hide-upsert-student-modal');
         }
@@ -312,7 +340,6 @@ class Students extends Component
      */
     public function newAddStudent()
     {
-        
         $data = $this->validate([
             'student.name' => ['bail', 'required', 'string'],
             'student.adm_no' => ['bail', 'nullable', Rule::unique('students', 'adm_no')],
@@ -335,18 +362,18 @@ class Students extends Component
 
         try {
 
+            $this->authorize('create', Student::class);
+            $this->authorize('create', Guardian::class);
+            $this->authorize('create', User::class);
+
             $dataStudent = array_filter($data['student'], fn($value, $key) => !empty($value), ARRAY_FILTER_USE_BOTH);
 
-            $systemSettings = app(SystemSettings::class);
-    
-            $access = Gate::inspect('create', Student::class);
-    
-            if($access->allowed()){
-    
-                DB::beginTransaction();
-    
+            DB::transaction(function() use($dataStudent, $data){
+
+                /** @var SystemSettings */
+                $systemSettings = app(SystemSettings::class);
+
                 if ($systemSettings->school_has_streams) {
-                    // Based on level and stream, get the level_unit_id and also persists
                     $dataStudent['level_unit_id'] = LevelUnit::where([
                         'level_id' => $dataStudent['admission_level_id'],
                         'stream_id' => $dataStudent['stream_id']
@@ -359,50 +386,32 @@ class Students extends Component
                 /** @var Guardian */
                 $guardian = Guardian::create($data['guardian']);
 
-                if($guardian){
+                /** @var User */
+                $user = $guardian->auth()->create(array_merge($data['guardian'], ['password' => Hash::make($password = Str::random(6))]));
 
-                    /** @var User */
-                    $user = $guardian->auth()->create(array_merge($data['guardian'], ['password' => Hash::make($password = Str::random(6))]));
+                // Sending email verification link to the user
+                if(!empty($user->email)) $user->sendEmailVerificationNotification();
 
-                    // Sending email verification link to the user
-                    if(!empty($user->email)) $user->sendEmailVerificationNotification();
+                // Send the guardian a password
+                $user->notifyNow(new SendPasswordNotification($password));
 
-                    // Send the guardian a password
-                    $user->notifyNow(new SendPasswordNotification($password));
-                }
-    
-                if($student && $guardian){
+                $student->guardians()->attach($guardian);
 
-                    $student->guardians()->attach($guardian);
-    
-                    DB::commit();
-    
-                    $this->reset(['student', 'guardian']);
-        
-                    $this->resetPage();
-        
-                    session()->flash('status', 'The student and guardian have successfully been added');
-        
-                    $this->emit('hide-add-student-modal');
-                }
-    
-            }else{
-    
-                session()->flash('error', $access->message());
-    
-                $this->emit('hide-add-student-modal');
-    
-            }
+            });
 
+            $this->reset(['student', 'guardian']);
+
+            $this->resetPage();
+
+            session()->flash('status', 'The student and guardian have successfully been added');
+
+            $this->emit('hide-add-student-modal');
+    
         } catch (\Exception $exception) {
 
-            DB::rollBack();
-
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__
-            ]);
-
-            session()->flash('error', 'Most likely you have not, generated the respective class from the level and stream, check with the admin');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Adding student with guardian operation failed");
 
             $this->emit('hide-add-student-modal');
             
@@ -424,7 +433,7 @@ class Students extends Component
     }
 
     /**
-     * Delete a student record from the database
+     * Trash a student
      */
     public function deleteStudent()
     {
@@ -434,36 +443,25 @@ class Students extends Component
             /** @var Student */
             $student = Student::findOrFail($this->studentId);
 
-            $access = Gate::inspect('delete', $student);
+            $this->authorize('delete', $student);
 
-            if($access->allowed()){
+            $student->delete();
+    
+            $this->reset();
 
-                if($student->delete()){
-    
-                    $this->reset();
-    
-                    $this->resetPage();
-    
-                    session()->flash('status', 'Student has been successfully deleted');
-    
-                    $this->emit('hide-delete-student-modal');
-                }
+            $this->resetPage();
 
-            }else{
+            $this->resetValidation();
 
-                session()->flash('error', $access->message());
-    
-                $this->emit('hide-delete-student-modal');
-            }
+            session()->flash('status', 'Student has been successfully deleted');
+
+            $this->emit('hide-delete-student-modal');
 
         } catch (\Exception $exception) {
          
-            Log::error($exception->getMessage(), [
-                'action' => __METHOD__,
-                'student-id' => $this->studentId
-            ]);
-
-            session()->flash('error', 'A fatal error occurred while trying to delete student');
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Deleting student operation failed, consult the admin if it persists");
 
             $this->emit('hide-delete-student-modal');
         }
@@ -479,6 +477,11 @@ class Students extends Component
         $this->emitTo('add-student-guardians', 'showAddStudentGuardiansModal', $student);
     }
 
+    /**
+     * Show feedback if a parent has been attach to a student
+     * 
+     * @param array $payload
+     */
     public function addStudentGuardiansFeedback(array $payload)
     {
         session()->flash($payload['type'], $payload['message']);
@@ -548,5 +551,63 @@ class Students extends Component
             
         }
 
+    }
+
+    /**
+     * Restore a trashed student
+     * 
+     * @param mixed $studentId
+     */
+    public function restoreStudent($studentId)
+    {
+        try {
+
+            /** @var Student */
+            $student = Student::where('id', $studentId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $student);
+
+            $student->restore();
+            
+            session()->flash('status', "Student, {$student->name}, has been successfully restored");
+
+        } catch (\Exception $exception) {
+         
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Restoring student operation failed, consult the admin if it persists");
+
+        }
+        
+    }
+
+    /**
+     * 
+     * Completely delete a student from the system
+     * 
+     * @param mixed $studentId
+     * 
+     */
+    public function destroyStudent($studentId)
+    {
+        try {
+
+            /** @var Student */
+            $student = Student::where('id', $studentId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $student);
+
+            $student->forceDelete();
+            
+            session()->flash('status', "Student, {$student->name}, has been completely deleted from the application");
+
+        } catch (\Exception $exception) {
+         
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+            
+            $this->setError($exception, "Sorry! Completely deleting student operation failed, consult the admin if it persists");
+
+        }
+        
     }
 }
