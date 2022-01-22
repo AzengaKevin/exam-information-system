@@ -122,7 +122,7 @@ class SubjectPolicy
     }
 
     /**
-     * Determine whether the user can view trashed permisions.
+     * Determine whether the user can view trashed subjects.
      *
      * @param  \App\Models\User  $user
      * @return \Illuminate\Auth\Access\Response|bool
@@ -133,5 +133,5 @@ class SubjectPolicy
             ? Response::allow()
             : Response::deny("Woops! You're not allowed to view trashed subjects");
         
-    } 
+    }
 }

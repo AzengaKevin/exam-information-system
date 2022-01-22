@@ -20,7 +20,7 @@
                 @guest
                 <form class="col-md-5" action="{{ route('login') }}" method="POST">
                     @csrf
-                    <div class="card shadow">
+                    <div class="card shadow-sm">
                         <div class="card-body p-3 p-md-5">
                             <div class="form-floating">
                                 <input type="tel" name="phone" id="phone"
