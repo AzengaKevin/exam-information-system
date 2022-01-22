@@ -58,6 +58,7 @@ class RolePermissionSeeder extends Seeder
             'Departments Delete',
             'Departments Restore',
             'Departments Destroy',
+            'Departments View Trashed',
 
             'Subjects Browse',
             'Subjects Read',
@@ -123,6 +124,7 @@ class RolePermissionSeeder extends Seeder
             'Students Delete',
             'Students Restore',
             'Students Destroy',
+            'Students View Trashed',
 
             'LevelUnits Browse',
             'LevelUnits Read',
