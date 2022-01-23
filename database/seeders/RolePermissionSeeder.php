@@ -148,6 +148,7 @@ class RolePermissionSeeder extends Seeder
             'Hostels Delete',
             'Hostels Restore',
             'Hostels Destroy',
+            'Hostels View Trashed',
             
             'Gradings Browse',
             'Gradings Read',

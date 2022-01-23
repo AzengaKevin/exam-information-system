@@ -4,25 +4,7 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Hostels</li>
-        </ol>
-    </nav>
-
-    <button data-bs-toggle="modal" data-bs-target="#upsert-hostel-modal" class="d-md-none btn btn-outline-primary rounded-circle">
-        <i class="fa fa-plus"></i>
-    </button>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-hostel-modal" class="d-none d-md-inline-flex btn btn-outline-primary gap-2 align-items-center">
-        <i class="fa fa-plus"></i>
-        <span>Hostel</span>
-    </button>
-</div>
-<hr>
-
-@livewire('hostels')
+<livewire:hostels :trashed="$trashed" />
 
 @endsection
 
