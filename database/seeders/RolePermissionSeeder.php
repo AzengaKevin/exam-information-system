@@ -112,6 +112,7 @@ class RolePermissionSeeder extends Seeder
             'Responsibilities Delete Locked',
             'Responsibilities Restore',
             'Responsibilities Destroy',
+            'Responsibilities View Trashed',
 
             'Exams Browse',
             'Exams Read',

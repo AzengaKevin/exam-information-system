@@ -21,7 +21,7 @@ class ResponsibilityPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('responsibilities-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the responsibilities page');
+            : Response::deny("Woops! You are not allowed to browse the responsibilities page");
     }
 
     /**
@@ -33,7 +33,9 @@ class ResponsibilityPolicy
      */
     public function view(User $user, Responsibility $responsibility)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-read')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view the responsibility, {$responsibility->name}, page");
     }
 
     /**
@@ -46,7 +48,7 @@ class ResponsibilityPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('responsibilities-create')
             ? Response::allow()
-            : Response::deny('You are not allowed to create a responsibility');
+            : Response::deny('Woops! You are not allowed to create a responsibility');
     }
 
     /**
@@ -60,7 +62,7 @@ class ResponsibilityPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('responsibilities-update')
             ? Response::allow()
-            : Response::deny('You are not allowed to update the responsibility');
+            : Response::deny("Woops! You are not allowed to update the responsibility, {$responsibility->name}");
     }
 
     /**
@@ -86,7 +88,9 @@ class ResponsibilityPolicy
      */
     public function delete(User $user, Responsibility $responsibility)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the responsibility, {$responsibility->name}");
     }
 
     /**
@@ -98,7 +102,9 @@ class ResponsibilityPolicy
      */
     public function deleteLocked(User $user, Responsibility $responsibility)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-delete-locked')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the locked responsibility, {$responsibility->name}");
     }
 
     /**
@@ -110,7 +116,9 @@ class ResponsibilityPolicy
      */
     public function restore(User $user, Responsibility $responsibility)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the responsibility, {$responsibility->name}");
     }
 
     /**
@@ -122,6 +130,21 @@ class ResponsibilityPolicy
      */
     public function forceDelete(User $user, Responsibility $responsibility)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to permanently delete the responsibility, {$responsibility->name}");
+    }
+
+    /**
+     * Determine whether a user is allowed to view trashed responsibilities
+     * 
+     * @param User $user
+     * @return Response
+     */
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('responsibilities-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view trashed responsibilities");
     }
 }
