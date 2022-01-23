@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Livewire\Grades;
 use App\Models\Grade;
+use App\Models\Permission;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
@@ -35,6 +36,8 @@ class GradesManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Grades Browse']));
+
         Grade::factory(2)->create();
 
         $response = $this->get(route('grades.index'));
@@ -52,6 +55,8 @@ class GradesManagementTest extends TestCase
     {
 
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Grades Update']));
         
         /** @var Grade */
         $grade = Grade::factory()->create();
