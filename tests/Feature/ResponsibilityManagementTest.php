@@ -37,6 +37,8 @@ class ResponsibilityManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Responsibilities Browse']));
+
         Responsibility::factory(2)->create();
 
         $response = $this->get(route('responsibilities.index'));
@@ -44,6 +46,8 @@ class ResponsibilityManagementTest extends TestCase
         $response->assertOk();
 
         $response->assertViewIs('responsibilities.index');
+
+        $response->assertViewHasAll(['trashed']);
 
         $response->assertSeeLivewire('responsibilities');
         
@@ -83,9 +87,7 @@ class ResponsibilityManagementTest extends TestCase
         /** @var Responsibility */
         $responsibility = Responsibility::factory()->create();
 
-        $payload = Responsibility::factory()->make([
-            'how_many' => 2
-        ])->toArray();
+        $payload = Responsibility::factory()->make(['how_many' => 2])->toArray();
 
         Livewire::test(Responsibilities::class)
             ->call('editResponsibility', $responsibility)
@@ -154,7 +156,7 @@ class ResponsibilityManagementTest extends TestCase
         
     }
 
-    /** @group responsibiities */
+    /** @group responsibilities */
     public function testAuthorizedUserCanToggleLockStatusOfAResponsibility()
     {
         $this->withoutExceptionHandling();
@@ -167,5 +169,61 @@ class ResponsibilityManagementTest extends TestCase
         Livewire::test(Responsibilities::class)->call('toggleResponsibilityLock', $responsibility);
 
         $this->assertFalse($responsibility->fresh()->locked);
+    }
+
+    /** @group responsibilities */
+    public function testAuthorizedUserCanDeleteAResponsibility()
+    {
+        $this->withoutExceptionHandling();
+        
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Responsibilities Delete']));
+        
+        /** @var Responsibility */
+        $responsibility = Responsibility::factory()->create();
+
+        Livewire::test(Responsibilities::class)
+            ->call('showDeleteResponsibilityModal', $responsibility)
+            ->call('deleteResponsibility');
+
+        $this->assertSoftDeleted($responsibility);
+
+    }
+
+    /** @group responsibilities */
+    public function testAuthorizedUserCanRestoreADeletedResponsibility()
+    {
+        $this->withoutExceptionHandling();
+        
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Responsibilities Restore']));
+        
+        /** @var Responsibility */
+        $responsibility = Responsibility::factory()->create();
+
+        $responsibility->delete();
+
+        $this->assertSoftDeleted($responsibility);
+
+        Livewire::test(Responsibilities::class)->call('restoreResponsibility', $responsibility->id);
+
+        $this->assertFalse($responsibility->fresh()->trashed());
+    }
+
+    /** @group responsibilities */
+    public function testAuthorizedUserCanCompletelyDeletedAResponsibility()
+    {
+        $this->withoutExceptionHandling();
+        
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Responsibilities Destroy']));
+        
+        /** @var Responsibility */
+        $responsibility = Responsibility::factory()->create();
+
+        $responsibility->delete();
+
+        $this->assertSoftDeleted($responsibility);
+
+        Livewire::test(Responsibilities::class)->call('destroyResponsibility', $responsibility->id);
+
+        $this->assertTrue(Responsibility::where('id', $responsibility->id)->withTrashed()->doesntExist());
     }
 }
