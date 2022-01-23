@@ -25,10 +25,29 @@ class Responsibilities extends Component
     public $requirements = [];
     public $description;
 
+    public $trashed = false;
+
+    /**
+     * Component lifecycle method that executes once when the component
+     * is mounting
+     * 
+     * @param string $trashed
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+    }
+
+    /**
+     * Component life cycle method that executes when the state of the
+     * component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.responsibilities', [
-            'responsibilities' => $this->getResponsibilities(),
+            'responsibilities' => $this->getPaginatedResponsibilities(),
             'requirementOptions' => Responsibility::requirementOptions()
         ]);
     }
@@ -38,15 +57,19 @@ class Responsibilities extends Component
      * 
      * @return Collection
      */
-    public function getResponsibilities()
+    public function getPaginatedResponsibilities()
     {
-        return Responsibility::with('teachers')->get();
+        $responsibilitiesQuery = Responsibility::with(['teachers']);
+
+        if($this->trashed) $responsibilitiesQuery->onlyTrashed();
+
+        return $responsibilitiesQuery->paginate(24);
     }
 
     /**
      * Show upsert user modal for editing and updating user
      * 
-     * @param User $user
+     * @param Responsibility $responsibility
      */
     public function editResponsibility(Responsibility $responsibility)
     {
@@ -185,6 +208,11 @@ class Responsibilities extends Component
         
     }
 
+    /**
+     * Show the confirmation modal for deleting responsibility
+     * 
+     * @param Responsibilitiy $responsibility
+     */
     public function showDeleteResponsibilityModal(Responsibility $responsibility)
     {
         $this->departmentId = $responsibility->id;
@@ -195,11 +223,17 @@ class Responsibilities extends Component
         
     }
 
-    public function deleteResponsibility(Responsibility $responsibility)
+    /**
+     * Trash a responsibility
+     */
+    public function deleteResponsibility()
     {
         try {
 
+            /** @var Responsibility */
             $responsibility = Responsibility::findOrFail($this->departmentId);
+
+            $this->authorize('delete', $responsibility);
 
             if($responsibility->delete()){
 
@@ -212,14 +246,83 @@ class Responsibilities extends Component
 
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'responsibility-id' => $this->departmentId,
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'A fatal error has occurred');
+            $message = "Failed to update the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-delete-responsibility-modal');
+        }
+    }
+
+    /** 
+     * Restore a trashed responsibilty
+     * 
+     * @param mixed $responsibilityId
+     */
+    public function restoreResponsibility($responsibilityId)
+    {
+        try {
+
+            /** @var Responsibility */
+            $responsibility = Responsibility::where('id', $responsibilityId)->withTrashed()->firstOrFail();
+            
+            $this->authorize('restore', $responsibility);
+
+            $responsibility->restore();
+
+            session()->flash('status', "The responsibility, {$responsibility->name}, has been restored");
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to update the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+        }
+    }
+
+    /**
+     * Completely delete a responsibility from the database
+     * 
+     * @param mixed $responsibilityId
+     */
+    public function destroyResponsibility($responsibilityId)
+    {
+        try {
+
+            /** @var Responsibility */
+            $responsibility = Responsibility::where('id', $responsibilityId)->withTrashed()->firstOrFail();
+            
+            $this->authorize('forceDelete', $responsibility);
+
+            $responsibility->forceDelete();
+
+            session()->flash('status', "The responsibility, {$responsibility->name}, has been completely deletd");
+            
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to update the responsibility";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
         }
     }
 }
