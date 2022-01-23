@@ -19,6 +19,7 @@
                 <span>Guardian</span>
             </button>
             @endcan
+            @if (!$trashed)                
             @can('viewTrashed', \App\Models\Guardian::class)
             <a href="{{ route('guardians.index', ['trashed' => true]) }}"
                 class="btn btn-warning d-inline-flex gap-1 align-items-center">
@@ -26,6 +27,7 @@
                 <span>Trash</span>
             </a>
             @endcan
+            @endif
         </div>
     </div>
     <hr>
