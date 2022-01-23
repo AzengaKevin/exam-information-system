@@ -4,22 +4,7 @@
 
 @section('content')
 
-<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-md-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Grading Systems</li>
-        </ol>
-    </nav>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-grading-modal"
-        class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
-        <i class="fa fa-plus"></i>
-        <span>System</span>
-    </button>
-</div>
-<hr>
-
-<livewire:gradings />
+<livewire:gradings :trashed="$trashed" />
 
 @endsection
 

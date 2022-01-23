@@ -140,7 +140,7 @@ class RolePermissionSeeder extends Seeder
             'Level Units Destroy',
             'Level Units View Trashed',
             'Level Units Bulk Delete',
-
+            
             'Hostels Browse',
             'Hostels Read',
             'Hostels Create',
@@ -148,7 +148,7 @@ class RolePermissionSeeder extends Seeder
             'Hostels Delete',
             'Hostels Restore',
             'Hostels Destroy',
-
+            
             'Gradings Browse',
             'Gradings Read',
             'Gradings Create',
@@ -156,6 +156,7 @@ class RolePermissionSeeder extends Seeder
             'Gradings Delete',
             'Gradings Restore',
             'Gradings Destroy',
+            'Gradings View Trashed',
 
             'Grades Browse',
             'Grades Read',
