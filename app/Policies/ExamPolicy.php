@@ -26,7 +26,7 @@ class ExamPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('exams-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the exams page');
+            : Response::deny('Woops! You are not allowed to browse the exams page');
     }
 
     /**
@@ -40,7 +40,7 @@ class ExamPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('exams-read')
             ? Response::allow()
-            : Response::deny('You are not allowed to access exam page');
+            : Response::deny("Woops! You are not allowed to view the exam, {$exam->name}");
     }
 
     /**
@@ -67,7 +67,7 @@ class ExamPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('exams-update')
             ? Response::allow()
-            : Response::deny('You are not allowed to update an exam');
+            : Response::deny("Woops! You are not allowed to update the exam, {$exam->name}");
     }
 
     /**
@@ -81,7 +81,7 @@ class ExamPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('exams-delete')
             ? Response::allow()
-            : Response::deny('You are not allowed to delete an exam');
+            : Response::deny("Woops! You are not allowed to delete the exam, {$exam->name}");
     }
 
     /**
@@ -93,7 +93,9 @@ class ExamPolicy
      */
     public function restore(User $user, Exam $exam)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('exams-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the exam, {$exam->name}");
     }
 
     /**
@@ -105,8 +107,23 @@ class ExamPolicy
      */
     public function forceDelete(User $user, Exam $exam)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('exams-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to completely delete the exam, {$exam->name}");
     }
+
+    /**
+     * Determine whether a user is allowed to view trashed exams
+     * 
+     * @param User $user
+     * @return Response
+     */
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('exams-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view trashed exama");
+    }    
 
     /**
      * Determine whether the user can update the exam scores table, necssarily if the clumns have changed
