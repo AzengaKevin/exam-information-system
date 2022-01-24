@@ -16,6 +16,12 @@ class RolePermissionSeeder extends Seeder
     public function run()
     {
         $permissionsPayload = array(
+            'Dashboard Access',
+            'Settings View',
+            'General Settings View',
+            'System Settings View',
+            'Settings Update',
+
             'Roles Browse',
             'Roles Read',
             'Roles Create',

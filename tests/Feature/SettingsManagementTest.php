@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Exam;
+use App\Models\Permission;
 use App\Models\Responsibility;
 use Tests\TestCase;
 use App\Models\Role;
@@ -36,6 +37,8 @@ class SettingsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Settings View']));
+
         $response = $this->get(route('settings.index'));
 
         $response->assertOk();
@@ -50,6 +53,8 @@ class SettingsManagementTest extends TestCase
     public function testAuthorizedUsersCanUpdateSettings()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Settings Update']));
 
         Responsibility::factory(2)->create();
 

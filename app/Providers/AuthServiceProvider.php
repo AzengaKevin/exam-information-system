@@ -44,5 +44,35 @@ class AuthServiceProvider extends ServiceProvider
                 : Response::deny('Only an Exam Manager can perform this action');
 
         });
+
+        Gate::define('access-admin-dashboard', function(User $user){
+            return $user->role->permissions->pluck('slug')->contains('dashboard-access')
+                ? Response::allow()
+                : Response::deny('You\'re not authorized to access the dashboard yet');
+        });
+
+        Gate::define('view-system-settings', function(User $user){
+            return $user->role->permissions->pluck('slug')->contains('system-settings-view')
+                ? Response::allow()
+                : Response::deny('You\'re not authorized to view system settings');
+        });
+
+        Gate::define('view-general-settings', function(User $user){
+            return $user->role->permissions->pluck('slug')->contains('general-settings-view')
+                ? Response::allow()
+                : Response::deny('You\'re not authorized to view general settings');
+        });
+
+        Gate::define('view-settings', function(User $user){
+            return $user->role->permissions->pluck('slug')->contains('settings-view')
+                ? Response::allow()
+                : Response::deny('You\'re not authorized to view the settings page');
+        });
+
+        Gate::define('update-settings', function(User $user){
+            return $user->role->permissions->pluck('slug')->contains('settings-update')
+                ? Response::allow()
+                : Response::deny('You\'re not authorized to update settings');
+        });
     }
 }
