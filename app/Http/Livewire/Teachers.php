@@ -136,11 +136,21 @@ class Teachers extends Component
                     'password' => Hash::make($password = Str::random(6))
                 ]));
 
-                // Sending email verification link to the user
-                if(!empty($user->email)) $user->sendEmailVerificationNotification();
+                if (App::environment('local')) {
 
-                // Send the guardian a password
-                $user->notifyNow(new SendPasswordNotification($password));
+                    Log::debug([
+                        'phone' => $user->phone,
+                        'password' => $password
+                    ]);
+
+                }else{
+                    // Sending email verification link to the user
+                    if(!empty($user->email)) $user->sendEmailVerificationNotification();
+    
+                    // Send the guardian a password
+                    $user->notifyNow(new SendPasswordNotification($password));
+                }
+
 
                 if(isset($data['selectedSubjects']) && !is_null($data['selectedSubjects'])){
 

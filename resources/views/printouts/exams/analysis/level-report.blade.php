@@ -237,6 +237,15 @@
         </div>
         @endforeach
         @endif
+
+        @if ($exam->levelTopSubjectStudents()->count())        
+        <hr>
+        @foreach($exam->subjects as $subject)
+        <div class="mt-3">
+            <x-exams.analysis.level-top-students-in-subject :exam="$exam" :level="$level" :subject="$subject" />
+        </div>
+        @endforeach
+        @endif
     </div>
 </body>
 

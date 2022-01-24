@@ -41,6 +41,7 @@
     </div>
     @endforeach
     @endif
+    
     @if ($exam->levelTopSubjectStudents()->count())        
     <hr>
     @foreach($exam->subjects as $subject)

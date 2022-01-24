@@ -59,7 +59,7 @@
                         @endif
                     </td>
                     @else
-                    <td>{{ $item->$col }}</td>
+                    <td>{{ $item->$col ?? '-' }}</td>
                     @endif
                     @endforeach
                 </tr>
