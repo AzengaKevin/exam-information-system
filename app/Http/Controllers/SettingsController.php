@@ -24,6 +24,8 @@ class SettingsController extends Controller
      */
     public function index(Request $request, SystemSettings $systemSettings, GeneralSettings $generalSettings)
     {
+        $this->authorize('view-settings');
+        
         $user = $request->user();
 
         $responsibilities = Responsibility::all(['id', 'name']);

@@ -3,8 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\Exam;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Models\User;
 use Illuminate\Validation\Rule;
+use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateSettingsRequest extends FormRequest
 {
@@ -15,7 +16,10 @@ class UpdateSettingsRequest extends FormRequest
      */
     public function authorize()
     {
-        return true;
+        /** @var User */
+        $user = request()->user();
+
+        return $user->can('update-settings');
     }
 
     /**
