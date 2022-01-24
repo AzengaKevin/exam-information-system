@@ -10,15 +10,20 @@ use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
 use App\Settings\GeneralSettings;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Exams extends Component
 {
-    use WithPagination;
+    use WithPagination, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
+
+    public $levels;
+    public $subjects;
 
     public $examId;
 
@@ -40,6 +45,8 @@ class Exams extends Component
     /** @var GeneralSettings */
     protected $generalSettings;
 
+    public $trashed = false;
+
     /**
      * Creates the exams component
      * 
@@ -51,11 +58,18 @@ class Exams extends Component
 
     /**
      * Lifecycle method called when the component is mounting
+     * 
+     * @param string $trashed
      */
-    public function mount()
+    public function mount(string $trashed = null)
     {
+        $this->trashed = boolval($trashed);
+
         $this->year = $this->generalSettings->current_academic_year;
         $this->term = $this->generalSettings->current_term;
+
+        $this->levels = $this->getLevels();
+        $this->subjects = $this->getSubjects();
     }
 
     /**
@@ -69,8 +83,6 @@ class Exams extends Component
             'exams' => $this->getPaginatedExams(),
             'otherExams' => $this->getOtherExams(),
             'terms'=> $this->getTerms(),
-            'levels' => $this->getLevels(),
-            'subjects' => $this->getSubjects(),
             'examStatusOptions'=>Exam::examStatusOptions()
         ]);
     }
@@ -112,7 +124,11 @@ class Exams extends Component
      */
     public function getPaginatedExams()
     {
-        return Exam::latest()->paginate(24);
+        $examsQuery = Exam::with(['levels', 'subjects'])->latest();
+
+        if($this->trashed) $examsQuery->onlyTrashed();
+
+        return $examsQuery->paginate(24)->withQueryString();
     }
 
     /**
@@ -128,9 +144,9 @@ class Exams extends Component
     }
 
     /**
-     * Show upsert user modal for editing and updating user
+     * Show upsert exam modal for updating an exam
      * 
-     * @param User $user
+     * @param Exam $exam
      */
     public function editExam(Exam $exam)
     {
@@ -147,16 +163,8 @@ class Exams extends Component
         $this->counts = $exam->counts;
         $this->status = $exam->status;
         $this->deviation_exam_id = $exam->deviation_exam_id;
-
-        // Mark selected subjects
-        foreach ($exam->subjects as $subject) {
-            $this->selectedSubjects[$subject->id] = 'true';
-        }
-
-        // Mark selected levels
-        foreach ($exam->levels as $level) {
-            $this->selectedLevels[$level->id] = 'true';
-        }
+        $this->selectedSubjects = array_fill_keys($exam->subjects->pluck('id')->all(), 'true');
+        $this->selectedLevels = array_fill_keys($exam->levels->pluck('id')->all(), 'true');
 
         $this->emit('show-upsert-exam-modal');
     }
@@ -194,71 +202,76 @@ class Exams extends Component
 
         try {
 
-            $access = Gate::inspect('create', Exam::class);
+            $this->authorize('create', Exam::class);
 
-            if($access->allowed()){
+            unset($data['status']);
 
-                unset($data['status']);
+            /** @var Exam */
+            $deviationExam = Exam::find($data['deviation_exam_id']);
+
+            unset($data['deviation_exam_id']);
+
+            DB::transaction(function() use($data, $deviationExam){
 
                 /** @var Exam */
-                $deviationExam = Exam::find($data['deviation_exam_id']);
+                $exam = Exam::create($data);
 
-                unset($data['deviation_exam_id']);
+                if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
 
-                DB::transaction(function() use($data, $deviationExam){
+                    $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
+                        return $value == 'true';
+                    }, ARRAY_FILTER_USE_BOTH);
 
-                    /** @var Exam */
-                    $exam = Exam::create($data);
+                    $exam->subjects()->sync(array_keys($selectedSubjectsData));
+                }
 
-                    if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
+                if (isset($data['selectedLevels']) && !empty($data['selectedLevels'])) {
 
-                        $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
-                            return $value == 'true';
-                        }, ARRAY_FILTER_USE_BOTH);
+                    $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
+                        return $value == 'true';
+                    }, ARRAY_FILTER_USE_BOTH);
+
+                    $exam->levels()->sync(array_keys($selectedLevelData));
+                }
+
+                if(!is_null($deviationExam) && $exam->matches($deviationExam)) 
+                    $exam->update(['deviation_exam_id' => $deviationExam->id]);
+                
+            });
+
+            $this->reset();
     
-                        $exam->subjects()->sync(array_keys($selectedSubjectsData));
-                    }
+            $this->resetPage();
 
-                    if (isset($data['selectedLevels']) && !empty($data['selectedLevels'])) {
+            session()->flash('status', "The exam has been successfully created");
 
-                        $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
-                            return $value == 'true';
-                        }, ARRAY_FILTER_USE_BOTH);
+            $this->emit('hide-upsert-exam-modal');
 
-                        $exam->levels()->sync(array_keys($selectedLevelData));
-                    }
-
-                    if(!is_null($deviationExam) && $exam->matches($deviationExam)) 
-                        $exam->update(['deviation_exam_id' => $deviationExam->id]);
-                    
-                });
-
-                $this->reset();
-        
-                $this->resetPage();
-
-                session()->flash('status', 'Exam has been successfully created');
-
-                $this->emit('hide-upsert-exam-modal');
-
-            }else{
-
-                session()->flash('error', $access->message());
-    
-                $this->emit('hide-upsert-exam-modal');
-
-            }
-            
         } catch (\Exception $exception) {
 
             Log::error($exception->getMessage(), ['action' => __METHOD__]);
-
-            session()->flash('error', $exception->getMessage());
+            
+            $this->setError($exception, "Sorry, creating exam action failed, contact admin if this persists");
 
             $this->emit('hide-upsert-exam-modal');
 
         }
     }
+
+    /**
+     * Set appropriate error based on the type of the error and the environment
+     * 
+     * @param \Exception $exception
+     * @param string $message
+     */
+    private function setError(\Exception $exception, string $message)
+    {
+        if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+        else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+        session()->flash('error', $message);
+    }      
 
     /**
      * Updates an exam database record with enrolled subjects and levels if applicable
@@ -272,67 +285,56 @@ class Exams extends Component
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            $access = Gate::inspect('update', $exam);
+            $this->authorize('update', $exam);
 
-            if($access->allowed()){
+            /** @var Exam */
+            $deviationExam = Exam::find($data['deviation_exam_id']);
 
-                /** @var Exam */
-                $deviationExam = Exam::find($data['deviation_exam_id']);
+            unset($data['deviation_exam_id']);
 
-                unset($data['deviation_exam_id']);
+            DB::transaction(function() use($exam, $data, $deviationExam){
 
-                DB::transaction(function() use($exam, $data, $deviationExam){
+                $exam->update($data);
 
-                    $exam->update($data);
+                if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
 
-                    if (isset($data['selectedSubjects']) && !empty($data['selectedSubjects'])) {
+                    $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
+                        return $value == 'true';
+                    }, ARRAY_FILTER_USE_BOTH);
 
-                        $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
-                            return $value == 'true';
-                        }, ARRAY_FILTER_USE_BOTH);
-    
-                        $exam->subjects()->sync(array_keys($selectedSubjectsData));
-                    }
+                    $exam->subjects()->sync(array_keys($selectedSubjectsData));
+                }
 
-                    if (isset($data['selectedLevels']) && !empty($data['selectedLevels'])) {
+                if (isset($data['selectedLevels']) && !empty($data['selectedLevels'])) {
 
-                        $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
-                            return $value == 'true';
-                        }, ARRAY_FILTER_USE_BOTH);
+                    $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
+                        return $value == 'true';
+                    }, ARRAY_FILTER_USE_BOTH);
 
-                        $exam->levels()->sync(array_keys($selectedLevelData));
-                        
-                    }
+                    $exam->levels()->sync(array_keys($selectedLevelData));
+                    
+                }
 
-                    if(!is_null($deviationExam) && $exam->matches($deviationExam)){
-                        $exam->update(['deviation_exam_id' => $deviationExam->id]);
-                    }
-                        
-                });
-                
-                $this->reset();
-
-                session()->flash('status', "The exam, {$exam->name}, has been successfully updated");
-
-                $this->emit('hide-upsert-exam-modal');
-
-            }else{
-
-                session()->flash('message', $access->message());
-    
-                $this->emit('hide-upsert-exam-modal');
-
-            }
-
+                if(!is_null($deviationExam) && $exam->matches($deviationExam)){
+                    $exam->update(['deviation_exam_id' => $deviationExam->id]);
+                }
+                    
+            });
             
+            $this->reset();
+
+            session()->flash('status', "The exam, {$exam->name}, has been successfully updated");
+
+            $this->emit('hide-upsert-exam-modal');
+
         } catch (\Exception $exception) {
 
             Log::error($exception->getMessage(), [
                 'exam-id' => $this->examId,
                 'action' => __METHOD__
             ]);
-
-            session()->flash('error', $exception->getMessage());
+            
+            $this->setError($exception, "Sorry, updating the exam operation failed");
 
             $this->emit('hide-upsert-exam-modal');
 
@@ -363,25 +365,15 @@ class Exams extends Component
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            $access = Gate::inspect('delete', $exam);
+            $this->authorize('delete', $exam);
 
-            if($access->allowed()){
-    
-                if($exam->delete()){
-    
-                    $this->reset(['examId', 'name']);
-    
-                    session()->flash('status', 'The exam has been successfully deleted');
-    
-                    $this->emit('hide-delete-exam-modal');
-                }
+            if($exam->delete()){
 
-            }else{
+                $this->reset(['examId', 'name']);
 
-                session()->flash('message', $access->message());
-    
-                $this->emit('hide-upsert-exam-modal');
+                session()->flash('status', 'The exam has been successfully deleted');
 
+                $this->emit('hide-delete-exam-modal');
             }
 
         } catch (\Exception $exception) {
@@ -390,8 +382,8 @@ class Exams extends Component
                 'exam-id' => $this->departmtneId,
                 'action' => __METHOD__
             ]);
-
-            session()->flash('error', $exception->getMessage());
+            
+            $this->setError($exception, "Sorry, deleting the exam operation failed");;
 
             $this->emit('hide-delete-exam-modal');
         }
@@ -428,27 +420,17 @@ class Exams extends Component
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            $access = Gate::inspect('update', $exam);
+            $this->authorize('update', $exam);
 
-            if ($access->allowed()) {
+            $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
+                return $value == 'true';
+            }, ARRAY_FILTER_USE_BOTH);
+            
+            $exam->levels()->sync(array_keys($selectedLevelData));
 
-                $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
-                    return $value == 'true';
-                }, ARRAY_FILTER_USE_BOTH);
-                
-                $exam->levels()->sync(array_keys($selectedLevelData));
+            session()->flash('status', 'Exam enrolled levels hav been successfully updated');
 
-                session()->flash('status', 'Exam enrolled levels hav been successfully updated');
-
-                $this->emit('hide-enroll-levels-modal');
-
-            }else{
-
-                session()->flash('message', $access->message());
-
-                $this->emit('hide-enroll-levels-modal');
-            }
-    
+            $this->emit('hide-enroll-levels-modal');
 
         } catch (\Exception $exception) {
 
@@ -456,8 +438,8 @@ class Exams extends Component
                 'action' => __METHOD__,
                 'exam-id' => $this->examId
             ]);
-
-            session()->flash('error', $exception->getMessage());
+            
+            $this->setError($exception, "Sorry, updating the exam operation failed");
 
             $this->emit('hide-enroll-levels-modal');
         }
@@ -494,27 +476,17 @@ class Exams extends Component
             /** @var Exam */
             $exam = Exam::findOrFail($this->examId);
 
-            $access = Gate::inspect('update', $exam);
+            $this->authorize('update', $exam);
+            
+            $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
+                return $value == 'true';
+            }, ARRAY_FILTER_USE_BOTH);
 
-            if($access->allowed()){
+            $exam->subjects()->sync(array_keys($selectedSubjectsData));
 
-                $selectedSubjectsData = array_filter($data['selectedSubjects'], function($value, $key){
-                    return $value == 'true';
-                }, ARRAY_FILTER_USE_BOTH);
+            session()->flash('status', 'Enrolling subjects to an exams successfully completed');
 
-                $exam->subjects()->sync(array_keys($selectedSubjectsData));
-    
-                session()->flash('status', 'Enrolling subjects to an exams successfully completed');
-    
-                $this->emit('hide-enroll-subjects-modal');
-                
-            }else{
-
-                session()->flash('error', $access->message());
-                
-                $this->emit('hide-enroll-subjects-modal');
-            }
-
+            $this->emit('hide-enroll-subjects-modal');
 
         } catch (\Exception $exception) {
 
@@ -522,12 +494,71 @@ class Exams extends Component
                 'action' => __METHOD__,
                 'exam-id' => $exam->id
             ]);
-
-            session()->flash('error', 'Enrolling subjects to an exam failed, contact admin');
+            
+            $this->setError($exception, "Sorry, enrolling subjects to an exam failed, contact admin");
 
             $this->emit('hide-enroll-subjects-modal');
         }
         
     }
 
+    /**
+     * Restore a trashed exam
+     * 
+     * @param mixed $examId
+     */
+    public function restoreExam($examId)
+    {
+        try {
+
+            /** @var Exam */
+            $exam = Exam::where('id', $examId)->withTrashed()->firstOrFail();
+
+            $this->authorize('restore', $exam);
+
+            $exam->restore();
+
+            session()->flash('status', "The exam, {$exam->name}, has been restored");
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'exam-id' => $exam->id
+            ]);
+            
+            $this->setError($exception, "Sorry, restoring an exam failed, contact admin");
+
+        }
+    }
+
+    /**
+     * Completely delete an exam from the database
+     * 
+     * @param mixed $examId
+     */
+    public function destroyExam($examId)
+    {
+        try {
+
+            /** @var Exam */
+            $exam = Exam::where('id', $examId)->withTrashed()->firstOrFail();
+
+            $this->authorize('forceDelete', $exam);
+
+            $exam->forceDelete();
+
+            session()->flash('status', "The exam, {$exam->name}, has been deleted completely");
+
+        } catch (\Exception $exception) {
+
+            Log::error($exception->getMessage(), [
+                'action' => __METHOD__,
+                'exam-id' => $exam->id
+            ]);
+            
+            $this->setError($exception, "Sorry, deleting an exam failed, contact admin");
+
+        }        
+    }
 }

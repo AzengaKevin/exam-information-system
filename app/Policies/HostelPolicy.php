@@ -21,7 +21,7 @@ class HostelPolicy
     {
         return $user->role->permissions->pluck('slug')->contains('hostels-browse')
             ? Response::allow()
-            : Response::deny('You are not allowed to browse the hostels page');
+            : Response::deny("Woops! You are not allowed to browse the hostels page");
     }
 
     /**
@@ -33,7 +33,9 @@ class HostelPolicy
      */
     public function view(User $user, Hostel $hostel)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('hostels-read')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view the hostel, {$hostel->name}, details");
     }
 
     /**
@@ -44,7 +46,9 @@ class HostelPolicy
      */
     public function create(User $user)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('hostels-create')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to create a hostel");
     }
 
     /**
@@ -56,7 +60,9 @@ class HostelPolicy
      */
     public function update(User $user, Hostel $hostel)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('hostels-update')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to update the hostel, {$hostel->name}");
     }
 
     /**
@@ -68,7 +74,9 @@ class HostelPolicy
      */
     public function delete(User $user, Hostel $hostel)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('hostels-delete')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to delete the hostel, {$hostel->name}");
     }
 
     /**
@@ -80,7 +88,9 @@ class HostelPolicy
      */
     public function restore(User $user, Hostel $hostel)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('hostels-restore')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to restore the hostel, {$hostel->name}");
     }
 
     /**
@@ -92,6 +102,21 @@ class HostelPolicy
      */
     public function forceDelete(User $user, Hostel $hostel)
     {
-        //
+        return $user->role->permissions->pluck('slug')->contains('hostels-destroy')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to completely delete the hostel, {$hostel->name}");
+    }
+
+    /**
+     * Determine whether a user is allowed to view trashed hostels
+     * 
+     * @param User $user
+     * @return Response
+     */
+    public function viewTrashed(User $user)
+    {
+        return $user->role->permissions->pluck('slug')->contains('hostels-view-trashed')
+            ? Response::allow()
+            : Response::deny("Woops! You are not allowed to view trashed hostels");
     }
 }

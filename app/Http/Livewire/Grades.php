@@ -3,11 +3,15 @@
 namespace App\Http\Livewire;
 
 use App\Models\Grade;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\App;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
 
 class Grades extends Component
 {
+    use AuthorizesRequests;
 
     public $english_comment;
     public $swahili_comment;
@@ -18,6 +22,23 @@ class Grades extends Component
 
     public $gradeId;
 
+    public $trashed;
+
+    /**
+     * Component lifecycle method that executes only once when the component is mounting
+     * 
+     * @param string $trashed 
+     */
+    public function mount(string $trashed = null)
+    {
+        $this->trashed = boolval($trashed);
+    }
+
+    /**
+     * Component lifecyle method that executes everytime the state of the component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.grades', [
@@ -25,6 +46,11 @@ class Grades extends Component
         ]);
     }
 
+    /**
+     * Get all application grades
+     * 
+     * @return Collection
+     */
     public function getAllGrades()
     {
         return Grade::all();
@@ -49,6 +75,11 @@ class Grades extends Component
         $this->emit('show-update-grade-modal');
     }
 
+    /**
+     * Define model fields validation rules
+     * 
+     * @return array
+     */
     public function rules()
     {
         return [
@@ -73,23 +104,28 @@ class Grades extends Component
             /** @var Grade */
             $grade = Grade::findOrFail($this->gradeId);
 
+            $this->authorize('update', $grade);
+
             if($grade->update($data)){
 
                 $this->reset();
 
-                session()->flash('status', 'grade been successfully updated');
+                session()->flash('status', 'Grade been successfully updated');
 
                 $this->emit('hide-update-grade-modal');
             }
             
         } catch (\Exception $exception) {
             
-            Log::error($exception->getMessage(), [
-                'grade-id' => $this->gradeId,
-                'action' => __METHOD__
-            ]);
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
-            session()->flash('error', 'Updating Grade Failed');
+            $message = "Sorry! Updating grade operation failed";
+            
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
 
             $this->emit('hide-update-grade-modal');
 

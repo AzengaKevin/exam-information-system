@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Http\Livewire\Gradings;
 use App\Models\Grading;
+use App\Models\Permission;
 use Tests\TestCase;
 use App\Models\Role;
 use App\Models\User;
@@ -16,8 +17,7 @@ class GradingsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
     
-    /** @var Role */
-    private $role;
+    private Role $role;
 
     public function setUp(): void
     {
@@ -36,6 +36,8 @@ class GradingsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Gradings Browse']));
+
         Grading::factory(2)->create();
 
         $response = $this->get(route('gradings.index'));
@@ -43,6 +45,8 @@ class GradingsManagementTest extends TestCase
         $response->assertOk();
 
         $response->assertViewIs('gradings.index');
+
+        $response->assertViewHasAll(['trashed']);
 
         $response->assertSeeLivewire('gradings');
         
@@ -55,11 +59,14 @@ class GradingsManagementTest extends TestCase
 
         $payload = Grading::factory()->make()->toArray();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Gradings Create']));
+
         Livewire::test(Gradings::class)
             ->set('name', $payload['name'])
             ->set('values', $payload['values'])
             ->call('addGrading');
 
+        /** @var Grading */
         $grading = Grading::first();
 
         $this->assertNotNull($grading);
@@ -74,6 +81,8 @@ class GradingsManagementTest extends TestCase
     public function testAuthorizedUserCanUpdateAGradingSystem()
     {
         $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Gradings Update']));
 
         /** @var Grading */
         $grading = Grading::factory()->create();
@@ -97,6 +106,8 @@ class GradingsManagementTest extends TestCase
     {
         $this->withoutExceptionHandling();
 
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Gradings Delete']));
+
         /** @var Grading */
         $grading = Grading::factory()->create();
 
@@ -116,8 +127,42 @@ class GradingsManagementTest extends TestCase
         /** @var Grading */
         $grading = Grading::factory()->create();
 
-        Livewire::test(Gradings::class)
-            ->call('showGrading', $grading);
+        Livewire::test(Gradings::class)->call('showGrading', $grading);
+    }
+
+    /** @group gradings */
+    public function testAuthorizedUserCanRestoreADeleteGradingSystem()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Gradings Restore']));
+
+        /** @var Grading */
+        $grading = Grading::factory()->create();
+
+        $grading->delete();
+
+        Livewire::test(Gradings::class)->call('restoreGrading', $grading->id);
+
+        $this->assertFalse($grading->fresh()->trashed());
+        
+    }
+
+    /** @group gradings */
+    public function testAuthorizedUserCanCompletelyDeleteAGradingSystem()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Gradings Destroy']));
+
+        /** @var Grading */
+        $grading = Grading::factory()->create();
+
+        $grading->delete();
+
+        Livewire::test(Gradings::class)->call('destroyGrading', $grading->id);
+
+        $this->assertTrue(Grading::where('id', $grading->id)->withTrashed()->doesntExist());
         
     }
 }

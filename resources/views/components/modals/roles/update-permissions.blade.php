@@ -6,7 +6,7 @@
         <form wire:submit.prevent="updatePermissions" class="modal-content">
             <div class="modal-header">
                 <h5 id="update-permissions-modal-title" class="modal-title">Update {{ $name }} Permissions</h5>
-                <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
