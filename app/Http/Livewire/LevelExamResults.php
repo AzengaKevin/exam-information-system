@@ -75,17 +75,11 @@ class LevelExamResults extends Component
                 ->where("{$tblName}.level_id", $this->level->id)
                 ->orderBy($this->orderBy ?? 'op');
             
-            if (!empty($this->level_unit_id)) {
-                $query->where("{$tblName}.level_unit_id", $this->level_unit_id);
-            }
+            if (!empty($this->level_unit_id)) $query->where("{$tblName}.level_unit_id", $this->level_unit_id);
+            
+            if (!empty($this->admno)) $query->where("students.adm_no", $this->admno);
 
-            if (!empty($this->admno)) {
-                $query->where("admno", $this->admno);
-            }
-
-            if(!empty($this->name)){
-                $query->where('students.name', 'LIKE', "%{$this->name}%");
-            }
+            if(!empty($this->name)) $query->where('students.name', 'LIKE', "%{$this->name}%");
 
             return $query->paginate(24, ['*'], Str::slug($this->level->name))->withQueryString();
 
@@ -114,15 +108,13 @@ class LevelExamResults extends Component
         /** @var SystemSettings */
         $systemSettings = app(SystemSettings::class);
 
-        $cols = array("mm", "tm", "op");
+        $cols = array("mm", "tm", "tmd");
 
-        if($systemSettings->school_level == 'secondary'){
-            array_push($cols, "mg", "mp", "tp");
-        }
+        if($systemSettings->school_level == 'secondary') array_push($cols, "mg", "mp", "tp", "tpd");
 
-        if ($systemSettings->school_has_streams) {
-            array_push($cols, "sp");
-        }
+        if ($systemSettings->school_has_streams) array_push($cols, "sp");
+
+        array_push($cols, "op");
 
         return $cols;
     }
