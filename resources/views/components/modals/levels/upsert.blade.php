@@ -48,9 +48,9 @@
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
                 @if(is_null($levelId))
-                <button type="submit" wire:click="deleteStream" class="btn btn-outline-info">Create</button>
+                <button type="submit" wire:click="createLevel" class="btn btn-outline-info">Create</button>
                 @else
-                <button type="submit" wire:click="updateStream" class="btn btn-outline-info">Update</button>
+                <button type="submit" wire:click="updateLevel" class="btn btn-outline-info">Update</button>
                 @endif
             </div>
         </div>
