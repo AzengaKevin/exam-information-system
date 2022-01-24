@@ -22,8 +22,7 @@ class ExamsManagementTest extends TestCase
 {
     use RefreshDatabase, WithFaker;
 
-    /** @var Role */
-    private $role;
+    private Role $role;
 
     public function setUp() : void
     {
@@ -32,9 +31,7 @@ class ExamsManagementTest extends TestCase
         $this->role = Role::factory()->create();
 
         /** @var Authenticatable */
-        $user = User::factory()->create([
-            'role_id' => $this->role->id
-        ]);
+        $user = User::factory()->create(['role_id' => $this->role->id]);
 
         $this->actingAs($user);
     }
@@ -53,6 +50,8 @@ class ExamsManagementTest extends TestCase
         $response->assertOk();
 
         $response->assertViewIs('exams.index');
+
+        $response->assertViewHasAll(['trashed']);
 
         $response->assertSeeLivewire('exams');
         
@@ -324,6 +323,58 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals('Marking', $exam->fresh()->status);
 
         $this->assertTrue(Schema::hasTable(Str::slug($exam->shortname)));
+        
+    }
+
+    /** @group exams */
+    public function testAuthorizedUserCanRestoreATrashedExam()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Restore']));
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        $subjects = Subject::all();
+        
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->subjects()->attach($subjects);
+
+        $exam->delete();
+
+        $this->assertSoftDeleted($exam);
+
+        Livewire::test(Exams::class)->call('restoreExam', $exam->id);
+
+        $this->assertNotSoftDeleted($exam);
+        
+    }
+
+    /** @group exams */
+    public function testAuthorizedUserCanCompletelyDeleteAnExam()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Exams Destroy']));
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+
+        $subjects = Subject::all();
+        
+        /** @var Exam */
+        $exam = Exam::factory()->create();
+
+        $exam->subjects()->attach($subjects);
+
+        $exam->delete();
+
+        $this->assertSoftDeleted($exam);
+
+        Livewire::test(Exams::class)->call('destroyExam', $exam->id);
+
+        $this->assertModelMissing($exam);
         
     }
 }
