@@ -128,7 +128,7 @@ class LevelUnitExamScores extends Component
         /** @var SystemSettings */
         $systemSettings = app(SystemSettings::class);
 
-        $cols = array("mm", "tm", "op");
+        $cols = array("mm", "tm");
 
         if($systemSettings->school_level == 'secondary'){
             array_push($cols, "mg", "mp", "tp");
@@ -137,6 +137,8 @@ class LevelUnitExamScores extends Component
         if ($systemSettings->school_has_streams) {
             array_push($cols, "sp");
         }
+
+        array_push($cols, "op");
 
         return $cols;
     }

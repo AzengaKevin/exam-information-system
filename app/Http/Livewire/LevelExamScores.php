@@ -100,15 +100,13 @@ class LevelExamScores extends Component
         /** @var SystemSettings */
         $systemSettings = app(SystemSettings::class);
 
-        $cols = array("mm", "tm", "op");
+        $cols = array("mm", "tm");
 
-        if($systemSettings->school_level == 'secondary'){
-            array_push($cols, "mg", "mp", "tp");
-        }
+        if($systemSettings->school_level == 'secondary') array_push($cols, "mg", "mp", "tp");
 
-        if ($systemSettings->school_has_streams) {
-            array_push($cols, "sp");
-        }
+        if ($systemSettings->school_has_streams) array_push($cols, "sp");
+
+        array_push($cols,  "op");
 
         return $cols;
     }
@@ -192,8 +190,8 @@ class LevelExamScores extends Component
 
             LevelActions::publishExamTopStudentsPerSubject($this->exam, $this->level);
 
-            if(!$systemSettings->school_has_streams)
-                LevelActions::publishStudentResults($this->exam, $this->level);
+            // if(!$systemSettings->school_has_streams)
+            LevelActions::publishStudentResults($this->exam, $this->level);
 
             session()->flash('status', "Level scores have successfully published for {$this->level->name}");
 
