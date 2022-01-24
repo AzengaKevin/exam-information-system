@@ -18,7 +18,7 @@
     @csrf
     @method('PATCH')
 
-    @if ($user->email == 'azenga.kevin7@gmail.com')
+    @can('view-system-settings')
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
@@ -90,7 +90,8 @@
             </div>
         </div>
     </div>
-    @endif
+    @endcan
+    @can('view-general-settings')
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
@@ -210,7 +211,9 @@
                                     id="school-manager-responsibility"
                                     class="form-select @error('general.school_manager_responsibility_id') is-invalid @enderror">
                                     @foreach ($responsibilities as $responsibility)
-                                        <option value="{{ $responsibility->id }}" {{ (old('general.school_manager_responsibility_id') ?? $generalSettings->school_manager_responsibility_id == $responsibility->id) ? 'selected' : '' }}>{{ $responsibility->name }}</option>
+                                    <option value="{{ $responsibility->id }}"
+                                        {{ (old('general.school_manager_responsibility_id') ?? $generalSettings->school_manager_responsibility_id == $responsibility->id) ? 'selected' : '' }}>
+                                        {{ $responsibility->name }}</option>
                                     @endforeach
                                 </select>
                                 <label for="school-manager-responsibility">School Head</label>
@@ -228,7 +231,9 @@
                                     id="school-manager-responsibility"
                                     class="form-select @error('general.exam_manager_responsibility_id') is-invalid @enderror">
                                     @foreach ($responsibilities as $responsibility)
-                                        <option value="{{ $responsibility->id }}" {{ (old('general.exam_manager_responsibility_id') ?? $generalSettings->exam_manager_responsibility_id == $responsibility->id) ? 'selected' : '' }}>{{ $responsibility->name }}</option>
+                                    <option value="{{ $responsibility->id }}"
+                                        {{ (old('general.exam_manager_responsibility_id') ?? $generalSettings->exam_manager_responsibility_id == $responsibility->id) ? 'selected' : '' }}>
+                                        {{ $responsibility->name }}</option>
                                     @endforeach
                                 </select>
                                 <label for="school-manager-responsibility">Exam Manager</label>
@@ -244,9 +249,12 @@
             </div>
         </div>
     </div>
+    @endcan
+    @can('update-settings')
     <div class="col-md-12">
         <button type="submit" class="btn btn-lg btn-primary">Update</button>
     </div>
+    @endcan
 </form>
 @endsection
 
