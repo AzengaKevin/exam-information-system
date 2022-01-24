@@ -121,6 +121,7 @@ class RolePermissionSeeder extends Seeder
             'Exams Delete',
             'Exams Restore',
             'Exams Destroy',
+            'Exams View Trashed',
 
             'Students Browse',
             'Students Read',

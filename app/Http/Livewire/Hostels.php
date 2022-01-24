@@ -117,8 +117,6 @@ class Hostels extends Component
 
     }
 
-
-
     /**
      * Set appropriate error based on the type of the error and the environment
      * 

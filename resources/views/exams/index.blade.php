@@ -4,30 +4,7 @@
 
 @section('content')
 
-<div class="d-flex justify-content-between align-items-center">
-
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mb-0">
-            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Exams</li>
-        </ol>
-    </nav>
-
-    @can('create', \App\Models\Exam::class)
-    <button data-bs-toggle="modal" data-bs-target="#upsert-exam-modal"
-        class="d-md-none btn btn-outline-primary rounded-circle">
-        <i class="fa fa-plus"></i>
-    </button>
-    <button data-bs-toggle="modal" data-bs-target="#upsert-exam-modal"
-        class="d-none d-md-inline-flex btn btn-outline-primary gap-2 align-items-center">
-        <i class="fa fa-plus"></i>
-        <span>Exam</span>
-    </button>
-    @endcan
-</div>
-<hr>
-
-@livewire('exams')
+<livewire:exams :trashed="$trashed" />
 
 @endsection
 
