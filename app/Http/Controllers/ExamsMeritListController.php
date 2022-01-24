@@ -111,15 +111,19 @@ class ExamsMeritListController extends Controller
      */
     public function getAggregateColumns(SystemSettings $systemSettings) : array
     {
-        $cols = array("mm", "tm", "op");
+        $cols = array("mm", "tm");
+
+        array_push($cols, "tmd");
 
         if($systemSettings->school_level == 'secondary'){
             array_push($cols, "mg", "mp", "tp");
+
+            array_push($cols, "tpd");
         }
 
-        if ($systemSettings->school_has_streams) {
-            array_push($cols, "sp");
-        }
+        if ($systemSettings->school_has_streams) array_push($cols, "sp");
+
+        array_push($cols, "op");
 
         return $cols;
     }    
