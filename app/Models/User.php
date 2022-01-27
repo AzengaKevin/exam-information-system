@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\NotDiskusUserScope;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -47,6 +48,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'active' => 'boolean'
     ];
+
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new NotDiskusUserScope);
+    // }
 
     public function authenticatable()
     {
@@ -119,4 +125,26 @@ class User extends Authenticatable implements MustVerifyEmail
 
         return $this->role->is($adminRole);
     }
+
+    /**
+     * Checks whether the user is an administrator
+     * 
+     * @return bool
+     */
+    public function isSuperAdmin()
+    {
+        /** @var Role */
+        $superAdminRole = Role::firstOrCreate(['name' => Role::SUPER_ROLE]);
+
+        return $this->role->is($superAdminRole);
+        
+    }
+
+    public function scopeVisible($query)
+    {
+        $diskusAdminRoleId = Role::firstOrCreate(['name' => Role::SUPER_ROLE])->id;
+
+        $query->whereNull('role_id')->orWhere('role_id', '!=', $diskusAdminRoleId);
+    }
+
 }

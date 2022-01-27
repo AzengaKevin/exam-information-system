@@ -2,15 +2,18 @@
 
 namespace App\Http\Livewire;
 
-use App\Models\Permission;
 use App\Models\Role;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\App;
+use App\Models\User;
 use Livewire\Component;
+use App\Models\Permission;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Roles extends Component
 {
@@ -61,13 +64,19 @@ class Roles extends Component
      */
     public function getPaginatedRoles()
     {
-        $query = Role::query();
+        /** @var User */
+        $user = Auth::user();
 
-        if ($this->trashed) {
-            $query->onlyTrashed();
-        }
+        /** @var Builder */
+        $rolesQuery = Role::query();
 
-        return $query->paginate(24)->withQueryString();
+        if(!$user->isSuperAdmin()) $rolesQuery->visible();
+
+        $rolesQuery->with(['permissions', 'users']);
+
+        if ($this->trashed) $rolesQuery->onlyTrashed();
+
+        return $rolesQuery->paginate(24)->withQueryString();
     }
 
     /**

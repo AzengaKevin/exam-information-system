@@ -42,7 +42,6 @@
                             <th>#</th>
                             <th>Name</th>
                             <th>Slug</th>
-                            <th>Created</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -53,7 +52,6 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ $permission->name }}</td>
                             <td>{{ $permission->slug }}</td>
-                            <td>{{ $permission->created_at->format('d/m/Y') }}</td>
                             <td>
                                 @if (!$trashed)
                                 <div class="hstack gap-2 align-items-center">
@@ -62,6 +60,13 @@
                                         class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
                                         <i class="fa fa-edit"></i>
                                         <span>Edit</span>
+                                    </button>
+                                    @endcan
+                                    @can('updateLocked', $permission)
+                                    <button wire:click="togglePermissionLockedStatus({{ $permission }})"
+                                        class="btn btn-sm btn-{{ $permission->locked ? "warning" : "outline-warning" }} d-inline-flex gap-1 align-items-center">
+                                        <i class="fa fa-trash-restore-alt"></i>
+                                        <span>{{ $permission->locked ? "Unlock" : "Lock" }}</span>
                                     </button>
                                     @endcan
                                     @can('delete', $permission)

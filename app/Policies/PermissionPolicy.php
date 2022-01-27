@@ -121,4 +121,19 @@ class PermissionPolicy
             : Response::deny("Woops! You're not allowed to view trashed permissions");
         
     }
+
+    /**
+     * Determine whether the user can update the model.
+     *
+     * @param  \App\Models\User  $user
+     * @param  \App\Models\Permission  $permission
+     * @return \Illuminate\Auth\Access\Response|bool
+     */
+    public function updateLocked(User $user, Permission $permission)
+    {
+        return $user->role->permissions->pluck('slug')->contains('permissions-update-locked')
+            ? Response::allow()
+            : Response::deny("Can't update permission lock");
+    }
+    
 }
