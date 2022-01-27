@@ -28,6 +28,14 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
+        // Intercept gate checks on super administrator
+        
+        Gate::before(function (User $user, $ability) {
+            if ($user->isSuperAdmin()) {
+                return true;
+            }
+        });
+
         Gate::define('change-exam-status', function(User $user){
 
             $isTeacher = $user->authenticatable_type == 'teacher';

@@ -35,40 +35,44 @@ class ExamsScoresController extends Controller
         /** @var User */
         $user = $request->user();
 
-        /** @var Teacher */
-        $teacher = $user->authenticatable;
+        if($user->isATeacher()){
 
-        /** @var Responsibility */
-        $subResp = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
-        $ctResp = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
-        $lsResp = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
-
-        $responsibilities = collect([]);
-
-        if($systemSettings->school_has_streams){
-
-            $responsibilities = $teacher->responsibilities()
-                ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
-                ->whereIn('responsibilities.id', [
-                    $subResp->id,
-                    $ctResp->id, 
-                    $lsResp->id
-                ])->get();
-        }else{
-
-            $responsibilities = $teacher->responsibilities()
-                ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
-                ->whereIn('responsibilities.id', [
-                    $subResp->id,
-                    $ctResp->id,
-                    $lsResp->id
-                ])->get();
-
+            /** @var Teacher */
+            $teacher = $user->authenticatable;
+    
+            /** @var Responsibility */
+            $subResp = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+            $ctResp = Responsibility::firstOrCreate(['name' => 'Class Teacher']);
+            $lsResp = Responsibility::firstOrCreate(['name' => 'Level Supervisor']);
+    
+            $responsibilities = collect([]);
+    
+            if($systemSettings->school_has_streams){
+    
+                $responsibilities = $teacher->responsibilities()
+                    ->wherePivotIn('level_unit_id', $exam->getAllLevelUnits()->pluck('id')->all())
+                    ->whereIn('responsibilities.id', [
+                        $subResp->id,
+                        $ctResp->id, 
+                        $lsResp->id
+                    ])->get();
+            }else{
+    
+                $responsibilities = $teacher->responsibilities()
+                    ->wherePivotIn('level_id', $exam->levels->pluck('id')->all())
+                    ->whereIn('responsibilities.id', [
+                        $subResp->id,
+                        $ctResp->id,
+                        $lsResp->id
+                    ])->get();
+    
+            }
         }
+
         
         return view('exams.scores.index', [
             'exam' => $exam,
-            'responsibilities' => $responsibilities
+            'responsibilities' => $responsibilities ?? collect([])
         ]);
         
     }

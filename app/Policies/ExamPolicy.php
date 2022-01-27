@@ -16,6 +16,11 @@ class ExamPolicy
 {
     use HandlesAuthorization;
 
+    public function before(User $user, $ability)
+    {
+        if($user->isSuperAdmin()) return Response::allow();
+    }
+
     /**
      * Determine whether the user can view any models.
      *
