@@ -103,6 +103,32 @@ class PermissionsManagmentTest extends TestCase
     }
 
     /** @group permissions */
+    public function testAuthorizedUserCanUpdateAPermissionsIncludingTheLockedProperty()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Permissions Update']));
+
+        /** @var Permission */
+        $permission = Permission::factory()->create();
+
+        /** @var array */
+        $payload = Permission::factory()->make(['locked' => false])->toArray();
+
+        Livewire::test(Permissions::class)
+            ->call('editPermission', $permission)
+            ->set('name', $payload['name'])
+            ->set('locked', $payload['locked'])
+            ->set('description', $payload['description'])
+            ->call('updatePermission');
+
+        $this->assertEquals($payload['name'], $permission->fresh()->name);
+        $this->assertEquals($payload['locked'], $permission->fresh()->locked);
+        $this->assertEquals($payload['description'], $permission->fresh()->description);
+        
+    }
+
+    /** @group permissions */
     public function testAuthorizedUserCanDeleteAPermission()
     {
         $this->withoutExceptionHandling();
@@ -117,6 +143,22 @@ class PermissionsManagmentTest extends TestCase
             ->call('deletePermission');
         
         $this->assertSoftDeleted($permission);
+        
+    }
+
+    /** @group permissions */
+    public function testAuthorizedUserCanToggledLockedPermissionProperty()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Permissions Update Locked']));
+
+        /** @var Permission */
+        $permission = Permission::factory()->create();
+
+        Livewire::test(Permissions::class)->call('togglePermissionLockedStatus', $permission);
+
+        $this->assertFalse($permission->fresh()->locked);
         
     }
 
