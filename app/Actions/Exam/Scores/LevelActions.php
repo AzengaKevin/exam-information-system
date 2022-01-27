@@ -472,13 +472,23 @@ class LevelActions
                             ['subject_id' , $subjectId]
                         ])->delete();
 
-    
+                    # Get the score at the howmany position
+                    $lastTopScore = DB::table($examTblName)
+                        ->selectRaw("CAST(JSON_UNQUOTE(JSON_EXTRACT($subjectCol, \"$.score\")) AS UNSIGNED) AS score")
+                        ->where("level_id", $level->id)
+                        ->orderBy("score", 'desc')
+                        ->skip($howMany - 1)
+                        ->take(1)
+                        ->first();
+
+                    $detScore = $lastTopScore->score;
+
                     /** @var Collection */
                     $data = DB::table($examTblName)
                         ->selectRaw("student_id, CAST(JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.score\")) AS UNSIGNED) AS score, JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.grade\")) AS grade")
                         ->where('level_id', $level->id)
-                        ->orderBy("score", 'desc')
-                        ->limit($howMany)
+                        ->whereRaw("CAST(JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.score\")) AS UNSIGNED) >= ?", $detScore)
+                        ->orderByRaw("CAST(JSON_UNQUOTE(JSON_EXTRACT({$subjectCol}, \"$.score\")) AS UNSIGNED)", 'desc')
                         ->get();
     
                     $data->each(function($item) use($exam, $level, $subjectId){

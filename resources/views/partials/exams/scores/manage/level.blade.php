@@ -35,13 +35,12 @@
             <span>Publish Student Results</span>
         </a>
         @endif
+        @endif
         <a href="#" data-bs-toggle="modal" data-bs-target="#publish-top-students-per-subject-modal" role="button"
             class="btn btn-primary d-inline-flex align-items-center gap-2 text-decoration-line-through">
             <i class="fa fa-upload"></i>
             <span>Publish Subject Top Students.</span>
         </a>
-        @endif
-
     </div>
     <livewire:level-exam-scores :exam="$exam" :level="$level" />
 </div>
