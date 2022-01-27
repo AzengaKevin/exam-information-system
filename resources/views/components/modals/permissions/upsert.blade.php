@@ -24,9 +24,9 @@
                     @enderror
                 </div>
                 <div class="mt-3">
-                    <label for="name" class="form-label">Description</label>
-                    <input type="text" wire:model.lazy="description" id="description"
-                        class="form-control @error('name') is-invalid @enderror">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea wire:model.lazy="description" id="description" cols="100" rows="3"
+                        class="form-control @error('description') is-invalid @enderror"></textarea>
                     @error('description')
                     <span class="invalid-feedback">
                         <strong>{{ $message }}</strong>

@@ -22,7 +22,7 @@
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <h6 class="text-uppercase">Users</h6>
-                            <span class="fw-bold number-count">{{ \App\Models\User::count() }}</span>
+                            <span class="fw-bold number-count">{{ \App\Models\User::visible()->count() }}</span>
                         </div>
                         <div
                             class="bg-primary w-4 h-4 rounded-circle d-inline-flex align-items-center justify-content-center">
