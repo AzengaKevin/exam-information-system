@@ -86,7 +86,7 @@
                                 </button>
                                 @endcan
                                 @can('forceDelete', $permission)
-                                <button wire:click="destroyPermissionModal({{ $permission }})"
+                                <button wire:click="destroyPermission({{ $permission }})"
                                     class="btn btn-sm btn-danger d-inline-flex gap-2 align-items-center">
                                     <i class="fa fa-trash-alt" aria-hidden="true"></i>
                                     <span>Destroy</span>
