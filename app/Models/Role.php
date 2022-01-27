@@ -17,6 +17,8 @@ class Role extends Model
         'description'
     ];
 
+    public const SUPER_ROLE = "Diskus Administrator";
+
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = $value;
@@ -39,5 +41,10 @@ class Role extends Model
     public function users()
     {
         return $this->hasMany(User::class);
+    }
+
+    public function scopeVisible($query)
+    {
+        $query->where('name', '!=', Role::SUPER_ROLE);
     }
 }

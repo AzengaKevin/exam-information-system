@@ -11,8 +11,21 @@ class Permission extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'slug',
+        'description',
+        'locked'
+    ];
 
+    protected $casts = [
+        'locked' => 'boolean'
+    ];
+
+    /**
+     * Name mutation to create the slug
+     * @param mixed $value
+     */
     public function setNameAttribute($value)
     {
         $this->attributes['name'] = $value;
@@ -21,9 +34,26 @@ class Permission extends Model
         
     }
 
+    /**
+     * Mutate the locked attribute to set it to boolean property
+     */
+    public function setLockedAttribute($value)
+    {
+        $this->attributes['locked'] = boolval($value);
+    }
+
+    /**
+     * Role Permission inverse relation
+     */
     public function roles()
     {
         return $this->belongsToMany(Role::class);
+    }
+
+    /** */
+    public function scopeUnLocked($query)
+    {
+        $query->where('locked', false);
     }
     
 }
