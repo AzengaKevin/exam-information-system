@@ -19,9 +19,9 @@ class UsersSeeder extends Seeder
     {
 
         DB::table('users')->updateOrInsert([
-            'phone' => '254700016349',
-            'email' => 'admin@diskus-analytics.com'
+            'phone' => '254700016349'
         ], [
+            'email' => 'admin@diskus-analytics.com',
             'name' => 'Diskus Admin',
             'role_id' => Role::firstOrCreate(['name' => Role::SUPER_ROLE])->id,
             'password' => Hash::make('turtledove')

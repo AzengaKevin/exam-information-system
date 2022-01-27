@@ -33,6 +33,8 @@ class Roles extends Component
 
     public $permissions;
 
+    public User $user;
+
     /**
      * Lifecycle method that executes once when the component is mounting
      * 
@@ -41,6 +43,8 @@ class Roles extends Component
     public function mount(string $trashed = null)
     {
         $this->trashed = boolval($trashed);
+
+        $this->user = Auth::user();
         
         $this->permissions = $this->getAllPermissions();
     }
@@ -52,9 +56,7 @@ class Roles extends Component
      */
     public function render()
     {
-        return view('livewire.roles', [
-            'roles' => $this->getPaginatedRoles()
-        ]);
+        return view('livewire.roles', ['roles' => $this->getPaginatedRoles()]);
     }
 
     /**
@@ -64,13 +66,11 @@ class Roles extends Component
      */
     public function getPaginatedRoles()
     {
-        /** @var User */
-        $user = Auth::user();
 
         /** @var Builder */
         $rolesQuery = Role::query();
 
-        if(!$user->isSuperAdmin()) $rolesQuery->visible();
+        if(!$this->user->isSuperAdmin()) $rolesQuery->visible();
 
         $rolesQuery->with(['permissions', 'users']);
 
@@ -86,7 +86,13 @@ class Roles extends Component
      */
     public function getAllPermissions()
     {
-        return Permission::all(['id', 'name']);
+        $query = Permission::query();
+
+        if(!$this->user->isSuperAdmin()) $query->unLocked();
+
+        if($this->trashed) $query->onlyTrashed();
+
+        return $query->get(['id', 'name']);
     }
 
     /**

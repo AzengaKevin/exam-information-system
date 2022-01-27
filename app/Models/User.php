@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
-use App\Scopes\NotDiskusUserScope;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
+use App\Scopes\NotDiskusUserScope;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -111,6 +112,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function scopeType($query, string $type)
     {
         $query->where('authenticatable_type', $type);
+    }
+
+    /**
+     * Check if a the current user is a teacher
+     * 
+     * @return bool - Whether the user is a teacher or not
+     */
+    public function isATeacher() : bool
+    {
+        /** @var Model */
+        $authenticatable = $this->authenticatable;
+
+        if(is_null($authenticatable)) return false;
+
+        else $authenticatable instanceof Teacher;
+        
     }
 
     /**
