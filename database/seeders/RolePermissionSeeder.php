@@ -39,6 +39,7 @@ class RolePermissionSeeder extends Seeder
             'Permissions Delete',
             'Permissions Restore',
             'Permissions Destroy',
+            'Permissions Update Locked',
             'Permissions View Trashed',
             
             'Levels Browse',
@@ -196,7 +197,7 @@ class RolePermissionSeeder extends Seeder
         });
 
         /** @var Role */
-        $adminRole = Role::firstOrCreate(['name' => 'Administrator']);
+        $adminRole = Role::firstOrCreate(['name' => Role::SUPER_ROLE]);
 
         $permissions = Permission::all(['id'])->pluck('id')->toArray();
 
