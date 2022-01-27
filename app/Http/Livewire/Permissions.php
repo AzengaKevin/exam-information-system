@@ -4,9 +4,11 @@ namespace App\Http\Livewire;
 
 use Livewire\Component;
 use App\Models\Permission;
+use App\Models\User;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Livewire\WithPagination;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -23,11 +25,19 @@ class Permissions extends Component
 
     public $name;
     public $slug;
+    public $locked;
     public $description;
+    public User $user;
 
+    /**
+     * Lifecycle method that executes only once when the component is mounting
+     * 
+     * @param string $trashed
+     */
     public function mount(string $trashed = null)
     {
         $this->trashed = boolval($trashed);
+        $this->user = Auth::user();
     }
 
     /**
@@ -37,9 +47,7 @@ class Permissions extends Component
      */
     public function render()
     {
-        return view('livewire.permissions', [
-            'permissions' => $this->getPaginatedPermissions()
-        ]);
+        return view('livewire.permissions', ['permissions' => $this->getPaginatedPermissions()]);
     }
 
     /**
@@ -50,6 +58,8 @@ class Permissions extends Component
     public function getPaginatedPermissions()
     {
         $query = Permission::query();
+
+        if(!$this->user->isSuperAdmin()) $query->unLocked();
 
         if($this->trashed) $query->onlyTrashed();
 
@@ -67,6 +77,7 @@ class Permissions extends Component
         $this->permissionId = $permission->id;
 
         $this->name = $permission->name;
+        $this->locked = $permission->locked;
         $this->description = $permission->description;
 
         $this->emit('show-upsert-permission-modal');
@@ -81,6 +92,7 @@ class Permissions extends Component
     {
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('permissions')->ignore($this->permissionId)],
+            'locked' => ['bail', 'nullable'],
             'description' => ['bail', 'nullable']
         ];
     }
@@ -162,6 +174,39 @@ class Permissions extends Component
             $this->emit('hide-upsert-permission-modal');
 
         }
+    }
+
+    /**
+     * Toggle the locked permissions status to the opposite of th current valude
+     * 
+     * @param Permission $permission
+     */
+    public function togglePermissionLockedStatus(Permission $permission)
+    {
+        try {
+            $this->authorize('updateLocked', $permission);
+
+            $permission->update(['locked' => $status = !$permission->fresh()->locked]);
+
+            $result = $status ? "Locked" : "Unlocked";
+
+            session()->flash('status', "{$permission->name} has been $result");
+            
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Failed to add the permission";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+        }
+
+        
     }
 
     /**

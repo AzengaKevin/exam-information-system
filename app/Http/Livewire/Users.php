@@ -64,9 +64,7 @@ class Users extends Component
      */
     public function getPaginatedUsers()
     {
-        $usersQuery = User::query();
-
-        $usersQuery->where('phone', '!=', '254114023230');
+        $usersQuery = User::visible();
 
         if($this->trashed) $usersQuery->onlyTrashed();
 
