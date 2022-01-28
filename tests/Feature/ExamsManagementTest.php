@@ -78,6 +78,7 @@ class ExamsManagementTest extends TestCase
             ->set('description', $payload['description'])
             ->call('createExam');
 
+        /** @var Exam */
         $exam = Exam::first();
 
         $this->assertNotNull($exam);
@@ -92,6 +93,8 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals($payload['weight'], $exam->weight);
         $this->assertEquals($payload['counts'], $exam->counts);
         $this->assertEquals($payload['description'], $exam->description);
+
+        $this->assertEquals(1, $exam->userActivities()->count());
     }
 
     /** @group exams */
@@ -134,6 +137,8 @@ class ExamsManagementTest extends TestCase
         $this->assertEquals($payload['counts'], $exam->counts);
         $this->assertEquals($payload['description'], $exam->description);
         $this->assertEquals($payload['deviation_exam_id'], $exam->deviation_exam_id);
+
+        $this->assertEquals(1, $exam->userActivities()->count());
         
     }
 
@@ -196,6 +201,8 @@ class ExamsManagementTest extends TestCase
 
         $this->assertEquals(count($selectedLevels), $exam->levels()->count());
         $this->assertEquals(count($selectedSubjects), $exam->subjects()->count());
+
+        $this->assertEquals(1, $exam->userActivities()->count());
         
     }
 
@@ -224,6 +231,8 @@ class ExamsManagementTest extends TestCase
             ->call('updateExamLevels');
         
         $this->assertEquals(count($payload), $exam->levels()->count());
+
+        $this->assertTrue($exam->userActivities()->count() > 0);
         
     }
 

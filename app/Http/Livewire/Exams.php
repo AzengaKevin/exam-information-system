@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\Auth;
 
 class Exams extends Component
 {
@@ -234,8 +235,9 @@ class Exams extends Component
                     $exam->levels()->sync(array_keys($selectedLevelData));
                 }
 
-                if(!is_null($deviationExam) && $exam->matches($deviationExam)) 
-                    $exam->update(['deviation_exam_id' => $deviationExam->id]);
+                if(!is_null($deviationExam) && $exam->matches($deviationExam)) $exam->update(['deviation_exam_id' => $deviationExam->id]);
+
+                $exam->userActivities()->attach(Auth::id(), ['action' => 'Created The Exam']);
                 
             });
 
@@ -318,6 +320,8 @@ class Exams extends Component
                 if(!is_null($deviationExam) && $exam->matches($deviationExam)){
                     $exam->update(['deviation_exam_id' => $deviationExam->id]);
                 }
+
+                $exam->userActivities()->attach(Auth::id(), ['action' => 'Updated The Exam']);
                     
             });
             
@@ -425,8 +429,16 @@ class Exams extends Component
             $selectedLevelData = array_filter($data['selectedLevels'], function($value, $key){
                 return $value == 'true';
             }, ARRAY_FILTER_USE_BOTH);
-            
-            $exam->levels()->sync(array_keys($selectedLevelData));
+
+            DB::transaction(function() use($exam, $selectedLevelData){
+                
+                $exam->levels()->sync(array_keys($selectedLevelData));
+
+                $exam->userActivities()->attach(Auth::id(), [
+                    'action' => "Updated Exam Levels"
+                ]);
+
+            });
 
             session()->flash('status', 'Exam enrolled levels hav been successfully updated');
 
@@ -482,7 +494,15 @@ class Exams extends Component
                 return $value == 'true';
             }, ARRAY_FILTER_USE_BOTH);
 
-            $exam->subjects()->sync(array_keys($selectedSubjectsData));
+            DB::transaction(function() use($exam, $selectedSubjectsData){
+
+                $exam->subjects()->sync(array_keys($selectedSubjectsData));
+
+                $exam->userActivities()->attach(Auth::id(), [
+                    'action' => "Updated Exam Subjects"
+                ]);
+                
+            });
 
             session()->flash('status', 'Enrolling subjects to an exams successfully completed');
 
