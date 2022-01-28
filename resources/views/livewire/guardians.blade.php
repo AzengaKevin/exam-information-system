@@ -12,6 +12,11 @@
             </ol>
         </nav>
         <div class="d-inline-flex flex-wrap gap-2 align-items-center">
+            <button data-bs-toggle="modal" data-bs-target="#import-guardians-spreadsheet-modal"
+                class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+                <i class="fa fa-download"></i>
+                <span>Import Guardians</span>
+            </button>
             @can('create', \App\Models\Guardian::class)
             <button data-bs-toggle="modal" data-bs-target="#upsert-guardian-modal"
                 class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
@@ -19,7 +24,7 @@
                 <span>Guardian</span>
             </button>
             @endcan
-            @if (!$trashed)                
+            @if (!$trashed)
             @can('viewTrashed', \App\Models\Guardian::class)
             <a href="{{ route('guardians.index', ['trashed' => true]) }}"
                 class="btn btn-warning d-inline-flex gap-1 align-items-center">
@@ -128,5 +133,7 @@
 
     <x-modals.guardians.upsert :guardianId="$guardianId" />
     <x-modals.guardians.delete :name="$name" />
+
+    @include('partials.modals.guardians.import')
 
 </div>

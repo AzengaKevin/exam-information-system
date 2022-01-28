@@ -44,6 +44,11 @@ class StudentsImport implements ToModel, WithStartRow
         ]);
     }
 
+    /**
+     * The students import start from the defined row
+     * 
+     * {@inheritdoc}
+     */
     public function startRow(): int
     {
         return 2;

@@ -1,1 +1,0 @@
-<livewire:level-unit-exam-scores :exam="$exam" :levelUnit="$levelUnit" />

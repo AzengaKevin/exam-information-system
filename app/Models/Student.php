@@ -66,6 +66,7 @@ class Student extends Model
     public function guardians()
     {
         return $this->belongsToMany(Guardian::class,'student_guardians')
+            ->withPivot(['primary'])
             ->withTimestamps();
     }
 
