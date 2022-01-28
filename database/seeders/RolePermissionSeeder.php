@@ -199,7 +199,7 @@ class RolePermissionSeeder extends Seeder
         /** @var Role */
         $adminRole = Role::firstOrCreate(['name' => Role::SUPER_ROLE]);
 
-        $permissions = Permission::all(['id'])->pluck('id')->toArray();
+        $permissions = Permission::all(['id'])->pluck('id')->all();
 
         $adminRole->permissions()->sync($permissions);
     }

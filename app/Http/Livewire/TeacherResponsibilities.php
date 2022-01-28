@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Models\ResponsibilityTeacher;
+use App\Roles\GetAppropriateRole;
 use App\Settings\SystemSettings;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -267,7 +268,6 @@ class TeacherResponsibilities extends Component
             
             $id = $data['responsibility_id'];
 
-            
             $responsibility = Responsibility::findOrFail($id);
             
             $count = ResponsibilityTeacher::where($data)->count();
@@ -275,8 +275,12 @@ class TeacherResponsibilities extends Component
             if($count < $responsibility->how_many){
 
                 unset($data['responsibility_id']);
-                
+
                 $this->teacher->responsibilities()->attach($id, $data);
+
+                $role = GetAppropriateRole::getRole($responsibility);
+
+                $this->teacher->auth->update(['role_id' => $role->id]);
     
                 session()->flash('status', "{$this->teacher->auth->name} has been assigned a new responsibility");
     
