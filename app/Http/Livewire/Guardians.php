@@ -2,24 +2,31 @@
 
 namespace App\Http\Livewire;
 
+use App\Imports\GuardiansImport;
 use App\Models\User;
+use App\Models\Level;
 use Livewire\Component;
 use App\Models\Guardian;
-use App\Notifications\SendPasswordNotification;
+use App\Models\LevelUnit;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
+use Livewire\WithFileUploads;
 use Illuminate\Validation\Rule;
 use App\Rules\MustBeKenyanPhone;
-use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
-use Illuminate\Support\Facades\App;
+use App\Services\StudentService;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Notifications\SendPasswordNotification;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class Guardians extends Component
 {
-    use WithPagination, AuthorizesRequests;
+    use WithPagination, WithFileUploads, AuthorizesRequests;
 
     protected $paginationTheme = 'bootstrap';
 
@@ -34,6 +41,15 @@ class Guardians extends Component
     public $profession;
     public $location;
 
+    // Import guardians properties
+    public $guardiansImportFile;
+    public $level_id;
+    public $level_unit_id;
+
+    public $levels;
+    public $levelUnits;
+
+
     /**
      * Lifecycle method that only executes once when the component is mounting
      * 
@@ -42,6 +58,10 @@ class Guardians extends Component
     public function mount(string $trashed = null)
     {
         $this->trashed = boolval($trashed);
+
+        $this->levels = $this->getAllLevels();
+
+        $this->levelUnits = $this->getAllLevelUnits();
     }
 
     /**
@@ -54,6 +74,24 @@ class Guardians extends Component
         return view('livewire.guardians', [
             'guardians' => $this->getPaginatedGuardians()
         ]);
+    }
+
+    /**
+     * Get all database levels
+     * 
+     * @return Collection
+     */
+    public function getAllLevels()
+    {
+        return Level::all(['id', 'name']);
+    }
+
+    /**
+     * Get all datbase streams
+     */
+    public function getAllLevelUnits()
+    {
+        return LevelUnit::all(['id', 'alias']);
     }
 
     /**
@@ -150,6 +188,75 @@ class Guardians extends Component
             session()->flash('error', $message);
 
             $this->emit('hide-upsert-guardian-modal');
+        }
+        
+    }
+
+    /**
+     * Download an excel file with format to upload student scores
+     */
+    public function downloadStudentsGuardiansFile(StudentService $studentService)
+    {
+        $data = $this->validate([
+            'level_id' => ['nullable', 'integer'],
+            'level_unit_id' => ['nullable', 'integer']
+        ]);
+
+        /** @var Collection */
+        $studentsWithGuardians = $studentService->getStudentsWithPrimaryGuardians($data);
+
+        $studentsWithGuardians = $studentsWithGuardians->filter(fn($item) => is_null($item->guardian_name) && is_null($item->guardian_phone));
+
+        // Adding the title column to the students with gurdians collection
+        $studentsWithGuardians->prepend(
+            (object)array(
+                "student_id" => "STUDENT ID",
+                "student_name" => "STUDENT NAME",
+                "guardian_name" => "GUARDIAN NAME",
+                "guardian_phone" => "GUARDIAN PHONE",
+                "guardian_email" => "GUARDIAN EMAIL",
+                "location" => "GUARDIAN LOCATION",
+                "profession" => "GUARDIAN PROFESSION"
+            )
+        );
+
+        $timeStr = now()->format("Y_m_d_His");
+
+        return $studentsWithGuardians->downloadExcel("{$timeStr}_students_guardians.xlsx");
+    }
+
+    /**
+     * Import the students guardians from the excel file
+     */
+    public function importStudentsGuardians()
+    {
+        $data = $this->validate(['guardiansImportFile' => ['file', 'mimes:xlsx,csv,ods,xlsm,xltx,xltm,xls,xlt,xml']]);
+
+        /** @var UploadedFile */
+        $guardiansFile = $data['guardiansImportFile'];
+
+        try {
+            
+            Excel::import(new GuardiansImport, $guardiansFile);
+    
+            session()->flash('status', 'Students guardian successfully imported');
+            
+            $this->emit('hide-import-guardians-spreadsheet-modal');
+
+        } catch (\Exception $exception) {
+         
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Woops! An error occurred while trying to import guardians";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            
+            else $message = App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $message);
+            
+            $this->emit('hide-import-guardians-spreadsheet-modal');
+            
         }
         
     }
