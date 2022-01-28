@@ -37,9 +37,9 @@
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>Student ID</th>
+                                {{-- <th>Student ID</th> --}}
                                 <th>Name</th>
-                                <th>Adm. No.</th>
+                                {{-- <th>Adm. No.</th> --}}
                                 @if (!empty($segments))
                                 @foreach ($segments as $key => $value)
                                 <th>{{ $key }}({{ $value }})</th>
@@ -60,9 +60,9 @@
                             $score = json_decode($item->$col);
                             @endphp
                             <tr>
-                                <td>{{ $item->stid }}</td>
+                                {{-- <td>{{ $item->stid }}</td> --}}
                                 <td>{{ $item->name }}</td>
-                                <td>{{ $item->admno }}</td>
+                                {{-- <td>{{ $item->admno }}</td> --}}
         
                                 @if (!empty($segments))
                                 @foreach ($segments as $key => $value)
