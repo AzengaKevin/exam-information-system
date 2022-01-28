@@ -126,7 +126,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
         if(is_null($authenticatable)) return false;
 
-        else $authenticatable instanceof Teacher;
+        else return $authenticatable instanceof Teacher;
         
     }
 
