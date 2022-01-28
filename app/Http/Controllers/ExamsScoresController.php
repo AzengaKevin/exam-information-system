@@ -2,21 +2,22 @@
 
 namespace App\Http\Controllers;
 
-use App\Actions\Exam\Scores\CompleteUpload;
-use App\Http\Requests\UploadScoresRequest;
 use App\Models\Exam;
 use App\Models\User;
+use App\Models\Level;
+use App\Models\Grading;
 use App\Models\Subject;
 use App\Models\Teacher;
 use App\Models\LevelUnit;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Models\Responsibility;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use App\Models\Grading;
-use App\Models\Level;
-use App\Settings\SystemSettings;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\UploadScoresRequest;
+use App\Actions\Exam\Scores\CompleteUpload;
 
 class ExamsScoresController extends Controller
 {
@@ -161,8 +162,8 @@ class ExamsScoresController extends Controller
             $title = "Manage Scores";
 
             if($subject){
-                if($level) $title = "Upload {$exam->name} - {$level->name} - {$subject->name} Scores";
-                if($levelUnit) $title = "Upload {$exam->name} - {$levelUnit->alias} - {$subject->name} Scores";
+                if($level) $title = "Manage {$exam->name} - {$level->name} - {$subject->name} Scores";
+                if($levelUnit) $title = "Manage {$exam->name} - {$levelUnit->alias} - {$subject->name} Scores";
             }elseif($levelUnit){
                 $title = "{$levelUnit->alias} Scores Management";
             } elseif($level){
@@ -234,6 +235,13 @@ class ExamsScoresController extends Controller
                 CompleteUpload::calculateDeviations($exam, $subject, $level, $levelUnit);
 
             }
+
+            $exam->userActivities()->attach(Auth::id(), [
+                'action' => 'Upload Exam Scores',
+                'level_id' => optional($level)->id,
+                'level_unit_id' => optional($levelUnit)->id,
+                'subject_id' => optional($subject)->id
+            ]);
 
             session()->flash('status', 'Scores successfully updated');
 

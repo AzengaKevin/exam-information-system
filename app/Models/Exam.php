@@ -256,4 +256,17 @@ class Exam extends Model
             ->withPivot(['subject_id', 'level_unit_id', 'score', 'grade']);
     }
 
+    /**
+     * Exam - User action relation
+     * 
+     * @return Relation
+     */
+    public function userActivities()
+    {
+        return $this->belongsToMany(User::class, 'exam_user_activities')
+            ->withTimestamps()
+            ->withPivot(['subject_id', 'level_id', 'level_unit_id', 'action'])
+            ->using(ExamUserActivity::class);
+    }
+
 }

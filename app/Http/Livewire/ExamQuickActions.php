@@ -2,19 +2,25 @@
 
 namespace App\Http\Livewire;
 
-use App\Actions\Exam\CreateScoresTable;
 use App\Models\Exam;
-use Illuminate\Support\Facades\Log;
-use Illuminate\Validation\Rule;
 use Livewire\Component;
+use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+use App\Actions\Exam\CreateScoresTable;
 
 class ExamQuickActions extends Component
 {
-    /** @var Exam */
-    public $exam;
+    public Exam $exam;
 
     public $status;
 
+    /**
+     * Lifecycle method that executes only once when the component is launching
+     * 
+     * @param Exam $exam
+     */
     public function mount(Exam $exam)
     {
         $this->exam = $exam;
@@ -22,6 +28,11 @@ class ExamQuickActions extends Component
         $this->status = $exam->status;
     }
 
+    /**
+     * Lifecycle method that renders he component everytime the state of the component changes
+     * 
+     * @return View
+     */
     public function render()
     {
         return view('livewire.exam-quick-actions', [
@@ -36,7 +47,14 @@ class ExamQuickActions extends Component
     {
         try {
 
-            CreateScoresTable::updateScoresTable($this->exam);
+            DB::transaction(function(){
+
+                CreateScoresTable::updateScoresTable($this->exam);
+
+                $this->exam->userActivities()->attach(Auth::id(), ['action' => 'Updated The Exam Scores Table']);
+
+            });
+
             
             session()->flash('status', "{$this->exam->name} scores table has been updated");
 
@@ -48,7 +66,7 @@ class ExamQuickActions extends Component
                 'action' => __METHOD__
             ]);
             
-            session()->flash('error', "Failed creating {$this->exam->name} scores table");
+            session()->flash('error', "Failed updating {$this->exam->name} scores table");
 
             $this->emit('hide-update-scores-table-modal');
         }
@@ -64,19 +82,25 @@ class ExamQuickActions extends Component
 
         try {
 
-            if($this->exam->update($data)){
+            DB::transaction(function() use($data){
 
-                if ($this->exam->fresh()->isInMarking()) {
-
-                    CreateScoresTable::invoke($this->exam);
-
+                if($this->exam->update($data)){
+    
+                    if ($this->exam->fresh()->isInMarking()) {
+    
+                        CreateScoresTable::invoke($this->exam);
+    
+                    }
+    
                 }
 
-                session()->flash('status', 'Exam status successfully changed');
+                $this->exam->userActivities()->attach(Auth::id(), ['action' => "Updated The Exam Status to {$this->exam->fresh()->status}"]);
+            });
 
-                $this->emit('hide-change-exam-status-modal');
-            }
+            
+            session()->flash('status', 'Exam status successfully changed');
 
+            $this->emit('hide-change-exam-status-modal');
 
         } catch (\Exception $exception) {
 

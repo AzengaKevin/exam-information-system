@@ -2,21 +2,22 @@
 
 namespace App\Http\Livewire;
 
-use App\Actions\Exam\Scores\LevelUnitActions;
-use App\Exceptions\InvalidConnectionDriverException;
 use App\Models\Exam;
 use App\Models\Grade;
+use App\Models\Student;
 use Livewire\Component;
 use App\Models\LevelUnit;
-use App\Models\Student;
-use App\Settings\SystemSettings;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\App;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use App\Actions\Exam\Scores\LevelUnitActions;
+use App\Exceptions\InvalidConnectionDriverException;
 
 class LevelUnitExamScores extends Component
 {
@@ -298,6 +299,11 @@ class LevelUnitExamScores extends Component
             LevelUnitActions::publishStudentResults($this->exam, $this->levelUnit);
 
             LevelUnitActions::publishExamTopStudentsPerSubject($this->exam, $this->levelUnit);
+
+            $this->exam->userActivities()->attach(Auth::id(), [
+                'action' => 'Published Exam Scores',
+                'level_unit_id' => $this->levelUnit->id
+            ]);
 
             session()->flash('status', "Class {$this->levelUnit->alias} scores have been successfully published, you can republish the scores incase of any changes");
 

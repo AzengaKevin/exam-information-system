@@ -13,6 +13,7 @@ use App\Http\Controllers\TeachersController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GuardiansController;
 use App\Http\Controllers\DepartmentsController;
+use App\Http\Controllers\ExamsActivitiesController;
 use App\Http\Controllers\ExamsAnalysisController;
 use App\Http\Controllers\ExamsMeritListController;
 use App\Http\Controllers\ExamsResultsController;
@@ -97,6 +98,9 @@ Route::group(['middleware' => ['auth']], function(){
     
     Route::get('/exams/{exam:slug}', [ExamsController::class, 'show'])
         ->name('exams.show');
+    
+    Route::get('/exams/{exam:slug}/activities', [ExamsActivitiesController::class, 'index'])
+        ->name('exams.activities.index');
 
     Route::get('/exams/{exam:slug}/scores', [ExamsScoresController::class, 'index'])
         ->name('exams.scores.index');

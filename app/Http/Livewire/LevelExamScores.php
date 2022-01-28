@@ -2,19 +2,20 @@
 
 namespace App\Http\Livewire;
 
-use App\Actions\Exam\Scores\LevelActions;
-use App\Exceptions\InvalidConnectionDriverException;
 use App\Models\Exam;
 use App\Models\Level;
-use App\Settings\SystemSettings;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Support\Facades\App;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use App\Settings\SystemSettings;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Schema;
+use App\Actions\Exam\Scores\LevelActions;
+use App\Exceptions\InvalidConnectionDriverException;
 
 class LevelExamScores extends Component
 {
@@ -192,6 +193,11 @@ class LevelExamScores extends Component
 
             // if(!$systemSettings->school_has_streams)
             LevelActions::publishStudentResults($this->exam, $this->level);
+
+            $this->exam->userActivities()->attach(Auth::id(), [
+                'action' => 'Published Exam Scores',
+                'level_id' => $this->level->id
+            ]);
 
             session()->flash('status', "Level scores have successfully published for {$this->level->name}");
 
