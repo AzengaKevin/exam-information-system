@@ -265,8 +265,8 @@ class Exam extends Model
     {
         return $this->belongsToMany(User::class, 'exam_user_activities')
             ->withTimestamps()
-            ->withPivot(['subject_id', 'level_id', 'level_unit_id', 'action']);
-            // ->using(ExamUserActivity::class);
+            ->withPivot(['subject_id', 'level_id', 'level_unit_id', 'action'])
+            ->using(ExamUserActivity::class);
     }
 
 }
