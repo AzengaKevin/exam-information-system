@@ -20,28 +20,12 @@ class ResponsibilitySeeder extends Seeder
                 'requirements' => []
             ],
             [
-                'name' => 'Deputy Principal',
-                'requirements' => []
-            ],
-            [
-                'name' => 'Senior Teacher',
+                'name' => 'Deputy',
                 'requirements' => []
             ],
             [
                 'name' => 'Director of Studies',
                 'requirements' => []
-            ],
-            [
-                'name' => 'Games Coordinator',
-                'requirements' => []
-            ],
-            [
-                'name' => 'Guiding and Counselling Teacher',
-                'requirements' => []
-            ],
-            [
-                'name' => 'Head of Department',
-                'requirements' => ['department']
             ],
             [
                 'name' => 'Level Supervisor',
