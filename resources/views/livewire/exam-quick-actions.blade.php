@@ -4,16 +4,14 @@
         <hr>
         <x-feedback />
         <div class="d-flex gap-3 flex-wrap">
-            @if (false)                
-            <a href="#" class="btn btn-outline-primary gap-2 align-items-center disabled">
+            <a href="{{ route('exams.activities.index', $exam) }}" class="btn btn-sm btn-outline-primary gap-2 align-items-center">
                 <i class="fa fa-table"></i>
-                <span class="">Exam Timetable</span>
+                <span class="">Exam Activities</span>
             </a>
-            @endif
 
             @can('updateScoresTable', $exam)
             <button data-bs-toggle="modal" data-bs-target="#update-scores-table-modal"
-                class="btn btn-primary hstack gap-2">
+                class="btn btn-sm btn-primary hstack gap-2">
                 <i class="fa fa-sync"></i>
                 <span>Scores Table</span>
             </button>
@@ -21,14 +19,14 @@
 
             @can('change-exam-status')
             <button data-bs-toggle="modal" data-bs-target="#change-status-exam-modal"
-                class="btn d-block btn-primary hstack gap-2">
+                class="btn btn-sm d-block btn-primary hstack gap-2">
                 <i class="fa fa-pencil-alt"></i>
                 <span>Change Status</span>
             </button>
             @endcan
 
             @can('viewScoresPage', $exam)
-            <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-outline-primary">
+            <a href="{{ route('exams.scores.index', $exam) }}" class="btn btn-sm btn-outline-primary">
                 <i class="fa fa-cog"></i>
                 <span class="">Manage Scores</span>
             </a>
@@ -36,12 +34,12 @@
 
             @if ($exam->fresh()->isPublished())
             <a href="{{ route('exams.results.index', $exam) }}"
-                class="btn btn-outline-primary gap-2 align-items-center">
+                class="btn btn-sm btn-outline-primary gap-2 align-items-center">
                 <i class="fa fa-table"></i>
                 <span class="">Results</span>
             </a>
             <a href="{{ route('exams.analysis.index', $exam) }}"
-                class="btn btn-outline-primary gap-2 align-items-center">
+                class="btn btn-sm btn-outline-primary gap-2 align-items-center">
                 <i class="fa fa-poll"></i>
                 <span class="">Analysis</span>
             </a>
@@ -49,7 +47,7 @@
 
             @can('viewTranscripts', $exam)
             <a href="{{ route('exams.transcripts.index', $exam) }}"
-                class="btn btn-outline-primary gap-2 align-items-center">
+                class="btn btn-sm btn-outline-primary gap-2 align-items-center">
                 <i class="fa fa-eye"></i>
                 <span class="">Transcripts</span>
             </a>

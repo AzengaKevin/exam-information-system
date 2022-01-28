@@ -301,7 +301,7 @@ class LevelUnitExamScores extends Component
             LevelUnitActions::publishExamTopStudentsPerSubject($this->exam, $this->levelUnit);
 
             $this->exam->userActivities()->attach(Auth::id(), [
-                'action' => 'Upload Exam Scores',
+                'action' => 'Published Exam Scores',
                 'level_unit_id' => $this->levelUnit->id
             ]);
 

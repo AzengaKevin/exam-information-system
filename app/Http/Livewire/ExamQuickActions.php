@@ -94,7 +94,7 @@ class ExamQuickActions extends Component
     
                 }
 
-                $this->exam->userActivities()->attach(Auth::id(), ['action' => 'Updated The Exam Status']);
+                $this->exam->userActivities()->attach(Auth::id(), ['action' => "Updated The Exam Status to {$this->exam->fresh()->status}"]);
             });
 
             

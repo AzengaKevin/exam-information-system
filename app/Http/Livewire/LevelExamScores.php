@@ -195,7 +195,7 @@ class LevelExamScores extends Component
             LevelActions::publishStudentResults($this->exam, $this->level);
 
             $this->exam->userActivities()->attach(Auth::id(), [
-                'action' => 'Upload Exam Scores',
+                'action' => 'Published Exam Scores',
                 'level_id' => $this->level->id
             ]);
 
