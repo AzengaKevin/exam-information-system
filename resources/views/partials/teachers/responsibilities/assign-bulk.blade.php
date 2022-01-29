@@ -25,7 +25,7 @@
                 </div>
 
                 @if ($systemSettings->school_has_streams)                    
-                @if ($allLevelUnitsMissingTeacherForThatSubject->count())
+                @if ($levelUnitsToShow->count())
                 <div class="mt-3">
                     <label for="classes" class="form-label">Classes</label>
                     <fieldset id="classes" class="row g-3">
@@ -37,7 +37,7 @@
                             </div>
                         </div>
 
-                        @foreach ($allLevelUnitsMissingTeacherForThatSubject as $levelUnit)
+                        @foreach ($levelUnitsToShow as $levelUnit)
                         <div class="col-md-4">
                             <div class="form-check">
                                 <input type="checkbox" wire:model="selectedClasses.{{ $levelUnit->id }}"
@@ -50,7 +50,7 @@
                 </div>
                 @endif
                 @else                    
-                @if ($allLevelsMissingTeacherForTheSubject->count())
+                @if ($levelsToShow->count())
                 <div class="mt-3">
                     <label for="classes" class="form-label">Levels</label>
                     <fieldset id="classes" class="row g-3">
@@ -62,7 +62,7 @@
                             </div>
                         </div>
 
-                        @foreach ($allLevelsMissingTeacherForTheSubject as $level)
+                        @foreach ($levelsToShow as $level)
                         <div class="col-md-4">
                             <div class="form-check">
                                 <input type="checkbox" wire:model="selectedClasses.{{ $level->id }}"
