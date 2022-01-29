@@ -153,7 +153,10 @@ class TeacherResponsibilities extends Component
 
             $levelUnitsQuery = LevelUnit::whereNotIn('id', $leveUnitIds);
 
-            if($subject->optional) $levelUnitsQuery->whereIn('level_id', $subject->levels->pluck('id')->all());
+            if($subject->optional) {
+                $levelUnitsQuery->whereIn('level_id', $subject->levels->pluck('id')->all());
+                $levelUnitsQuery->whereIn('stream_id', $subject->streams->pluck('id')->all());
+            }
             
             $this->allLevelUnitsMissingTeacherForThatSubject = $levelUnitsQuery->get();
 
