@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Models\ResponsibilityTeacher;
+use App\Models\Subject;
 use App\Roles\GetAppropriateRole;
 use App\Settings\SystemSettings;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -146,8 +147,15 @@ class TeacherResponsibilities extends Component
                     ['subject_id', $value],
                     ['responsibility_id', $this->teacherResponsibility->id]
                 ])->pluck('level_unit_id')->all();
+
+            /** @var Subject */
+            $subject = Subject::find($value);
+
+            $levelUnitsQuery = LevelUnit::whereNotIn('id', $leveUnitIds);
+
+            if($subject->optional) $levelUnitsQuery->whereIn('level_id', $subject->levels->pluck('id')->all());
             
-            $this->allLevelUnitsMissingTeacherForThatSubject = LevelUnit::whereNotIn('id', $leveUnitIds)->get();
+            $this->allLevelUnitsMissingTeacherForThatSubject = $levelUnitsQuery->get();
 
         }else{
 
@@ -159,7 +167,14 @@ class TeacherResponsibilities extends Component
                     ['responsibility_id', $this->teacherResponsibility->id]
                 ])->pluck('level_id')->all();
 
-            $this->allLevelsMissingTeacherForTheSubject = Level::whereNotIn('id', $levelIds)->get();
+            /** @var Subject */
+            $subject = Subject::find($value);
+
+            $levelsQuery = Level::whereNotIn('id', $levelIds);
+
+            if($subject->optional) $levelsQuery->whereIn('id', $subject->levels->pluck('id')->all());
+
+            $this->allLevelsMissingTeacherForTheSubject = $levelsQuery->get();
         }
     }
 

@@ -31,6 +31,7 @@ class Subjects extends Component
     public $subject_code;
     public $department_id;
     public $description;
+    public $optional;
     public $segments = array();
 
     public $teachers;
@@ -111,6 +112,7 @@ class Subjects extends Component
         $this->name = $subject->name;
         $this->shortname = $subject->shortname;
         $this->subject_code = $subject->subject_code;
+        $this->optional = $subject->optional;
         $this->department_id = $subject->department_id;
         $this->description = $subject->description;
 
@@ -157,6 +159,7 @@ class Subjects extends Component
             'shortname' => ['bail', 'required', 'max:5', new LowerAlphaOnly],
             'subject_code' => ['bail', 'nullable'],
             'department_id' => ['bail', 'nullable'],
+            'optional' => ['nullable'],
             'segments' => ['bail', 'nullable', 'array'],
             'segments.*.level_id' => ['bail', 'required'],
             'segments.*.key' => ['bail', 'required'],

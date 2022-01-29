@@ -60,4 +60,10 @@ class Level extends Model
             ->withTimestamps()
             ->withPivot(['teacher_id', 'subject_id']);
     }
+
+    public function optionalSubjects()
+    {
+        return $this->belongsToMany(Subject::class)
+            ->withTimestamps();
+    }
 }

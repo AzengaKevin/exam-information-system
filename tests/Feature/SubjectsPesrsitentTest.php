@@ -19,11 +19,13 @@ class SubjectsPesrsitentTest extends TestCase
 
         $payload = Subject::factory()->make()->toArray();
 
+        /** @var Subject */
         $subject = Subject::create($payload);
 
         $this->assertEquals($payload['name'], $subject->name);
         $this->assertEquals($payload['shortname'], $subject->shortname);
         $this->assertEquals($payload['description'], $subject->description);
+        $this->assertFalse($subject->fresh()->optional);
         
     }
 

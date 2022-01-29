@@ -11,9 +11,31 @@ class Subject extends Model
 {
     use HasFactory,SoftDeletes;
 
-    protected $guarded = [];
+    protected $fillable = [
+        'name',
+        'shortname',
+        'slug',
+        'optional',
+        'segments',
+        'department_id',
+        'subject_code',
+        'description'
+    ];
 
-    protected $casts = ['segments' => 'array'];
+    protected $casts = [
+        'segments' => 'array',
+        'optional' => 'boolean'
+    ];
+
+    public function scopeOptional($query)
+    {
+        $query->where('optional', true);
+    }
+
+    public function scopeCompulsory($query)
+    {
+        $query->where('optional', false);
+    }
 
     public function department()
     {
@@ -26,6 +48,11 @@ class Subject extends Model
         $this->attributes['slug'] = Str::slug($value);
     }
 
+    public function setOptionalAttribute($value)
+    {
+        $this->attributes['optional'] = boolval($value);
+    }
+
     public function exams()
     {
         return $this->belongsToMany(Exam::class);
@@ -34,6 +61,12 @@ class Subject extends Model
     public function teachers()
     {
         return $this->belongsToMany(Teacher::class)
+            ->withTimestamps();
+    }
+
+    public function levels()
+    {
+        return $this->belongsToMany(Level::class)
             ->withTimestamps();
     }
 }
