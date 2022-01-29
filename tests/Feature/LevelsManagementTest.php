@@ -11,9 +11,11 @@ use App\Models\Student;
 use App\Models\Permission;
 use Illuminate\Support\Str;
 use App\Http\Livewire\Levels;
+use App\Models\Subject;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 
 class LevelsManagementTest extends TestCase
 {
@@ -82,6 +84,43 @@ class LevelsManagementTest extends TestCase
     }
 
     /** @group levels */
+    public function testAuthorizedCanAddALevelWithOptionalSubjectsAtOneGo()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Levels Create']));
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+        
+        DB::table('subjects')->latest()->limit(2)->update(['optional' => true]);
+
+        $subjectsIds = Subject::latest()->limit(2)->pluck('id')->all();
+
+        /** @var array */
+        $payload = Level::factory()->make([
+            'selectedOptionalSubjects' => array_fill_keys($subjectsIds, 'true')
+        ])->toArray();
+
+        Livewire::test(Levels::class)
+            ->set('name', $payload['name'])
+            ->set('numeric', $payload['numeric'])
+            ->set('description', $payload['description'])
+            ->set('selectedOptionalSubjects', $payload['selectedOptionalSubjects'])
+            ->call('createLevel');
+
+        $level = Level::first();
+
+        $this->assertNotNull($level);
+
+        $this->assertEquals($payload['name'], $level->name);
+        $this->assertEquals(Str::slug($payload['name']), $level->slug);
+        $this->assertEquals($payload['numeric'], $level->numeric);
+        $this->assertEquals($payload['description'], $level->description);
+        $this->assertEquals($subjectsIds, $level->fresh()->optionalSubjects->pluck('id')->all());
+        
+    }    
+
+    /** @group levels */
     public function testAuthorizedUserCanUpdateALevel()
     {
         $this->withoutExceptionHandling();
@@ -104,6 +143,42 @@ class LevelsManagementTest extends TestCase
         $this->assertEquals($payload['name'], $level->fresh()->name);
         $this->assertEquals(Str::slug($payload['name']), $level->fresh()->slug);
         $this->assertEquals($payload['numeric'], $level->fresh()->numeric);
+        $this->assertEquals($payload['description'], $level->fresh()->description);
+        
+    }
+
+    /** @group levels */
+    public function testAuthorizedUserCanUpdateALevelAndAssociateOptionalSubjects()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Levels Update']));
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+        
+        /** @var Level */
+        $level = Level::factory()->create();
+        
+        DB::table('subjects')->latest()->limit(2)->update(['optional' => true]);
+
+        $subjectsIds = Subject::latest()->limit(2)->pluck('id')->all();
+
+        $payload = Level::factory()->make([
+            'selectedOptionalSubjects' => array_fill_keys($subjectsIds, 'true')
+        ])->toArray();
+
+        Livewire::test(Levels::class)
+            ->call('editLevel', $level)
+            ->set('name', $payload['name'])
+            ->set('numeric', $payload['numeric'])
+            ->set('selectedOptionalSubjects', $payload['selectedOptionalSubjects'])
+            ->set('description', $payload['description'])
+            ->call('updateLevel');
+
+        $this->assertEquals($payload['name'], $level->fresh()->name);
+        $this->assertEquals(Str::slug($payload['name']), $level->fresh()->slug);
+        $this->assertEquals($payload['numeric'], $level->fresh()->numeric);
+        $this->assertEquals($subjectsIds, $level->fresh()->optionalSubjects->pluck('id')->all());
         $this->assertEquals($payload['description'], $level->fresh()->description);
         
     }
