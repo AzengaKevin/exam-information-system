@@ -63,4 +63,10 @@ class Subject extends Model
         return $this->belongsToMany(Teacher::class)
             ->withTimestamps();
     }
+
+    public function levels()
+    {
+        return $this->belongsToMany(Level::class)
+            ->withTimestamps();
+    }
 }
