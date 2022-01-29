@@ -1,8 +1,5 @@
 <div>
     <x-feedback />
-    @php
-    $segments = $subject->segments;
-    @endphp
 
     <div class="card">
         <div class="card-body">
@@ -15,7 +12,7 @@
                             <th>Adm. No.</th>
                             @if (!empty($segments))
                             @foreach ($segments as $key => $value)
-                            <th>{{ $key }}({{ $value }})</th>
+                            <th>{{ $key }}(Max. {{ $value }})</th>
                             @endforeach
                             @endif
                             <th>% Score</th>
