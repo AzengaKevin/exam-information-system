@@ -116,6 +116,8 @@ class Subjects extends Component
         $this->department_id = $subject->department_id;
         $this->description = $subject->description;
 
+        $this->reset(['segments']);
+
         if(!empty($subject->segments)){
             foreach ($subject->segments as $level_id => $segments) {
                 foreach ($segments as $key => $value) {                    
