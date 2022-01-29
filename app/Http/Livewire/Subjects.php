@@ -5,6 +5,7 @@ namespace App\Http\Livewire;
 use App\Models\Subject;
 use Livewire\Component;
 use App\Models\Department;
+use App\Models\Level;
 use App\Rules\LowerAlphaOnly;
 use Illuminate\Auth\Access\AuthorizationException;
 use Livewire\WithPagination;
@@ -33,6 +34,7 @@ class Subjects extends Component
     public $segments = array();
 
     public $teachers;
+    public $levels;
 
     /**
      * Lifecycle method that executes once when the component is launching
@@ -46,6 +48,8 @@ class Subjects extends Component
         $this->teachers = collect([]);
 
         $this->departments = $this->getDepartments();
+
+        $this->levels = $this->getAllLevels();
     }
 
     /**
@@ -68,6 +72,16 @@ class Subjects extends Component
     public function getDepartments()
     {
         return Department::all(['id', 'name']);
+    }
+
+    /**
+     * Get all levels from the database
+     * 
+     * @return Collection
+     */
+    public function getAllLevels()
+    {
+        return Level::all(['id', 'name']);
     }
 
     /**
@@ -101,11 +115,14 @@ class Subjects extends Component
         $this->description = $subject->description;
 
         if(!empty($subject->segments)){
-            foreach ($subject->segments as $key => $value) {
-                array_push($this->segments, [
-                    'key' => $key,
-                    'value' => $value
-                ]);
+            foreach ($subject->segments as $level_id => $segments) {
+                foreach ($segments as $key => $value) {                    
+                    array_push($this->segments, [
+                        'level_id' => $level_id,
+                        'key' => $key,
+                        'value' => $value
+                    ]);
+                }
             }
         }
 
@@ -141,6 +158,7 @@ class Subjects extends Component
             'subject_code' => ['bail', 'nullable'],
             'department_id' => ['bail', 'nullable'],
             'segments' => ['bail', 'nullable', 'array'],
+            'segments.*.level_id' => ['bail', 'required'],
             'segments.*.key' => ['bail', 'required'],
             'segments.*.value' => ['bail', 'required', 'integer']
         ];
@@ -162,18 +180,33 @@ class Subjects extends Component
 
                 $segments = array();
 
-                foreach ($data['segments'] as $item) $segments[$item['key']] = $item['value'];
+                foreach ($data['segments'] as $item){
+
+                    if(!array_key_exists($item['level_id'], $segments))
+                        $segments[$item['level_id']] = array();
+
+                    $segments[$item['level_id']][$item['key']] = $item['value'];
+                } 
 
                 $data['segments'] = $segments;
             }
 
-            Subject::create($data);
+            /** @var Subject */
+            $subject = Subject::create($data);
 
-            $this->reset(['name','shortname','subject_code','description','department_id', 'segments']);
+            if($subject){
 
-            session()->flash('status', 'Subject successfully created');
+                $this->reset(['name','shortname','subject_code','description','department_id', 'segments']);
 
-            $this->emit('hide-upsert-subject-modal');
+                $this->resetValidation();
+
+                $this->resetPage();
+    
+                session()->flash('status', 'Subject successfully created');
+    
+                $this->emit('hide-upsert-subject-modal');
+
+            }
             
         } catch (\Exception $exception) {
             
@@ -202,7 +235,13 @@ class Subjects extends Component
 
             $segments = array();
 
-            foreach ($data['segments'] as $item) $segments[$item['key']] = $item['value'];
+            foreach ($data['segments'] as $item){
+
+                if(!array_key_exists($item['level_id'], $segments))
+                    $segments[$item['level_id']] = array();
+
+                $segments[$item['level_id']][$item['key']] = $item['value'];
+            } 
 
             $data['segments'] = $segments;
         }
@@ -260,6 +299,7 @@ class Subjects extends Component
     public function addSegmentFields()
     {
         array_push($this->segments, array(
+            'level_id' => null,
             'key' => null,
             'value' => null
         ));

@@ -134,7 +134,11 @@
         </div>
     </div>
 
-    <x-modals.subjects.upsert :departmentId="$departmentId" :subjectId="$subjectId" :departments="$departments"
+    <x-modals.subjects.upsert 
+        :departmentId="$departmentId" 
+        :subjectId="$subjectId" 
+        :departments="$departments"
+        :levels="$levels"
         :segments="$segments" />
     <x-modals.subjects.delete :name="$name" />
     <x-modals.subjects.truncate />
