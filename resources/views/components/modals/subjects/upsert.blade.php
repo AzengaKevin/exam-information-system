@@ -1,11 +1,11 @@
-@props(['departmentId' => null,'departments','subjectId'=>null, 'segments' => [], 'levels' => []])
+@props(['subjectId'=>null, 'departments' => [], 'segments' => [], 'levels' => []])
 
 <div wire:ignore.self id="upsert-subject-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-subject-modal-title">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                @if (is_null($departmentId))
+                @if (is_null($subjectId))
                 <h5 id="upsert-subject-modal-title" class="modal-title">Add Subject</h5>
                 @else
                 <h5 id="upsert-subject-modal-title" class="modal-title">Update Subject</h5>
