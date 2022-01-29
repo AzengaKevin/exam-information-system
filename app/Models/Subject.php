@@ -69,4 +69,10 @@ class Subject extends Model
         return $this->belongsToMany(Level::class)
             ->withTimestamps();
     }
+
+    public function streams()
+    {
+        return $this->belongsToMany(Stream::class)
+            ->withTimestamps();
+    }
 }

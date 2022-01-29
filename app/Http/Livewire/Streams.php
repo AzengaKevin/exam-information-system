@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Stream;
+use App\Services\SubjectService;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Illuminate\Validation\Rule;
@@ -10,6 +11,7 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 
 class Streams extends Component
 {
@@ -25,13 +27,21 @@ class Streams extends Component
 
     public $trashed = false;
 
+    public $optionalSubjects;
+    public $selectedOptionalSubjects = array();
+
     /**
      * Lifecycle method that executes only once when the component is mounting
      * 
      * @param string $trashed
+     * @param SubjectService $subjectService
      */
-    public function mount(string $trashed = null)
+    public function mount(
+        SubjectService $subjectService,
+        string $trashed = null
+    )
     {
+        $this->optionalSubjects = $subjectService->getOptionalSubjects();
         $this->trashed = boolval($trashed);
     }
 
@@ -64,12 +74,13 @@ class Streams extends Component
      */
     public function editStream(Stream $stream)
     {
-        
         $this->streamId = $stream->id;
 
         $this->name = $stream->name;
         $this->alias = $stream->alias;
         $this->description = $stream->description;
+
+        $this->selectedOptionalSubjects = array_fill_keys($stream->optionalSubjects->pluck('id')->all(), 'true');
 
         $this->emit('show-upsert-stream-modal');
     }
@@ -84,6 +95,7 @@ class Streams extends Component
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('streams')->ignore($this->streamId)],
             'alias' => ['bail','required','string'],
+            'selectedOptionalSubjects' => ['nullable', 'array'],
             'description' => ['bail', 'nullable']
         ];
     }
@@ -99,13 +111,27 @@ class Streams extends Component
 
             $this->authorize('create', Stream::class);
 
-            $stream = Stream::create($data);
+            if(!empty($data['selectedOptionalSubjects'])){
+                $data['selectedOptionalSubjects'] = array_filter(
+                    $data['selectedOptionalSubjects'],
+                    fn($value, $key) => boolval($value),
+                    ARRAY_FILTER_USE_BOTH
+                );
+            }
 
-            $this->reset(['name', 'alias', 'description']);
+            DB::transaction(function() use($data){
+    
+                /** @var Stream */
+                $stream = Stream::create($data);
 
-            session()->flash('status', "A stream, {$stream->name}, has been successfully created");
-
-            $this->emit('hide-upsert-stream-modal');
+                $stream->optionalSubjects()->sync(array_keys($data['selectedOptionalSubjects']));
+    
+                $this->reset(['name', 'alias', 'description']);
+    
+                session()->flash('status', "A stream, {$stream->name}, has been successfully created");
+    
+                $this->emit('hide-upsert-stream-modal');
+            });
             
         } catch (\Exception $exception) {
             
@@ -145,19 +171,32 @@ class Streams extends Component
 
         try {
 
-            /** @var User */
+            /** @var Stream */
             $stream = Stream::findOrFail($this->streamId);
 
             $this->authorize('update', $stream);
 
-            if($stream->update($data)){
+            if(!empty($data['selectedOptionalSubjects'])){
+                $data['selectedOptionalSubjects'] = array_filter(
+                    $data['selectedOptionalSubjects'],
+                    fn($value, $key) => boolval($value),
+                    ARRAY_FILTER_USE_BOTH
+                );
+            }
 
+            DB::transaction(function() use($stream, $data){
+
+                $stream->update($data);
+
+                $stream->optionalSubjects()->sync(array_keys($data['selectedOptionalSubjects']));
+    
                 $this->reset(['streamId', 'name', 'alias', 'description']);
 
                 session()->flash('status', 'stream successfully updated');
 
                 $this->emit('hide-upsert-stream-modal');
-            }
+            });
+
             
         } catch (\Exception $exception) {
             

@@ -133,7 +133,7 @@
         </div>
     </div>
 
-    <x-modals.streams.upsert :streamId="$streamId" />
+    <x-modals.streams.upsert :streamId="$streamId" :optionalSubjects="$optionalSubjects" />
     <x-modals.streams.delete :name="$name" />
     <x-modals.streams.truncate />
 

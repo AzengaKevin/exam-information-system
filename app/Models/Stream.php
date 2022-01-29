@@ -36,4 +36,15 @@ class Stream extends Model
         return $this->hasMany(Student::class);
     }
 
+    /**
+     * Stream Subject Relation
+     * 
+     * @return Relation
+     */
+    public function optionalSubjects()
+    {
+        return $this->belongsToMany(Subject::class)
+            ->withTimestamps();
+    }
+
 }
