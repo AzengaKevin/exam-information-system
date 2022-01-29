@@ -2,17 +2,18 @@
 
 namespace Tests\Feature;
 
-use App\Http\Livewire\Streams;
-use App\Models\Level;
-use App\Models\Permission;
 use Tests\TestCase;
 use App\Models\Role;
-use App\Models\Stream;
 use App\Models\User;
+use App\Models\Stream;
+use Livewire\Livewire;
+use App\Models\Subject;
+use App\Models\Permission;
+use App\Http\Livewire\Streams;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Livewire\Livewire;
 
 class StreamsManagementTest extends TestCase
 {
@@ -80,6 +81,43 @@ class StreamsManagementTest extends TestCase
 
 
     /** @group streams */
+    public function testAuthorizedUserCanCreateAStreamAndLinkOptionalSubjects()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Streams Create']));
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+        
+        DB::table('subjects')->latest()->limit(2)->update(['optional' => true]);
+
+        $subjectsIds = Subject::latest()->limit(2)->pluck('id')->all();
+
+        $payload = Stream::factory()->make([
+            'selectedOptionalSubjects' => array_fill_keys($subjectsIds, 'true')
+        ])->toArray();
+
+        Livewire::test(Streams::class)
+            ->set('name', $payload['name'])
+            ->set('alias', $payload['alias'])
+            ->set('selectedOptionalSubjects', $payload['selectedOptionalSubjects'])
+            ->set('description', $payload['description'])
+            ->call('createStream');
+
+        /** @var Stream */
+        $stream = Stream::first();
+
+        $this->assertNotNull($stream);
+
+        $this->assertEquals($payload['name'], $stream->name);
+        $this->assertEquals($payload['alias'], $stream->alias);
+        $this->assertEquals($payload['description'], $stream->description);
+        $this->assertEquals($subjectsIds, $stream->optionalSubjects->pluck('id')->toArray());
+        
+    }    
+
+
+    /** @group streams */
     public function testAuthorizedUserCanUpdateAStream()
     {
         $this->withoutExceptionHandling();
@@ -101,6 +139,41 @@ class StreamsManagementTest extends TestCase
         $this->assertEquals($payload['name'], $stream->fresh()->name);
         $this->assertEquals($payload['alias'], $stream->fresh()->alias);
         $this->assertEquals($payload['description'], $stream->fresh()->description);
+        
+    }
+
+    /** @group streams */
+    public function testAuthorizedUserCanUpdateAStreamWithOptionalSubjects()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Streams Update']));
+
+        /** @var Stream */
+        $stream = Stream::factory()->create();
+
+        $this->artisan('db:seed --class=SubjectsSeeder');
+        
+        DB::table('subjects')->latest()->limit(2)->update(['optional' => true]);
+
+        $subjectsIds = Subject::latest()->limit(2)->pluck('id')->all();
+
+        $payload = Stream::factory()->make([
+            'selectedOptionalSubjects' => array_fill_keys($subjectsIds, 'true')
+        ])->toArray();
+
+        Livewire::test(Streams::class)
+            ->call('editStream', $stream)
+            ->set('name', $payload['name'])
+            ->set('alias', $payload['alias'])
+            ->set('selectedOptionalSubjects', $payload['selectedOptionalSubjects'])
+            ->set('description', $payload['description'])
+            ->call('updateStream');
+
+        $this->assertEquals($payload['name'], $stream->fresh()->name);
+        $this->assertEquals($payload['alias'], $stream->fresh()->alias);
+        $this->assertEquals($payload['description'], $stream->fresh()->description);
+        $this->assertEquals($subjectsIds, $stream->fresh()->optionalSubjects->pluck('id')->toArray());
         
     }
 
