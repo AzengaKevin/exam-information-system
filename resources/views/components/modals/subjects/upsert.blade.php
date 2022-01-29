@@ -45,7 +45,7 @@
                     </span>
                     @enderror
                 </div>
-                <div class="form-group mt-3">
+                <div class="mt-3">
                     <label for="department" class="form-label">Department</label>
                     <select class="form-control" wire:model.lazy="department_id" id="department">
                         <option value="">--select department--</option>
@@ -53,6 +53,12 @@
                         <option value="{{$department->id}}">{{$department->name}}</option>
                         @endforeach
                     </select>
+                </div>
+                <div class="mt-3">
+                    <div class="form-check">
+                        <input type="checkbox" wire:model="optional" id="optional-subject-check" class="form-check-input">
+                        <label for="optional-subject-check" class="form-check-label">Optional Subject</label>
+                    </div>
                 </div>
                 <div class="mt-3">
                     <label for="segments" class="form-label fw-bold">Segments(Optional)</label>

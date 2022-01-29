@@ -164,6 +164,29 @@ class SubjectsManagementTest extends TestCase
     }
 
     /** @group subjects */
+    public function testAuthorizedUserCanUpdateASubjectAddChangeOptionalValue()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Subjects Update']));
+
+        /** @var Subject */
+        $subject = Subject::factory()->create();
+        
+        $payload = Subject::factory()->make([
+            'optional' => $this->faker->boolean()
+        ])->toArray();
+
+        Livewire::test(Subjects::class)
+            ->call('editSubject', $subject)
+            ->set('optional', $payload['optional'])
+            ->call('updateSubject');
+
+        $this->assertEquals($payload['optional'], $subject->fresh()->optional);
+        
+    }    
+
+    /** @group subjects */
     public function testAuthorizedUserCanDeleteASubject()
     {
         $this->withoutExceptionHandling();
