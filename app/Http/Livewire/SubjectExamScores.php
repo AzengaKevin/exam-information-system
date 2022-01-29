@@ -21,6 +21,7 @@ class SubjectExamScores extends Component
     public Subject $subject;
     public $level;
     public $levelUnit;
+    public $segments;
 
     /**
      * Call when the subject-exam-scores compoent is mounting
@@ -37,6 +38,14 @@ class SubjectExamScores extends Component
         $this->subject = $subject;
         $this->level = $level;
         $this->levelUnit = $levelUnit;
+
+        $levelId = optional($level)->id ?? optional(optional($levelUnit)->level)->id;
+
+        if(!empty($subject->segments)){
+            if(array_key_exists($levelId, $subject->segments)){
+                $this->segments = $subject->segments[$levelId];
+            }
+        }
     }
 
     public function render()
@@ -58,15 +67,23 @@ class SubjectExamScores extends Component
         $col = $this->subject->shortname;
 
         $query = DB::table('students')
-            ->leftJoin("{$tblName}", "students.id", "=", "{$tblName}.student_id")
-            ->select("students.id", "students.adm_no", "students.name", "{$tblName}.{$col}");
-            // ->selectRaw("students.id, students.adm_no, students.name, `{$tblName}`.{$col}, CAST(JSON_UNQUOTE(JSON_EXTRACT(`{$tblName}`.$col,\"$.score\")) AS UNSIGNED) AS score");
+            ->leftJoin("{$tblName}", "students.id", "=", "{$tblName}.student_id");
+
+        $dbDriver = DB::connection()->getPdo()->getAttribute(\PDO::ATTR_DRIVER_NAME);
+
+        if($dbDriver == 'mysql') $query->selectRaw("students.id, students.adm_no, students.name, `{$tblName}`.{$col}, CAST(JSON_UNQUOTE(JSON_EXTRACT(`{$tblName}`.$col,\"$.score\")) AS UNSIGNED) AS score");
+
+        else $query->select("students.id", "students.adm_no", "students.name", "{$tblName}.{$col}");
 
         if ($this->level) $query->where('students.level_id', $this->level->id);
 
         if (!is_null($this->levelUnit)) $query->where('students.level_unit_id', $this->levelUnit->id);
+
+        if($dbDriver == 'mysql') $query->orderBy('score', "DESC");
+        
+        else $query->orderBy('name');
             
-        return $query->orderBy('name')->paginate(24)->withQueryString();
+        return $query->paginate(24)->withQueryString();
     }
 
     /** 
