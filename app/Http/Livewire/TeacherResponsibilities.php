@@ -26,9 +26,11 @@ class TeacherResponsibilities extends Component
 
     public $allResponsibilities;
     public $levels;
+    public $levelsToShow;
     public $subjects;
     public $departments;
     public $levelUnits;
+    public $levelUnitsToShow;
 
     public $responsibility_id;
     public $level_unit_id;
@@ -47,11 +49,9 @@ class TeacherResponsibilities extends Component
 
     public $selectedClasses = [];
 
-    public $allLevelUnitsMissingTeacherForThatSubject;
-
-    public $allLevelsMissingTeacherForTheSubject;
-
     public Responsibility $teacherResponsibility;
+
+    public Responsibility $currentResponsibility;
 
     /**
      * Lifecycle method executed ones when the component is launching
@@ -63,16 +63,27 @@ class TeacherResponsibilities extends Component
         $this->teacher = $teacher;
 
         $this->allResponsibilities = $this->getResponsibilities();
+        
         $this->levels = $this->getLevels();
+        $this->levelsToShow = collect([]);
         $this->subjects = $this->getSubjects();
         $this->departments = $this->getDepartments();
         $this->levelUnits = $this->getLevelUnits();
-
-        $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
-
-        $this->allLevelsMissingTeacherForTheSubject = collect([]);
+        $this->levelUnitsToShow = collect([]);
 
         $this->teacherResponsibility = Responsibility::firstOrCreate(['name' => 'Subject Teacher']);
+    }
+
+    /**
+     * Reset classes
+     * 
+     * @return void
+     */
+    private function initClassesToShow(){
+
+        $this->levelUnitsToShow = collect([]);
+        $this->levelsToShow = collect([]);
+
     }
 
     /**
@@ -90,13 +101,70 @@ class TeacherResponsibilities extends Component
     /**
      * Hook method called everytime the responsibility_id field is updated
      * 
-     * @param mixed
+     * @param mixed $value
      */
     public function updatedResponsibilityId($value)
     {
         $responsibility = $this->allResponsibilities->find($value);
 
+        $this->currentResponsibility = $responsibility;
+
         $this->fields = $responsibility->requirements ?? [];
+    }
+
+    /**
+     * Hook method that gets called everytime a subject is updated
+     * 
+     * @param mixed $value
+     */
+    public function updatedSubjectId($value)
+    {
+
+        /** @var Subject */
+        $subject = $this->subjects->find($value);
+
+        if(!empty($this->currentResponsibility) && ($this->currentResponsibility->name == 'Subject Teacher')){
+
+            /** @var SystemSettings */
+            $systemSettings = app(SystemSettings::class);
+
+            if ($systemSettings->school_has_streams) {
+
+                $leveUnitIds = DB::table('responsibility_teacher')
+                    ->select(['level_unit_id'])->distinct('level_unit_id')
+                    ->where([
+                        ['subject_id', $value],
+                        ['responsibility_id', $this->currentResponsibility->id]
+                    ])->pluck('level_unit_id')->all();
+
+                $this->levelUnitsToShow = $this->levelUnits->whereNotIn('id', $leveUnitIds);
+
+                if($subject->optional) {
+                    $this->levelUnitsToShow = $this->levelUnitsToShow
+                        ->whereIn('level_id', $subject->levels->pluck('id')->all())
+                        ->whereIn('stream_id', $subject->streams->pluck('id')->all());
+                }
+
+            }else{
+
+                $levelIds = DB::table('responsibility_teacher')
+                    ->select(['level_id'])
+                    ->distinct('level_id')
+                    ->where([
+                        ['subject_id', $value],
+                        ['responsibility_id', $this->currentResponsibility->id]
+                    ])->pluck('level_id')->all();
+
+                /** @var Subject */
+                $subject = Subject::find($value);
+
+                $this->levelsToShow = $this->levels->whereNotIn('id', $levelIds);
+
+                if($subject->optional) {
+                    $this->levelsToShow = $this->levelsToShow->whereIn('id', $subject->levels->pluck('id')->all());
+                }
+            }            
+        }
     }
 
     /**
@@ -113,15 +181,15 @@ class TeacherResponsibilities extends Component
 
         if($systemSettings->school_has_streams){
             if($value){
-                $this->selectedClasses = array_fill_keys($this->allLevelUnitsMissingTeacherForThatSubject->pluck('id')->all(), 'true');
+                $this->selectedClasses = array_fill_keys($this->levelUnitsToShow->pluck('id')->all(), 'true');
             }else{
-                $this->selectedClasses = array_fill_keys($this->allLevelUnitsMissingTeacherForThatSubject->pluck('id')->all(), null);
+                $this->selectedClasses = array_fill_keys($this->levelUnitsToShow->pluck('id')->all(), null);
             }
         }else{
             if($value){
-                $this->selectedClasses = array_fill_keys($this->allLevelsMissingTeacherForTheSubject->pluck('id')->all(), 'true');
+                $this->selectedClasses = array_fill_keys($this->levelsToShow->pluck('id')->all(), 'true');
             }else{
-                $this->selectedClasses = array_fill_keys($this->allLevelsMissingTeacherForTheSubject->pluck('id')->all(), null);
+                $this->selectedClasses = array_fill_keys($this->levelsToShow->pluck('id')->all(), null);
             }
         }
         
@@ -134,6 +202,8 @@ class TeacherResponsibilities extends Component
      */
     public function updatedTeacherSubjectId($value)
     {
+        /** @var Subject */
+        $subject = $this->subjects->find($value);
 
         /** @var SystemSettings */
         $systemSettings = app(SystemSettings::class);
@@ -148,17 +218,13 @@ class TeacherResponsibilities extends Component
                     ['responsibility_id', $this->teacherResponsibility->id]
                 ])->pluck('level_unit_id')->all();
 
-            /** @var Subject */
-            $subject = Subject::find($value);
-
-            $levelUnitsQuery = LevelUnit::whereNotIn('id', $leveUnitIds);
+            $this->levelUnitsToShow = $this->levelUnits->whereNotIn('id', $leveUnitIds);
 
             if($subject->optional) {
-                $levelUnitsQuery->whereIn('level_id', $subject->levels->pluck('id')->all());
-                $levelUnitsQuery->whereIn('stream_id', $subject->streams->pluck('id')->all());
+                $this->levelUnitsToShow = $this->levelUnitsToShow
+                    ->whereIn('level_id', $subject->levels->pluck('id')->all())
+                    ->whereIn('stream_id', $subject->streams->pluck('id')->all());
             }
-            
-            $this->allLevelUnitsMissingTeacherForThatSubject = $levelUnitsQuery->get();
 
         }else{
 
@@ -170,14 +236,12 @@ class TeacherResponsibilities extends Component
                     ['responsibility_id', $this->teacherResponsibility->id]
                 ])->pluck('level_id')->all();
 
-            /** @var Subject */
-            $subject = Subject::find($value);
+            $this->levelsToShow = $this->levels->whereNotIn('id', $levelIds);
 
-            $levelsQuery = Level::whereNotIn('id', $levelIds);
-
-            if($subject->optional) $levelsQuery->whereIn('id', $subject->levels->pluck('id')->all());
-
-            $this->allLevelsMissingTeacherForTheSubject = $levelsQuery->get();
+            if($subject->optional) {
+                $this->levelsToShow = $this->levelsToShow
+                    ->whereIn('id', $subject->levels->pluck('id')->all());
+            }
         }
     }
 
@@ -301,8 +365,10 @@ class TeacherResponsibilities extends Component
                 $this->teacher->auth->update(['role_id' => $role->id]);
     
                 session()->flash('status', "{$this->teacher->auth->name} has been assigned a new responsibility");
-    
+
                 $this->reset(['responsibility_id', 'level_unit_id', 'level_id', 'department_id', 'subject_id']);
+                
+                $this->initClassesToShow();
     
                 $this->emit('hide-assign-teacher-responsibility-modal');
 
@@ -362,7 +428,6 @@ class TeacherResponsibilities extends Component
                             'level_unit_id' => $key,
                             'subject_id' => $data['teacher_subject_id']
                         ]);
-    
                 }
 
             }else{
@@ -381,10 +446,8 @@ class TeacherResponsibilities extends Component
             }
 
             $this->reset(['selectAllClasses', 'teacher_subject_id', 'selectedClasses']);
-
-            $this->allLevelUnitsMissingTeacherForThatSubject = collect([]);
-
-            $this->allLevelsMissingTeacherForTheSubject = collect([]);
+            
+            $this->initClassesToShow();
 
             session()->flash('status', 'Teacher successfully assigned bulk subject responsibilities');
 
