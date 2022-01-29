@@ -3,6 +3,7 @@
 namespace App\Http\Livewire;
 
 use App\Models\Level;
+use App\Models\Subject;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Livewire\WithPagination;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+use Illuminate\Support\Facades\DB;
 
 class Levels extends Component
 {
@@ -25,8 +27,11 @@ class Levels extends Component
     public $numeric;
     public $slug;
     public $description;
+    public $selectedOptionalSubjects = array();
 
     public $trashed = false;
+
+    public $optionalSubjects;
 
     /**
      * Lifecycle method that gets called onces when the component is mountint
@@ -36,6 +41,7 @@ class Levels extends Component
     public function mount(string $trashed = null)
     {
         $this->trashed = boolval($trashed);
+        $this->optionalSubjects = $this->getAllOptionalSubjects();
     }
 
     /**
@@ -50,6 +56,8 @@ class Levels extends Component
 
     /**
      * Get all levels from the database
+     * 
+     * @return Paginator
      */
     public function getPaginatedLevels()
     {
@@ -58,6 +66,16 @@ class Levels extends Component
         if($this->trashed) $levelsQuery->onlyTrashed();
 
         return $levelsQuery->paginate(24)->withQueryString();
+    }
+
+    /**
+     * Get all optional subjects from the database
+     * 
+     * @return Collection
+     */
+    public function getAllOptionalSubjects()
+    {
+        return Subject::optional()->get(['id', 'name']);
     }
     
    
@@ -74,6 +92,10 @@ class Levels extends Component
         $this->name = $level->name;
         $this->numeric = $level->numeric;
         $this->description = $level->description;
+        
+        $subjectsIds = $level->optionalSubjects->pluck('id')->all();
+
+        $this->selectedOptionalSubjects = array_fill_keys($subjectsIds, 'true');
 
         $this->emit('show-upsert-level-modal');
     }
@@ -88,7 +110,8 @@ class Levels extends Component
         return [
             'name' => ['bail', 'required', 'string', Rule::unique('levels')->ignore($this->levelId)],
             'numeric' => ['bail','required','integer'],
-            'description' => ['bail', 'nullable']
+            'description' => ['bail', 'nullable'],
+            'selectedOptionalSubjects' => ['nullable', 'array']
         ];
     }
 
@@ -103,18 +126,27 @@ class Levels extends Component
 
             $this->authorize('create', Level::class);
 
-            $level = Level::create($data);
+            $data['selectedOptionalSubjects'] = array_filter(
+                $data['selectedOptionalSubjects'],
+                fn($value, $key) => boolval($value),
+                ARRAY_FILTER_USE_BOTH
+            );
 
-            if($level){
+            DB::transaction(function() use($data){
+
+                /** @var Level */
+                $level = Level::create($data);
+
+                $level->optionalSubjects()->sync(array_keys($data['selectedOptionalSubjects']));
 
                 $this->reset(['name', 'numeric', 'description', 'slug']);
-
+    
                 session()->flash('status', 'Level successfully added');
         
                 $this->emit('hide-upsert-level-modal');
 
-            }
-            
+            });
+
         } catch (\Exception $exception) {
             
             Log::error($exception->getMessage(), ['action' => __METHOD__]);
@@ -152,19 +184,30 @@ class Levels extends Component
 
         try {
 
+            $data['selectedOptionalSubjects'] = array_filter(
+                $data['selectedOptionalSubjects'],
+                fn($value, $key) => boolval($value),
+                ARRAY_FILTER_USE_BOTH
+            );
+
             /** @var Level */
             $level = Level::findOrFail($this->levelId);
 
             $this->authorize('update', $level);
 
-            if($level->update($data)){
+            DB::transaction(function() use($level, $data){
+
+                $level->update($data);
+
+                $level->optionalSubjects()->sync(array_keys($data['selectedOptionalSubjects']));
 
                 $this->reset(['levelId', 'name', 'numeric', 'slug', 'description']);
 
                 session()->flash('status', 'Level successfully updated');
 
                 $this->emit('hide-upsert-level-modal');
-            }
+
+            });
             
         } catch (\Exception $exception) {
             

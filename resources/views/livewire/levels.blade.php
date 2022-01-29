@@ -134,7 +134,7 @@
         </div>
     </div>
 
-    <x-modals.levels.upsert :levelId="$levelId" />
+    <x-modals.levels.upsert :levelId="$levelId" :optionalSubjects="$optionalSubjects" />
     <x-modals.levels.delete :name="$name" />
     <x-modals.levels.truncate />
 
