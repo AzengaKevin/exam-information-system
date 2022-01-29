@@ -25,9 +25,6 @@
     'level-unit' => optional($levelUnit)->id,
     'level' => optional($level)->id
 ]) }}" method="post" class="row g-3">
-    @php
-    $segments = $subject->segments;
-    @endphp
     @csrf
     @method('PUT')
     <div class="col-md-8">
@@ -42,7 +39,7 @@
                                 {{-- <th>Adm. No.</th> --}}
                                 @if (!empty($segments))
                                 @foreach ($segments as $key => $value)
-                                <th>{{ $key }}({{ $value }})</th>
+                                <th>{{ $key }}(Max. {{ $value }})</th>
                                 @endforeach
                                 @else
                                 <th>% Score</th>
@@ -70,7 +67,6 @@
                                     class="form-control form-control-sm" placeholder="Score"
                                     value="{{ old("scores.{$item->stid}.{$key}") ?? optional($score)->$key }}"></td>
                                 @endforeach
-        
                                 @else
                                 <td><input type="number" name="scores[{{ $item->stid }}][score]" min="0" max="100"
                                         class="form-control form-control-sm"

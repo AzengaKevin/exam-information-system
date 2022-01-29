@@ -7,6 +7,7 @@ use App\Models\User;
 use Livewire\Livewire;
 use App\Models\Subject;
 use App\Http\Livewire\Subjects;
+use App\Models\Level;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -90,12 +91,15 @@ class SubjectsManagementTest extends TestCase
 
         $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Subjects Create']));
 
+        /** @var Level */
+        $level = Level::factory()->create();
+
         $payload = Subject::factory()->make([
             'name' => 'English',
             'shortname' => 'eng',
             'segments' => [
-                ['key' => 'outOf60', 'value' => 60],
-                ['key' => 'comp','value' => 40]
+                ['level_id' => $level->id, 'key' => 'outOf60', 'value' => 60],
+                ['level_id' => $level->id, 'key' => 'comp','value' => 40]
             ]
         ])->toArray();
 
@@ -116,7 +120,7 @@ class SubjectsManagementTest extends TestCase
         $this->assertEquals($payload['shortname'], $subject->shortname);
         $this->assertEquals($payload['description'], $subject->description);
         $this->assertEquals($payload['department_id'], $subject->department_id);
-        $this->assertEquals(['outOf60' => 60, 'comp'=> 40], $subject->segments);
+        $this->assertEquals([$level->id => ['outOf60' => 60, 'comp'=> 40]], $subject->segments);
         
     }
 
@@ -129,13 +133,16 @@ class SubjectsManagementTest extends TestCase
 
         /** @var Subject */
         $subject = Subject::factory()->create();
+
+        /** @var Level */
+        $level = Level::factory()->create();
         
         $payload = Subject::factory()->make([
             'name' => 'English',
             'shortname' => 'eng',
             'segments' => [
-                ['key' => 'outOf60', 'value' => 60],
-                ['key' => 'comp','value' => 40]
+                ['level_id' => $level->id, 'key' => 'outOf60', 'value' => 60],
+                ['level_id' => $level->id, 'key' => 'comp','value' => 40]
             ]
         ])->toArray();
 
@@ -152,7 +159,7 @@ class SubjectsManagementTest extends TestCase
         $this->assertEquals($payload['shortname'], $subject->fresh()->shortname);
         $this->assertEquals($payload['description'], $subject->fresh()->description);
         $this->assertEquals($payload['department_id'], $subject->fresh()->department_id);
-        $this->assertEquals(['outOf60' => 60, 'comp'=> 40], $subject->fresh()->segments);
+        $this->assertEquals([$level->id => ['outOf60' => 60, 'comp'=> 40]], $subject->fresh()->segments);
         
     }
 

@@ -70,7 +70,6 @@ class ExamsScoresController extends Controller
             }
         }
 
-        
         return view('exams.scores.index', [
             'exam' => $exam,
             'responsibilities' => $responsibilities ?? collect([])
@@ -98,6 +97,16 @@ class ExamsScoresController extends Controller
             /** @var Level */
             $level = Level::find(intval($request->get('level')));
 
+            $levelId = optional($level)->id ?? optional(optional($levelUnit)->level)->id;
+
+            $segments = array();
+
+            if(!empty($subject->segments)){
+                if(array_key_exists($levelId, $subject->segments)){
+                    $segments = $subject->segments[$levelId];
+                }
+            }
+
             $gradings = Grading::all(['id', 'name']);
 
             $tblName = Str::slug($exam->shortname);
@@ -121,6 +130,7 @@ class ExamsScoresController extends Controller
                 'level' => $level,
                 'levelUnit' => $levelUnit,
                 'subject' => $subject,
+                'segments' => $segments,
                 'gradings' => $gradings,
                 'data' => $data,
                 'title' => $title
@@ -212,11 +222,21 @@ class ExamsScoresController extends Controller
             /** @var Level */
             $level = Level::find(intval($request->get('level')));
 
+            $levelId = optional($level)->id ?? optional(optional($levelUnit)->level)->id;
+
+            $segments = array();
+
+            if(!empty($subject->segments)){
+                if(array_key_exists($levelId, $subject->segments)){
+                    $segments = $subject->segments[$levelId];
+                }
+            }
+
             $grading = Grading::find($data['grading_id'] ?? 1) ?? Grading::first();
 
             $values = $grading->values;
 
-            if(empty($subject->segments)){
+            if(empty($segments)){
                 // Process Uploading the scores
                 $this->uploadScoresWithoutSegments($data, $values, $level, $levelUnit, $exam, $subject);
 

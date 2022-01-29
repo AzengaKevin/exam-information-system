@@ -37,8 +37,15 @@ class CompleteUpload
 
             $values = $grading->values;
 
-            /** @var array */
-            $segments = $subject->segments;
+            $levelId = optional($level)->id ?? optional($levelUnit)->level->id;
+
+            $segments = array();
+
+            if(!empty($subject->segments)){
+                if(array_key_exists($levelId, $subject->segments)){
+                    $segments = $subject->segments[$levelId];
+                }
+            }
 
             /** @todo Check if all segments are filled */
 

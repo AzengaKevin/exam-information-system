@@ -99,7 +99,7 @@ class UploadingExamsScoresManagementTest extends TestCase
 
         $response->assertViewIs('exams.scores.upload');
 
-        $response->assertViewHasAll(['exam', 'subject', 'level', 'gradings', 'data', 'title']);
+        $response->assertViewHasAll(['exam', 'subject', 'segments', 'level', 'gradings', 'data', 'title']);
         
     }
 
@@ -209,7 +209,9 @@ class UploadingExamsScoresManagementTest extends TestCase
         $subject = Subject::factory()->create([
             'name' => 'English',
             'shortname' => 'eng',
-            'segments' => [ 'outOf60' => 60, 'comp' => 40]
+            'segments' => [
+                $level->id => [ 'outOf60' => 60, 'comp' => 40]
+            ]
         ]);
 
         // Create Responsibility for the current teacher

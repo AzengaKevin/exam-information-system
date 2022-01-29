@@ -1,4 +1,4 @@
-@props(['departmentId' => null,'departments','subjectId'=>null, 'segments' => []])
+@props(['departmentId' => null,'departments','subjectId'=>null, 'segments' => [], 'levels' => []])
 
 <div wire:ignore.self id="upsert-subject-modal" class="modal fade" tabindex="-1" data-bs-backdrop="static"
     aria-labelledby="upsert-subject-modal-title">
@@ -59,6 +59,13 @@
                     <fieldset id="segments" class="d-flex flex-column gap-3">
                         @foreach ($segments as $segment)
                         <div class="input-group">
+                            <select wire:model="segments.{{ $loop->index }}.level_id" 
+                                class="form-select @error("segments.{{ $loop->index }}.level_id") is-invalid @enderror">
+                                <option value="">Level...</option>
+                                @foreach ($levels as $level)
+                                <option value="{{ $level->id }}">{{ $level->name }}</option>
+                                @endforeach
+                            </select>
                             <input type="text" wire:model.lazy="segments.{{ $loop->index }}.key" class="form-control"
                                 placeholder="Field" aria-label="Field">
                             <input type="number" wire:model.lazy="segments.{{ $loop->index }}.value"
