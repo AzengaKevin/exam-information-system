@@ -97,26 +97,30 @@
                                     @if (!$trashed)
                                     @can('view', $student)
                                     <a href="{{route('students.show', $student)}}"
-                                        class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
+                                        class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
                                         <i class="fa fa-eye"></i>
                                         <span>Details</span>
+                                    </a>
+                                    <a href="{{ route('students.subjects.index', $student) }}" class="btn btn-sm btn-outline-primary d-inline-flex gap-1 align-items-center">
+                                        <i class="fa fa-eye"></i>
+                                        <span>Subjects</span>
                                     </a>
                                     @endcan
                                     @can('update', $student)
                                     <button wire:click="showAddStudentGuardiansModal({{ $student }})"
-                                        class="btn btn-sm btn-outline-success hstack gap-1 align-items-center">
+                                        class="btn btn-sm btn-outline-success d-inline-flex gap-1 align-items-center">
                                         <i class="fa fa-plus"></i>
                                         <span>Guardians</span>
                                     </button>
                                     <button wire:click="editStudent({{ $student }})"
-                                        class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
+                                        class="btn btn-sm btn-outline-info d-inline-flex gap-1 align-items-center">
                                         <i class="fa fa-edit"></i>
                                         <span>Edit</span>
                                     </button>
                                     @endcan
                                     @can('delete', $student)
                                     <button wire:click="showDeleteStudentModal({{ $student }})"
-                                        class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
+                                        class="btn btn-sm btn-outline-danger d-inline-flex gap-1 align-items-center">
                                         <i class="fa fa-trash"></i>
                                         <span>Delete</span>
                                     </button>
@@ -124,14 +128,14 @@
                                     @else
                                     @can('restore', $student)
                                     <button wire:click="restoreStudent({{ $student->id }})"
-                                        class="btn btn-sm btn-success hstack gap-1 align-items-center">
+                                        class="btn btn-sm btn-success d-inline-flex gap-1 align-items-center">
                                         <i class="fa fa-trash-restore-alt"></i>
                                         <span>Restore</span>
                                     </button>
                                     @endcan
                                     @can('forceDelete', $student)
                                     <button wire:click="destroyStudent({{ $student->id }})"
-                                        class="btn btn-sm btn-danger hstack gap-1 align-items-center">
+                                        class="btn btn-sm btn-danger d-inline-flex gap-1 align-items-center">
                                         <i class="fa fa-trash-alt"></i>
                                         <span>Delete</span>
                                     </button>

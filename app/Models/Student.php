@@ -82,4 +82,14 @@ class Student extends Model
         return $this->belongsTo(Hostel::class)
             ->withDefault(['name' => 'N/A']);
     }
+
+    /**
+     * Student - Optional Subject Relation
+     * 
+     * @return Relation
+     */
+    public function optionalSubjects()
+    {
+        return $this->belongsToMany(Subject::class);
+    }
 }

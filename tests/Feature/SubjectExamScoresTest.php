@@ -183,7 +183,7 @@ class SubjectExamScoresTest extends TestCase
         $subject = Subject::factory()->create([
             'name' => 'English',
             'shortname' => 'eng',
-            'segments' => [ 'outOf60' => 60, 'comp' => 40]
+            'segments' => [$level->id => ['outOf60' => 60, 'comp'=> 40]]
         ]);
 
         // Create Responsibility for the current teacher
