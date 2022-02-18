@@ -44,6 +44,7 @@ class UpdateSettingsRequest extends FormRequest
             'general.school_manager_responsibility_id' => ['bail', 'required', 'int'],
             'general.exam_manager_responsibility_id' => ['bail', 'required', 'int'],
             'general.current_term' => ['bail', 'required', 'string', Rule::in(Exam::termOptions())],
+            'general.sms_notification_is_active' => ['bail', 'nullable'],
 
             'raw.logo' => ['nullable', 'image', 'max:96']
         ];

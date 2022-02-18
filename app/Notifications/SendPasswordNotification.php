@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Settings\GeneralSettings;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
@@ -33,7 +33,12 @@ class SendPasswordNotification extends Notification
      */
     public function via($notifiable)
     {
-        $viaArray = array('advanta');
+        $viaArray = array();
+
+        /** @var GeneralSettings */
+        $generalSettings = app(GeneralSettings::class);
+
+        if($generalSettings->sms_notification_is_active) array_push($viaArray, 'advanta');
 
         if(!empty($notifiable->email)) array_push($viaArray, "mail");
         
