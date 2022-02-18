@@ -70,37 +70,25 @@ class SettingsController extends Controller
         
                 // Updating System Settings
                 foreach ($data['system'] as $key => $value) {
-        
-                    if (in_array($key, ['school_has_streams', 'boarding_school'])) {
-        
-                        $systemSettings->$key = boolval($value);
-        
-                    }else{
-        
-                        $systemSettings->$key = $value;
-        
-                    }
-        
+                    if (in_array($key, ['school_has_streams', 'boarding_school'])) $systemSettings->$key = boolval($value);
+                    else $systemSettings->$key = $value;
                 }
                 
                 // Boolean System Keys handling if they're been unchecked
-        
-                if (!array_key_exists('school_has_streams', $data['system'])) {
-                    $systemSettings->school_has_streams = false;
-                }
+                if (!array_key_exists('school_has_streams', $data['system'])) $systemSettings->school_has_streams = false;
                 
-                if (!array_key_exists('boarding_school', $data['system'])) {
-                    $systemSettings->boarding_school = false;
-                }
+                if (!array_key_exists('boarding_school', $data['system'])) $systemSettings->boarding_school = false;
         
                 $systemSettings->save();
             }
     
-            // Updateing general settings
+            // Updating general settings
             foreach ($data['general'] as $key => $value) {
-    
-                $generalSettings->$key = $value;
+                if (in_array($key, ['sms_notification_is_active'])) $generalSettings->$key = boolval($value);
+                else $generalSettings->$key = $value;
             }
+
+            if(!array_key_exists('sms_notification_is_active', $data['general'])) $generalSettings->sms_notification_is_active = false;
             
             $generalSettings->save();
             

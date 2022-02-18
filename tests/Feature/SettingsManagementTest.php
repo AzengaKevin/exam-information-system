@@ -74,6 +74,7 @@ class SettingsManagementTest extends TestCase
                 'current_term' => $currentTerm = $this->faker->randomElement(Exam::termOptions()),
                 'school_manager_responsibility_id' => Responsibility::first()->id,
                 'exam_manager_responsibility_id' => Responsibility::latest()->first()->id,
+                'sms_notification_is_active' => $smsNotificatioActive = $this->faker->boolean()
             ]
         ]);
 
@@ -94,6 +95,7 @@ class SettingsManagementTest extends TestCase
         $this->assertEquals($schoolEmailAddress, $generalSettings->school_email_address);
         $this->assertEquals($currentAcademicYear, $generalSettings->current_academic_year);
         $this->assertEquals($currentTerm, $generalSettings->current_term);
+        $this->assertEquals($smsNotificatioActive, $generalSettings->sms_notification_is_active);
         $this->assertEquals(Responsibility::first()->id, $generalSettings->school_manager_responsibility_id);
         $this->assertEquals(Responsibility::latest()->first()->id, $generalSettings->exam_manager_responsibility_id);
 

@@ -22,7 +22,6 @@ class GuardiansImport implements ToModel, WithStartRow
     */
     public function model(array $row)
     {
-        
         // Check for required fields
         if(empty($row[0]) || empty($row[2]) || empty($row[3])) return null;
 
