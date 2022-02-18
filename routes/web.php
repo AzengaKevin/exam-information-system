@@ -28,6 +28,7 @@ use App\Http\Controllers\PermissionsController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ResponsibilitiesController;
 use App\Http\Controllers\SettingsController;
+use App\Http\Controllers\StudentsSubjectsController;
 use App\Http\Controllers\TeachersResponsibilitiesController;
 use App\Http\Controllers\WelcomeController;
 
@@ -92,6 +93,9 @@ Route::group(['middleware' => ['auth']], function(){
   
     Route::resource('students', StudentsController::class)
         ->only(['index', 'show']);
+
+    Route::resource('students.subjects', StudentsSubjectsController::class)
+        ->only(['index']);
 
     Route::resource('exams', ExamsController::class)
         ->only(['index']);
