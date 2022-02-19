@@ -4,7 +4,7 @@
 
 @section('content')
 
-<livewire:users :trashed="$trashed" />
+<livewire:users :trashed="$trashed" :roleId="$roleId" />
 
 @endsection
 

@@ -1,4 +1,4 @@
-<div>
+<div class="row g-3">
     <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-md-0">
@@ -33,9 +33,18 @@
             @endif
         </div>
     </div>
-    <hr>
-    <x-feedback />
 
+    @if (!$trashed)        
+    <div class="d-flex flex-wrap gap-2">
+        @foreach ($roles as $role)
+        <a href="{{ route('users.index', ['role_id' => $role->id]) }}"
+            class="btn btn-outline-primary d-inline-flex gap-2 align-items-center">
+            <span>{{ $role->name }}</span>
+        </a>
+        @endforeach
+    </div>
+    @endif
+    <x-feedback />
     <div class="card">
         <div class="card-body">
             <div class="table-responsive">
@@ -67,7 +76,7 @@
                             <td>{{ ucfirst($user->authenticatable_type ?? 'Anonymous') }}</td>
                             <td>{{ $user->role->name }}</td>
                             <td>{{ $user->active ? 'True' : 'False' }}</td>
-                            <td>{{ $user->created_at->format('d/m/Y') }}</td>
+                            <td>{{ optional($user->created_at)->format('d/m/Y') }}</td>
                             <td>
                                 <div class="d-inline-flex gap-2 align-items-center">
                                     @if (!$trashed)

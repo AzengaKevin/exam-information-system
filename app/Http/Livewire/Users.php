@@ -4,9 +4,11 @@ namespace App\Http\Livewire;
 
 use App\Models\Role;
 use App\Models\User;
+use App\Services\RoleService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
@@ -29,20 +31,28 @@ class Users extends Component
     public $role_id;
 
     public $trashed = false;
+    public $currentRoleId;
 
     public $selectedUsers = [];
+
+    public User $currentUser;
 
     /**
      * Lifecycle method that excute onces when the component is mounting
      * 
      * @param mixed $trashed
      */
-    public function mount(string $trashed = null)
+    public function mount(RoleService $roleService, ?string $trashed = null, ?int $roleId = null)
     {
         $this->trashed = boolval($trashed);
 
-        $this->roles = $this->getAllRoles();
+        $this->currentUser = Auth::user();
 
+        $this->currentRoleId = $roleId;
+
+        $this->roles = $this->currentUser->isSuperAdmin()
+            ? $roleService->getAllRoles([], true)
+            : $roleService->getAllRoles();
     }
 
     /**
@@ -64,21 +74,15 @@ class Users extends Component
      */
     public function getPaginatedUsers()
     {
-        $usersQuery = User::visible();
+        $usersQuery = User::orderBy('name');
+
+        if(!$this->currentUser->isSuperAdmin()) $usersQuery->visible();
 
         if($this->trashed) $usersQuery->onlyTrashed();
 
-        return $usersQuery->paginate(24)->withQueryString();
-    }
+        if($this->currentRoleId) $usersQuery->role($this->currentRoleId);
 
-    /**
-     * Get all roles from the database
-     * 
-     * @return Collection
-     */
-    public function getAllRoles()
-    {
-        return Role::all(['id', 'name']);
+        return $usersQuery->paginate(24)->withQueryString();
     }
 
     /**

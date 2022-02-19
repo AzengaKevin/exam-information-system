@@ -49,7 +49,7 @@ class UsersManagementTest extends TestCase
 
         $response->assertViewIs('users.index');
 
-        $response->assertViewHasAll(['trashed']);
+        $response->assertViewHasAll(['trashed', 'roleId']);
 
         $response->assertSeeLivewire('users');
         

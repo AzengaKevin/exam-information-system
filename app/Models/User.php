@@ -164,4 +164,10 @@ class User extends Authenticatable implements MustVerifyEmail
         $query->whereNull('role_id')->orWhere('role_id', '!=', $diskusAdminRoleId);
     }
 
+    public function scopeRole($query, int $roleId)
+    {
+        $query->where('role_id', $roleId);
+        
+    }
+
 }

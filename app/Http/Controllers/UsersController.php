@@ -25,9 +25,11 @@ class UsersController extends Controller
     {
         $trashed = $request->trashed;
 
-        // if(boolval($trashed)) $this->authorize('viewTrashed', User::class);
+        $roleId = $request->role_id;
 
-        return view('users.index', compact('trashed'));
+        if(boolval($trashed)) $this->authorize('viewTrashed', User::class);
+
+        return view('users.index', compact('trashed', 'roleId'));
         
     }
 }
