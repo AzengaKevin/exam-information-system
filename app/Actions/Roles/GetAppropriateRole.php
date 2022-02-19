@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Roles;
+namespace App\Actions\Roles;
 
 use App\Models\Permission;
 use App\Models\Responsibility;

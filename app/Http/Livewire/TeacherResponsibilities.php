@@ -2,6 +2,7 @@
 
 namespace App\Http\Livewire;
 
+use App\Actions\Roles\GetAppropriateRole;
 use App\Models\Level;
 use App\Models\Teacher;
 use Livewire\Component;
@@ -13,7 +14,6 @@ use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Log;
 use App\Models\ResponsibilityTeacher;
 use App\Models\Subject;
-use App\Roles\GetAppropriateRole;
 use App\Settings\SystemSettings;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -110,6 +110,34 @@ class TeacherResponsibilities extends Component
         $this->currentResponsibility = $responsibility;
 
         $this->fields = $responsibility->requirements ?? [];
+
+        if($this->currentResponsibility->name === 'Class Teacher'){
+            
+            /** @var SystemSettings */
+            $systemSettings = app(SystemSettings::class);
+
+            if ($systemSettings->school_has_streams) {
+
+                $leveUnitIds = DB::table('responsibility_teacher')
+                    ->select(['level_unit_id'])->distinct('level_unit_id')
+                    ->where('responsibility_id', $this->currentResponsibility->id)
+                    ->pluck('level_unit_id')->all();
+
+                $this->levelUnitsToShow = $this->levelUnits->whereNotIn('id', $leveUnitIds);
+
+            }else{
+
+                $levelIds = DB::table('responsibility_teacher')
+                    ->select(['level_id'])
+                    ->distinct('level_id')
+                    ->where('responsibility_id', $this->currentResponsibility->id)
+                    ->pluck('level_id')->all();
+
+                $this->levelsToShow = $this->levels->whereNotIn('id', $levelIds);
+                
+            }
+        }
+
     }
 
     /**
