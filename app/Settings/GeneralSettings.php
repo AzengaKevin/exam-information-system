@@ -16,6 +16,7 @@ class GeneralSettings extends Settings
     public ?int $school_manager_responsibility_id;
     public ?int $exam_manager_responsibility_id;
     public bool $sms_notification_is_active;
+    public string $report_form_disclaimer;
 
     public static function group() : string
     {

@@ -227,6 +227,9 @@
                         <span>{{ $pComments[$studentScores->mg] ?? '-' }}</span>
                     </td>
                 </tr>
+                <tr>
+                    <td class="text-start text-secondary" style="padding: 1rem 0 1.5rem 0;">{{ $generalSettings->report_form_disclaimer }}</td>
+                </tr>
             </tbody>
         </table>
     </div>

@@ -247,10 +247,26 @@
 
                         <div class="col-md-6">
                             <div class="form-check">
-                                <input type="checkbox" name="general[sms_notification_is_active]" id="sms-notification-active" class="form-check-input"
-                                {{ (old('genenal.sms_notification_is_active') ?? $generalSettings->sms_notification_is_active) ? 'checked' : '' }}>
-                                <label for="sms-notification-active" class="form-check-label">SMS Notification Active</label>
+                                <input type="checkbox" name="general[sms_notification_is_active]"
+                                    id="sms-notification-active" class="form-check-input"
+                                    {{ (old('genenal.sms_notification_is_active') ?? $generalSettings->sms_notification_is_active) ? 'checked' : '' }}>
+                                <label for="sms-notification-active" class="form-check-label">SMS Notification
+                                    Active</label>
                             </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <label for="report-form-disclaimer" class="form-label">Report Form Disclaimer</label>
+                            <textarea name="general[report_form_disclaimer]" id="report-form-disclaimer" cols="30"
+                                rows="4"
+                                class="form-control @error('general.report_form_disclaimer') is-invalid @enderror">
+                                    {{ old('general.report_form_disclaimer') ?? $generalSettings->report_form_disclaimer }}
+                                </textarea>
+                            @error('general.report_form_disclaimer')
+                            <span class="invalid-feedback">
+                                <strong>{{ $message }}</strong>
+                            </span>
+                            @enderror
                         </div>
                     </div>
                 </div>
