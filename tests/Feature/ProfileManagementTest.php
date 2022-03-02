@@ -110,7 +110,7 @@ class ProfileManagementTest extends TestCase
 
         $payload = array(
             'current_password' => $password,
-            'password' => $newPassword = $this->faker->password(),
+            'password' => $newPassword = $this->faker->password(8),
             'password_confirmation' => $newPassword
         );
 
