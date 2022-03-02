@@ -69,8 +69,8 @@
                                             <i class="fa fa-cog"></i>
                                             <span>Manage Scores</span>
                                         </a>
-                                        @if (($responsibility->name == 'Class Teacher') && $exam->isPublished() &&
-                                        $generalSettings->sms_notification_is_active)
+                                        {{-- @if (($responsibility->name == 'Class Teacher') && $exam->isPublished() &&
+                                        $generalSettings->sms_notification_is_active) --}}
                                         <form action="{{ route('exams.results.send-message', [
                                             'exam' => $exam,
                                             'level-unit' => $responsibility->pivot->levelUnit->id,
@@ -83,7 +83,7 @@
                                                 <span>Send Results</span>
                                             </button>
                                         </form>
-                                        @endif
+                                        {{-- @endif --}}
                                     </div>
                                 </td>
                             </tr>
