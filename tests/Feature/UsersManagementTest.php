@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 
 class UsersManagementTest extends TestCase
 {
@@ -221,5 +222,23 @@ class UsersManagementTest extends TestCase
         
         $this->assertTrue(User::where('id', $user->id)->withTrashed()->doesntExist());
         
-    }    
+    }
+
+    /** @group users */
+    public function testAuthorizedUserCanResetUsersPassword()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::create(['name' => 'Users Update']));
+
+        /** @var User */
+        $user = User::factory()->create(['password' => $this->faker->password(8, 10)]);
+
+        Livewire::test(Users::class)->call('resetPassword', $user);
+
+        $credentials = ['phone' => $user->phone, 'password' => 'password'];
+
+        $this->assertTrue(Auth::attempt($credentials));
+        
+    }
 }

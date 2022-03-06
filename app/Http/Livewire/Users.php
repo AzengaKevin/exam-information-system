@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
@@ -360,6 +361,34 @@ class Users extends Component
             Log::error($exception->getMessage(), ['action' => __METHOD__]);
 
             $message = "User deletion failed";
+
+            if($exception instanceof AuthorizationException) $message = $exception->getMessage();
+            else App::environment('local') ? $exception->getMessage() : $message;
+
+            session()->flash('error', $exception);
+            
+        }
+    }
+
+    /**
+     * Resest the password for the specified user to password
+     * 
+     * @param User $user
+     */
+    public function resetPassword(User $user)
+    {
+        try {
+
+            $this->authorize('update', $user);
+            
+            if($user->update(['password' => Hash::make('password')]))
+                session()->flash('status', "{$user->name} password has been reset to password");
+
+        } catch (\Exception $exception) {
+            
+            Log::error($exception->getMessage(), ['action' => __METHOD__]);
+
+            $message = "Reseting user password failed, try again later";
 
             if($exception instanceof AuthorizationException) $message = $exception->getMessage();
             else App::environment('local') ? $exception->getMessage() : $message;
