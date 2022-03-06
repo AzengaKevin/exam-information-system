@@ -12,13 +12,19 @@
                     re-uploading the file in the form below</p>
                 <div class="mt-3">
                     <label for="file" class="form-label">Students Excel File</label>
-                    <input type="file" wire:model="studentsFile" id="file"
-                        class="form-control @error('studentsFile') is-invalid @enderror">
+                    <div class="input-group">
+                        <input type="file" wire:model="studentsFile" id="file"
+                            class="form-control @error('studentsFile') is-invalid @enderror">
+                        <span class="input-group-text" wire:loading wire:target="studentsFile"><i class="fa fa-spinner fa-spin"></i></span>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                <button type="button" wire:click="importStudents" class="btn btn-outline-primary">Upload</button>
+                <button type="button" wire:click="importStudents" class="btn btn-outline-primary d-inline-flex gap-1 align-items-center" wire:loading.attr="disabled">
+                    <i wire:loading wire:target="importStudents" class="fa fa-spinner fa-spin"></i>
+                    <span>Upload</span>
+                </button>
             </div>
         </div>
     </div>

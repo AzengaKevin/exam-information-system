@@ -180,9 +180,15 @@
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
                 @if(is_null($examId))
-                <button type="submit" wire:click="createExam" class="btn btn-outline-info">Create</button>
+                <button type="submit" wire:click="createExam" class="btn btn-outline-primary d-inline-flex gap-1 align-items-center">
+                    <i wire:loading class="fa fa-spinner fa-spin"></i>
+                    <span>Create</span>
+                </button>
                 @else
-                <button type="submit" wire:click="updateExam" class="btn btn-outline-info">Update</button>
+                <button type="submit" wire:click="updateExam" class="btn btn-outline-info d-inline-flex gap-1 align-items-center">
+                    <i wire:loading class="fa fa-spinner fa-spin"></i>
+                    <span>Update</span>
+                </button>
                 @endif
             </div>
         </div>

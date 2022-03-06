@@ -11,7 +11,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                <button type="submit" wire:click="downloadSpreadSheet" class="btn btn-outline-primary">Download</button>
+                <button type="submit" class="btn btn-outline-primary d-inline-flex gap-1">
+                    <i  wire:loading class="fa fa-spinner fa-spin"></i>
+                    <span>Download</span>
+                </button>
             </div>
         </div>
     </div>

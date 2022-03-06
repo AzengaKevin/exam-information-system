@@ -282,7 +282,7 @@ class Teachers extends Component
 
         $this->teacherId = $teacher->id;
 
-        $this->name = $teacher->auth->name;
+        $this->name = optional($teacher->auth)->name;
 
         $this->emit('show-delete-teacher-modal');
         

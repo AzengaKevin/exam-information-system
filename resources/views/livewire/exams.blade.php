@@ -89,12 +89,12 @@
                                     </button>
                                     <button wire:click="showEnrollLevelsModal({{ $exam }})"
                                         class="btn btn-sm btn-outline-secondary hstack gap-1 align-items-center">
-                                        <i class="fa fa-check"></i>
+                                        <i class="fa fa-cog"></i>
                                         <span>Levels</span>
                                     </button>
                                     <button wire:click="showEnrollSubjectsModal({{ $exam }})"
                                         class="btn btn-sm btn-outline-success hstack gap-1 align-items-center">
-                                        <i class="fa fa-check"></i>
+                                        <i class="fa fa-cog"></i>
                                         <span>Subjects</span>
                                     </button>
                                     @endcan

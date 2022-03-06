@@ -15,7 +15,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" data-bs-dismiss="modal" class="btn btn-outline-secondary">Cancel</button>
-                <button type="submit" wire:click="updateScoresTable" class="btn btn-outline-info">Update</button>
+                <button type="submit" wire:click="updateScoresTable" class="btn btn-outline-info">
+                    <i wire:loading class="fa fa-spinner fa-spin"></i>
+                    <span>Update</span>
+                </button>
             </div>
         </div>
     </div>
