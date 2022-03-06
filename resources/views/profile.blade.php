@@ -1,29 +1,29 @@
 @extends('layouts.app')
 
+@section('title', 'My Profile')
+
 @section('content')
 <div class="container">
-    <div class="row g-3 py-3">
-        <div class="col-md-5">
-            <h5 class="text-dark">Profile Photo</h5>
-            <p class="text-muted">Your profile picture is used within this application, it makes identification much easier for other users.</p>
+    <div class="row g-3">
+
+        <div class="col-md-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-md-0">
+                    <li class="breadcrumb-item"><a href="{{ route('welcome') }}">Welcome</a></li>
+                    <li class="breadcrumb-item"><a href="{{ route('home') }}">Home</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">My Profile</li>
+                </ol>
+            </nav>
         </div>
-        <div class="col-md-7">
+
+        <div class="col-md-6">
             <livewire:user-profile-photo :user="$user" />
         </div>
-        <hr class="my-3 my-md-5">
-        <div class="col-md-5">
-            <h5 class="text-dark">Profile Details</h5>
-            <p class="text-muted">Other than identification, some of the details in this section are essential for notification and instant communications. Make sure the details are verified where applicable.</p>
-        </div>
-        <div class="col-md-7">
+
+        <div class="col-md-6">
             <livewire:user-profile-information :user="$user" />
         </div>
-        <hr class="my-3 my-md-5">
-        <div class="col-md-5">
-            <h5 class="text-dark">Updated Password</h5>
-            <p class="text-muted">Ensure you are using a strong password to stay secure</p>
-        </div>
-        <div class="col-md-7">
+        <div class="col-md-6">
             <livewire:update-user-password :user="$user" />
         </div>
     </div>

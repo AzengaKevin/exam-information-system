@@ -1,6 +1,6 @@
-<div class="card h-100">
+<div class="card shadow-sm h-100">
     <div class="card-header bg-white">
-        <h5 class="card-title">Profile Photo</h5>
+        <h5 class="card-title my-0">Profile Photo</h5>
     </div>
     <div class="card-body">
         <div class="row g-3 align-items-center">
@@ -13,7 +13,7 @@
             </div>
             <div class="col-md-8">
                 <h6 class="h5">{{ $user->fresh()->name }}</h6>
-                <span class="text-muted">Joined in {{ $user->created_at->format("Y")}}</span>
+                <span class="text-muted">Joined in {{ optional($user->created_at)->format("Y")}}</span>
                 <hr>
             </div>
         </div>

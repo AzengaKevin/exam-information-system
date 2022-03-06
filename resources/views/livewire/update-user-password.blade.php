@@ -1,8 +1,12 @@
 <div>
-    <div class="card">
+    <div class="card shadow-sm h-100">
+
+    <div class="card-header bg-white">
+        <h5 class="card-title my-0">Change Password</h5>
+    </div>
         <div class="card-body">
             <div class="row g-3">
-                <div class="col-md-9">
+                <div class="col-md-12">
                     <div class="">
                         <label for="current-password" class="form-label">Current Password</label>
                         <input type="password" wire:model.lazy="current_password" id="current-password"
@@ -24,7 +28,7 @@
                         @enderror
                     </div>
                     <div class="mt-3">
-                        <label for="confirm-password" class="form-label">Confirma Password</label>
+                        <label for="confirm-password" class="form-label">Confirm Password</label>
                         <input type="password" wire:model.lazy="password_confirmation" id="confirm-password" class="form-control">
                     </div>
                     <div class="mt-3"><x-feedback /></div>

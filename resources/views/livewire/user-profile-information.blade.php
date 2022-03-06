@@ -1,4 +1,7 @@
-<div class="card h-100">
+<div class="card shadow-sm h-100">
+    <div class="card-header bg-white">
+        <h5 class="card-title my-0">Profile Information</h5>
+    </div>
     <div class="card-body">
         <div class="row g-3">
             <div class="col-md-12">
