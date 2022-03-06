@@ -30,6 +30,7 @@ use App\Http\Controllers\ResponsibilitiesController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\StudentsSubjectsController;
 use App\Http\Controllers\TeachersResponsibilitiesController;
+use App\Http\Controllers\User\MessagesController as UserMessagesController;
 use App\Http\Controllers\WelcomeController;
 
 /*
@@ -173,6 +174,10 @@ Route::group(['middleware' => ['auth']], function(){
 
     Route::patch('/settings/update', [SettingsController::class, 'update'])
         ->name('settings.update');
+
+    Route::group(['as' => 'user.', 'prefix' => 'user'], function(){
+        Route::resource('messages', UserMessagesController::class)->only(['index']);
+    });
 
     Route::resource('messages', MessagesController::class)->only(['index']);
 });

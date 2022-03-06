@@ -60,8 +60,8 @@
                             <td>{{ $loop->iteration }}</td>
                             <td>{{ optional($guardian->auth)->name }}</td>
                             <td>{{ optional($guardian->auth)->phone }}</td>
-                            <td>{{ $guardian->profession }}</td>
-                            <td>{{ $guardian->location }}</td>
+                            <td>{{ $guardian->profession ?? '-' }}</td>
+                            <td>{{ $guardian->location ?? '-' }}</td>
                             <td>
                                 <div class="d-inline-flex flex-wrap gap-2 align-items-center">
                                     @if (!$trashed)
