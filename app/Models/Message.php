@@ -10,6 +10,8 @@ class Message extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const PAGE_SIZE = 24;
+
     protected $fillable = [
         'sender_id',
         'recipient_id',

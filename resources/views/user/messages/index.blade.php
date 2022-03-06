@@ -4,30 +4,31 @@
 
 @section('content')
 
-<div class="row g-3">
-    <div class="col-md-12">
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb mb-md-0">
-                    <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Messages</li>
-                </ol>
-            </nav>
-            <div class="d-inline-flex flex-wrap gap-2">
-                <button data-bs-toggle="modal" data-bs-target="#send-bulk-sms"
-                    class="btn btn-outline-primary d-inline-flex gap-1 align-items-center">
-                    <i class="fa fa-paper-plane"></i>
-                    <span>Bulk Messages</span>
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-12">
-        <livewire:messages />
-        <livewire:bulk-messages.grouped-guardians />
-        <livewire:bulk-messages.randomized-guardians />
+<div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb mb-md-0">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Messages</li>
+        </ol>
+    </nav>
+    <div class="d-inline-flex flex-wrap gap-2">
+        <button data-bs-toggle="modal" data-bs-target="#upsert-message-modal"
+            class="btn btn-outline-primary d-inline-flex gap-1 align-items-center">
+            <i class="fa fa-paper-plane"></i>
+            <span>Message</span>
+        </button>
+        <button data-bs-toggle="modal" data-bs-target="#send-bulk-sms"
+            class="btn btn-outline-primary d-inline-flex gap-1 align-items-center">
+            <i class="fa fa-paper-plane"></i>
+            <span>Bulk Messages</span>
+        </button>
     </div>
 </div>
+<hr>
+
+<livewire:user-messages :user="Auth::user()" />
+<livewire:bulk-messages.grouped-guardians />
+<livewire:bulk-messages.randomized-guardians />
 
 @endsection
 
