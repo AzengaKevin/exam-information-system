@@ -58,7 +58,26 @@ class MessagesManagementTest extends TestCase
 
         $response->assertViewIs('messages.index');
 
-        $response->assertSeeLivewire('user-messages');
+        $response->assertSeeLivewire('messages');
+        
+    }
+
+    /** @group messages */
+    public function testAuthorizedUserCanVisitOwnMessagesPage()
+    {
+        $this->withoutExceptionHandling();
+        
+        Notification::fake();
+
+        Message::factory(2)->create(['sender_id' => $this->user->id]);
+
+        $response = $this->get(route('user.messages.index'));
+
+        $response->assertOk();
+
+        $response->assertViewIs('user.messages.index');
+
+        $response->assertSeeLivewire(UserMessages::class);
         
     }
 
