@@ -13,7 +13,7 @@
                     @endif
                 </ol>
             </nav>
-    
+
             <div class="d-inline-flex gap-2 align-items-center">
                 @can('bulkUpdate', \App\Models\User::class)
                 @if (count($selectedUsers ?? []))
@@ -68,7 +68,8 @@
                             @if ($users->count())
                             @foreach ($users as $user)
                             <tr>
-                                <td><input type="checkbox" class="form-check" wire:model="selectedUsers.{{ $user->id }}">
+                                <td><input type="checkbox" class="form-check"
+                                        wire:model="selectedUsers.{{ $user->id }}">
                                 </td>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $user->name }}</td>
@@ -77,45 +78,67 @@
                                 <td>{{ $user->role->name }}</td>
                                 <td>{{ $user->active ? 'True' : 'False' }}</td>
                                 <td>
-                                    <div class="d-inline-flex flex-wrap gap-2 align-items-center">
-                                        @if (!$trashed)
-                                        <button class="btn btn-sm btn-outline-primary hstack gap-1 align-items-center">
-                                            <i class="fa fa-eye"></i>
-                                            <span>Details</span>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm btn-outline-secondary" type="button"
+                                            id="manage-user-button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                            <span>Manage</span>
                                         </button>
-                                        <button wire:click="editUser({{ $user }})"
-                                            class="btn btn-sm btn-outline-info hstack gap-1 align-items-center">
-                                            <i class="fa fa-edit"></i>
-                                            <span>Edit</span>
-                                        </button>
-                                        <button wire:click="toggleUserActiveStatus({{ $user }})"
-                                            class="btn btn-sm btn-outline-{{ $user->active ? 'warning' : 'success' }} hstack gap-1 align-items-center">
-                                            <i class="fa fa-edit"></i>
-                                            <span>{{ $user->active ? 'Deativate' : 'Activate' }}</span>
-                                        </button>
-                                        <button wire:click="resetPassword({{ $user }})"
-                                            class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
-                                            <i class="fa fa-lock"></i>
-                                            <span>Reset</span>
-                                        </button>
-                                        <button wire:click="showDeleteUserModal({{ $user }})"
-                                            class="btn btn-sm btn-outline-danger hstack gap-1 align-items-center">
-                                            <i class="fa fa-trash-alt"></i>
-                                            <span>Delete</span>
-                                        </button>
-                                        @else
-                                        <button wire:click="restoreUser({{ $user->id }})"
-                                            class="btn btn-sm btn-success d-inline-flex gap-1 align-items-center">
-                                            <i class="fa fa-trash-restore-alt"></i>
-                                            <span>Restore</span>
-                                        </button>
-    
-                                        <button wire:click="destroyUser({{ $user->id }})"
-                                            class="btn btn-sm btn-danger d-inline-flex gap-1 align-items-center">
-                                            <i class="fa fa-trash-alt"></i>
-                                            <span>Delete</span>
-                                        </button>
-                                        @endif
+
+                                        <ul class="dropdown-menu dropdown-menu-start">
+                                            @if (!$trashed)
+                                            <li>
+                                                <a href="#"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-eye"></i>
+                                                    <span>Details</span>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <button wire:click="editUser({{ $user }})"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-edit"></i>
+                                                    <span>Edit</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button wire:click="toggleUserActiveStatus({{ $user }})"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-edit"></i>
+                                                    <span>{{ $user->active ? 'Deativate' : 'Activate' }}</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button wire:click="resetPassword({{ $user }})"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-lock"></i>
+                                                    <span>Reset</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button wire:click="showDeleteUserModal({{ $user }})"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-trash-alt"></i>
+                                                    <span>Delete</span>
+                                                </button>
+                                            </li>
+                                            @else
+                                            <li>
+                                                <button wire:click="restoreUser({{ $user->id }})"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-trash-restore-alt"></i>
+                                                    <span>Restore</span>
+                                                </button>
+                                            </li>
+                                            <li>
+                                                <button wire:click="destroyUser({{ $user->id }})"
+                                                    class="dropdown-item d-inline-flex gap-1 align-items-center text-muted">
+                                                    <i class="fa fa-trash-alt"></i>
+                                                    <span>Delete</span>
+                                                </button>
+                                            </li>
+                                            @endif
+                                        </ul>
                                     </div>
                                 </td>
                             </tr>
