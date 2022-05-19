@@ -117,6 +117,12 @@
                                         <i class="fa fa-edit"></i>
                                         <span>Edit</span>
                                     </button>
+
+                                    <button wire:click="archiveStudent({{ $student }})"
+                                        class="btn btn-sm btn-outline-warning d-inline-flex gap-1 align-items-center">
+                                        <i class="fa fa-archive"></i>
+                                        <span>Archive</span>
+                                    </button>
                                     @endcan
                                     @can('delete', $student)
                                     <button wire:click="showDeleteStudentModal({{ $student }})"

@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Models\Student;
 use Illuminate\Support\Facades\DB;
 
 class StudentRepository
@@ -67,6 +68,19 @@ class StudentRepository
 
         return $studentsQuery->get();
 
+    }
+
+    /**
+     * Rtrive a paginated list of students from the database
+     * 
+     * @return Paginator
+     */
+    public function findPaginated()
+    {
+        $studentQuery = Student::query();
+
+        return $studentQuery->paginate(Student::DEFAULT_PAGE_SIZE);
+        
     }
     
 }

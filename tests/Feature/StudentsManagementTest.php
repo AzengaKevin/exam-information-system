@@ -317,4 +317,27 @@ class StudentsManagementTest extends TestCase
         $this->assertTrue(Student::where('id', $student->id)->withTrashed()->doesntExist());
         
     }
+
+    /** @group students */
+    public function testAuthorizedUserCanArchiveAStudent()
+    {
+        $this->withoutExceptionHandling();
+
+        $this->role->permissions()->attach(Permission::firstOrCreate(['name' => 'Students Destroy']));
+
+        Student::factory()->count($studentCount = 3)->create();
+
+
+        /** @var Student */
+        $student = Student::inRandomOrder()->first();
+
+        $student->delete();
+
+        $this->assertSoftDeleted($student);
+
+        Livewire::test(Students::class)->call('archiveStudent', $student);
+        
+        $this->assertCount(($studentCount - 1), Student::all());
+        
+    }
 }

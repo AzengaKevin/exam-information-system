@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Scopes\ArchivedStudentScope;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -9,6 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Student extends Model
 {
     use HasFactory, SoftDeletes;
+
+    public const DEFAULT_PAGE_SIZE = 24;
 
     protected $fillable = [
         'adm_no',
@@ -23,12 +26,24 @@ class Student extends Model
         'stream_id',
         'level_unit_id',
         'upi',
-        'description'
+        'description',
+        'archived_at'
     ];
 
     protected $casts = [
-        'dob' => 'date:Y-m-d'
+        'dob' => 'date:Y-m-d',
+        'archived_at' => 'datetime:Y-m-d'
     ];
+
+    /**
+     * The booted method of the Student Model
+     * 
+     * @return void
+     */
+    public static function booted()
+    {
+        static::addGlobalScope(new ArchivedStudentScope);
+    }
 
     public function setAdmissionLevelIdAttribute($value)
     {
