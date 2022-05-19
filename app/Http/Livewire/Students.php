@@ -490,6 +490,18 @@ class Students extends Component
     }
 
     /**
+     * Archive student for the ones that have completed school
+     * 
+     * @param Student $student
+     */
+    public function archiveStudent(Student $student)
+    {
+        $student->update(["archived_at" => now()]);
+
+        session()->flash('statue', "The student has been archived");
+    }
+
+    /**
      * Export students as an excel sheet
      * 
      * @return mixed
